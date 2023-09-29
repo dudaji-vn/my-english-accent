@@ -6,6 +6,7 @@ function App(): JSX.Element {
   return (
     <Providers>
       <LoginScreen />
+      {/* <PauseIcon /> */}
     </Providers>
   );
 }
