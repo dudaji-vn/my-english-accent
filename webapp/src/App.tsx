@@ -5,6 +5,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import ManagerData from './shared/utils/manageData.util';
 
 function App() {
+  ManagerData.setToken('fake-token')
   const token = ManagerData.getToken();
   const routing = useRoutes(routes(!!token));
   return (
