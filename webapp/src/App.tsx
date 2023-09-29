@@ -1,24 +1,21 @@
-import React, { useState } from 'react';
-import './App.css';
 import { useRoutes } from 'react-router-dom';
 import routes from './routers';
+import theme from './shared/theme/theme';
+import { ThemeProvider } from '@mui/material/styles';
+import ManagerData from './shared/utils/manageData.util';
 
 function App() {
-  // const { isLoggedIn } = useSelector((state) => state.auth);
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const routing = useRoutes(routes(isLoggedIn));
+  const token = ManagerData.getToken();
+  const routing = useRoutes(routes(!!token));
   return (
-    <>
+    <ThemeProvider theme={theme}>
       {routing}
-      <button onClick={() => {
-        setIsLoggedIn(!isLoggedIn)
-      }}>
-        {!isLoggedIn ? 'Log in' : 'Log out'}
-      </button>
-    </>
+    </ThemeProvider>
   );
 }
 
 export default App;
+
+
 
 
