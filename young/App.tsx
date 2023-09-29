@@ -1,6 +1,7 @@
-import {SafeAreaView, Text, useColorScheme} from 'react-native';
+import {SafeAreaView, useColorScheme} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import LoginScreen from './src/features/auth/screens/login-screen';
 import React from 'react';
 
 function App(): JSX.Element {
@@ -12,7 +13,7 @@ function App(): JSX.Element {
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <Text>My English Accent</Text>
+      <LoginScreen />
     </SafeAreaView>
   );
 }
