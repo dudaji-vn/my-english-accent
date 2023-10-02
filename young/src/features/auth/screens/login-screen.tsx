@@ -1,6 +1,6 @@
-import {Image, Text, View} from 'react-native';
+import {Box, Button, Text, View} from 'native-base';
 
-import {GoogleSigninButton} from '@react-native-google-signin/google-signin';
+import {Logo} from '../../../components/icons';
 import React from 'react';
 import {User} from '../../../types/user';
 import {googleLogin} from '../login/google-login';
@@ -28,20 +28,17 @@ export default function LoginScreen() {
     return user;
   };
   return (
-    <View>
-      <GoogleSigninButton
-        size={GoogleSigninButton.Size.Wide}
-        color={GoogleSigninButton.Color.Dark}
-        onPress={onGoogleButtonPress}
-      />
-      <View>
-        <Image
-          style={{width: 50, height: 50}}
-          source={{uri: userInfo.avatar}}
-        />
-        <Text>{userInfo.name}</Text>
-        <Text>{userInfo.email}</Text>
-      </View>
+    <View
+      bg="highlight"
+      height="full"
+      justifyContent="center"
+      alignItems="center">
+      <Box alignItems="center">
+        <Logo />
+        <Button rounded="lg" mt="10" onPress={onGoogleButtonPress} bg="white">
+          <Text>Sign in with Google account </Text>
+        </Button>
+      </Box>
     </View>
   );
 }
