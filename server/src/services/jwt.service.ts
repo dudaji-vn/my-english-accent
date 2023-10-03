@@ -10,7 +10,7 @@ export default class JwtService {
     }
     return jwt.sign(payload, tokenSecret, {
       algorithm: 'HS256',
-      expiresIn: '10d'
+      expiresIn: '30d'
     })
   }
 }
