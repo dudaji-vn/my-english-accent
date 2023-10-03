@@ -2,55 +2,66 @@ import bcrypt from 'bcrypt'
 import { injectable } from 'tsyringe'
 import UserModel from '../entities/User'
 import {
-  IUserRegisterRequestDTO,
-  IUserRequestDTO
+  IUserRegisterDTO,
+  IUserLoginDTO
 } from '../interfaces/dto/UserDTO'
 import JwtService from './jwt.service'
+import { UnAuthorizeError } from '../interfaces/dto/Error'
 @injectable()
 export default class AuthService {
   constructor(private jwtService: JwtService) {}
-  async login(userDto: IUserRequestDTO): Promise<string> {
-    const { username, password } = userDto
+  checkFieldsExist(
+    user: IUserRegisterDTO,
+    fields: string[]
+  ): boolean {
+    return fields.every((field) => user?.hasOwnProperty(field))
+  }
+  async login(userDto: IUserLoginDTO): Promise<string> {
+    const { userId, email } = userDto
 
-    if (!username || !password) {
-      throw new Error('username or password not found')
+    if (!userId || !email) {
+      throw new UnAuthorizeError('user is not register')
     }
 
     const user = await UserModel.findOne({
-      username: username
+      email: email,
+      userId: userId
     })
 
     if (!user) {
-      throw new Error('username not found')
-    }
-    const isMatch = await bcrypt.compare(password, user.password)
-    if (!isMatch) {
-      throw new Error('username or password not correct')
+      throw new UnAuthorizeError('username not found')
     }
 
-    const payload = { userId: user._id, username: username }
+    const payload = { userId: user._id, email: email }
     const token = this.jwtService.generateAccessToken(payload)
     return token
   }
-  async register(userDto: IUserRegisterRequestDTO): Promise<string> {
-    const { username, password, confirmPassword } = userDto
-    if (!username || !password || !confirmPassword) {
+  async register(userDto: IUserRegisterDTO): Promise<string> {
+    const { email } = userDto
+    const requiredFields = [
+      'userId',
+      'avatar',
+      'email',
+      'department',
+      'displayName',
+      'fullName',
+      'nativeLanguage',
+      'role'
+    ]
+    if (!this.checkFieldsExist(userDto, requiredFields)) {
       throw new Error('Please input all fields')
     }
-    if (password !== confirmPassword) {
-      throw new Error('Confirm password not match with password')
-    }
-    const isExistUser = await UserModel.exists({ username: username })
+
+    const isExistUser = await UserModel.exists({ email: email })
     if (isExistUser) {
-      throw new Error('username is existed')
+      throw new Error('email is existed')
     }
-    const passwordHash = await bcrypt.hash(password, 12)
+
     const user = new UserModel({
-      username: username,
-      password: passwordHash
+      ...userDto
     })
     await user.save()
-    const payload = { userId: user._id, username: username }
+    const payload = { userId: user._id, email: email }
     const token = this.jwtService.generateAccessToken(payload)
     return token
   }

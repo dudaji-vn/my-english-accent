@@ -1,20 +1,25 @@
 
 // Login
-POST  http://localhost:5000/api/auth/login
+POST  http://10.0.100.81:5000/api/auth/login
 Content-Type:  application/json
 
 {
-    "username":"test1",
-    "password":"111111"
+    "email":"user@example.com",
+    "userId":"123"
 }
 
 
 ###
-POST  http://localhost:5000/api/auth/register
+POST  http://10.0.100.81:5000/api/auth/register
 Content-Type:  application/json
 
 {
-    "username":"test6",
-    "password":"111111",
-    "confirmPassword":"111111"
+  "userId": "123",
+  "avatar": "avatar.jpg",
+  "email": "user@example.com",
+  "department": "HR",
+  "displayName": "John",
+  "fullName": "John Doe",
+  "nativeLanguage": "English",
+  "role": "Employee"
 }
