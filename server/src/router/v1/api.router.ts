@@ -5,7 +5,7 @@ import userRouter from './user.router'
 
 const apiRouterV1 = express.Router()
 
-const listGroupApi = [
+const listApi = [
   {
     path: PATH.auth,
     router: authRouter
@@ -15,7 +15,7 @@ const listGroupApi = [
     router: userRouter
   }
 ]
-listGroupApi.forEach((item) => {
+listApi.forEach((item) => {
   apiRouterV1.use(item.path, item.router)
 })
 

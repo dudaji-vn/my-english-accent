@@ -33,9 +33,9 @@ const auth = async (
     next()
   } catch (err) {
     if (err instanceof Error) {
-      return res.error(err.message, err.stack, 401)
+      return res.error(401, err.message, err.stack)
     }
-    return res.error('Uncaught Error in auth middleware', '', 401)
+    return res.error(401, 'Uncaught Error in auth middleware', '')
   }
 }
 

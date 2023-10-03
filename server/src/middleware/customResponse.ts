@@ -11,9 +11,9 @@ function customResponse(res: IResponse): Response {
 
   // Add an error method
   res.error = function (
+    statusCode: number = 500,
     message: string,
-    messageDetail: string = '',
-    statusCode: number = 500
+    messageDetail: string = ''
   ) {
     return res.status(statusCode || 500).json({
       status: 'error',
