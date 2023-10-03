@@ -45,8 +45,7 @@ export default class AuthService {
       'department',
       'displayName',
       'fullName',
-      'nativeLanguage',
-      'role'
+      'nativeLanguage'
     ]
     if (!this.checkFieldsExist(userDto, requiredFields)) {
       throw new Error('Please input all fields')
