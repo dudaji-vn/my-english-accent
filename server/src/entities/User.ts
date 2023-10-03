@@ -23,17 +23,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    department: {
-      type: String,
-      required: true
-    },
     role: {
-      type: String,
-      required: true
+      type: String
     },
     avatar: {
-      type: String,
-      required: true
+      type: String
     }
   },
   {
