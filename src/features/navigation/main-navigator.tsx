@@ -5,12 +5,13 @@ import {
   MicrophoneIcon,
 } from '../../components/icons';
 
-import {ListenScreen} from '../listen/screens';
-import {Navbar} from '../../components/navbar';
-import React from 'react';
-import {SCREEN_NAMES} from '../../constants/screen';
-import {StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import React from 'react';
+import {StyleSheet} from 'react-native';
+import {Navbar} from '../../components/navbar';
+import {SCREEN_NAMES} from '../../constants/screen';
+import {ListenScreen} from '../listen/screens';
+import SettingsScreen from '../settings/screens/settings-screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -36,7 +37,15 @@ export const MainNavigator = () => {
       <Tab.Screen name={SCREEN_NAMES.listen} component={ListenScreen} />
       <Tab.Screen name={SCREEN_NAMES.record} component={ListenScreen} />
       <Tab.Screen name={SCREEN_NAMES.game} component={ListenScreen} />
-      <Tab.Screen name={SCREEN_NAMES.settings} component={ListenScreen} />
+      <Tab.Screen
+        options={{
+          headerShown: true,
+          headerShadowVisible: false,
+          title: 'Setting',
+        }}
+        name={SCREEN_NAMES.settings}
+        component={SettingsScreen}
+      />
     </Tab.Navigator>
   );
 };
