@@ -1,12 +1,15 @@
+import React from 'react';
 import {Navigation} from './src/features/navigation';
 import Providers from './src/providers/providers';
-import React from 'react';
+import Stores from './src/redux/stores';
 
 function App(): JSX.Element {
   return (
-    <Providers>
-      <Navigation />
-    </Providers>
+    <Stores>
+      <Providers>
+        <Navigation />
+      </Providers>
+    </Stores>
   );
 }
 

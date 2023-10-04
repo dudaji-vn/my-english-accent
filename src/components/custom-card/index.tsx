@@ -3,34 +3,42 @@ import {
   GestureResponderEvent,
   Image,
   ImageSourcePropType,
+  StyleProp,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 import {colors} from '../../consts';
 
 interface ICountryCardProps {
   source?: ImageSourcePropType;
   title?: string;
-  containerStyle?: any;
-  imageStyle?: any;
+  containerStyle?: StyleProp<ViewStyle> | undefined;
+  cardImageStyle?: StyleProp<ViewStyle> | undefined;
   onPress?: ((event: GestureResponderEvent) => void) | undefined;
+  isActive?: boolean;
 }
 
 const CustomCard = (props: ICountryCardProps) => {
-  const {source, containerStyle, imageStyle, title, onPress} = props;
+  const {source, containerStyle, cardImageStyle, title, onPress, isActive} =
+    props;
 
   return (
     <View style={[styles.wrapper, containerStyle]}>
       {source && (
         <TouchableOpacity
           onPress={onPress}
-          style={[styles.cardImage, imageStyle]}
+          style={[
+            styles.cardImage,
+            cardImageStyle,
+            isActive && styles.cardActive,
+          ]}
           accessibilityRole="button">
           <Image
             source={source}
-            style={{flex: 1, width: '100%', height: '100%'}}
+            style={{width: '100%', height: '100%'}}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -48,14 +56,24 @@ const styles = StyleSheet.create({
   cardImage: {
     backgroundColor: colors.lighterBackground,
     borderRadius: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingVertical: 40,
     marginBottom: 4,
-    width: 100,
     height: 160,
+    width: '100%',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    shadowColor: '#161616',
+    elevation: 4,
+  },
+  cardActive: {
+    borderColor: colors.highlight,
+    borderWidth: 2,
   },
   textContainer: {
     alignItems: 'center',
+    color: colors.text,
   },
 });
 

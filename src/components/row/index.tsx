@@ -13,8 +13,8 @@ const Row: React.FC<RowProps> = ({children, rowStyle}) => {
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
+    alignItems: 'stretch',
     justifyContent: 'space-between',
-    alignItems: 'center',
   },
 });
 

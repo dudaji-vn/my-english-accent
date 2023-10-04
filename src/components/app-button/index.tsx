@@ -17,6 +17,7 @@ interface AppButtonProps {
   textStyle?: TextStyle;
   type: TypeButton;
   fullWidth?: boolean;
+  disabled?: boolean;
 }
 
 const AppButton: FC<AppButtonProps> = ({
@@ -26,6 +27,7 @@ const AppButton: FC<AppButtonProps> = ({
   textStyle,
   fullWidth,
   type = 'highlight',
+  disabled,
 }) => {
   const getTypeButton = (type: TypeButton) => {
     switch (type) {
@@ -53,11 +55,13 @@ const AppButton: FC<AppButtonProps> = ({
   };
   return (
     <TouchableOpacity
+      disabled={disabled}
       style={[
         getTypeButton(type),
         styles.button,
         buttonStyle,
         fullWidth && {width: '100%'},
+        disabled && {backgroundColor: '#bdd0f6'},
       ]}
       onPress={onPress}>
       <Text style={[getTypeText(type), textStyle]}>{title}</Text>
@@ -86,7 +90,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonTextHighLight: {
-    color: 'white',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
