@@ -1,63 +1,22 @@
-import {
-  CogIcon,
-  GamepadIcon,
-  HeadphoneIcon,
-  MicrophoneIcon,
-} from '../../components/icons';
-
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {BottomNavigator} from './bottom-navigator';
 import React from 'react';
-import {StyleSheet} from 'react-native';
-import {Navbar} from '../../components/navbar';
 import {SCREEN_NAMES} from '../../constants/screen';
-import {ListenScreen} from '../listen/screens';
-import SettingsScreen from '../settings/screens/settings-screen';
-
-const Tab = createBottomTabNavigator();
-
-type RouteIconsMap = {
-  [key: string]: React.FC;
-};
-const routeIconsMap = {
-  listen: HeadphoneIcon,
-  record: MicrophoneIcon,
-  game: GamepadIcon,
-  settings: CogIcon,
-} as RouteIconsMap;
+import {SettingNavigator} from './settings-navigator';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
 
 export const MainNavigator = () => {
   return (
-    <Tab.Navigator
-      screenOptions={({}) => ({
+    <Stack.Navigator
+      screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
-        tabBarStyle: styles.tabBarStyle,
-      })}
-      tabBar={props => <Navbar routeIconsMap={routeIconsMap} {...props} />}>
-      <Tab.Screen name={SCREEN_NAMES.listen} component={ListenScreen} />
-      <Tab.Screen name={SCREEN_NAMES.record} component={ListenScreen} />
-      <Tab.Screen name={SCREEN_NAMES.game} component={ListenScreen} />
-      <Tab.Screen
-        options={{
-          headerShown: true,
-          headerShadowVisible: false,
-          title: 'Setting',
-        }}
-        name={SCREEN_NAMES.settings}
-        component={SettingsScreen}
+        headerShadowVisible: false,
+      }}>
+      <Stack.Screen name="bottom-navigator" component={BottomNavigator} />
+      <Stack.Screen
+        name={SCREEN_NAMES.settingsNavigator}
+        component={SettingNavigator}
       />
-    </Tab.Navigator>
+    </Stack.Navigator>
   );
 };
-
-const styles = StyleSheet.create({
-  tabBarStyle: {
-    position: 'absolute',
-    backgroundColor: 'transparent',
-    borderTopWidth: 0,
-    bottom: 0,
-    right: 0,
-    left: 0,
-    height: 58,
-  },
-});
