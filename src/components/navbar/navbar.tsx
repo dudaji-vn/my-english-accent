@@ -13,14 +13,16 @@ export const Navbar = ({
 }: BottomTabBarProps & {routeIconsMap: {[key: string]: React.FC}}) => {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const positionLeft = React.useRef(new Animated.Value(0)).current;
+
   React.useEffect(() => {
+    const toValue = -4 + 96 * activeIndex + 2 * activeIndex;
     Animated.spring(positionLeft, {
-      toValue: 9.5 + 90 * activeIndex,
+      toValue: toValue,
       useNativeDriver: true,
     }).start();
   }, [activeIndex, positionLeft]);
   return (
-    <View position="absolute" bottom={0} left={0} right={0}>
+    <View position="absolute" bottom={0} left={0} right={0} height={16}>
       <HStack justifyContent="space-between" position="relative">
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
@@ -58,6 +60,7 @@ export const Navbar = ({
         <Animated.View
           // eslint-disable-next-line react-native/no-inline-styles
           style={{
+            left: 0,
             position: 'absolute',
             transform: [{translateX: positionLeft}],
           }}>
