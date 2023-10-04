@@ -1,9 +1,9 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React from 'react';
-import {screenConfig} from '../../configs/screen-config';
-import LoginScreen from '../auth/screens/login-screen';
-import FirstLoginScreen from '../auth/screens/first-login-screen';
+import {SCREEN_NAMES} from '../../constants/screen';
 import {useRootSelector} from '../../redux/reducers';
+import FirstLoginScreen from '../auth/screens/first-login-screen';
+import LoginScreen from '../auth/screens/login-screen';
 const Stack = createNativeStackNavigator();
 
 export const AuthStack = () => {
@@ -13,9 +13,9 @@ export const AuthStack = () => {
   }
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name={screenConfig.name.login} component={LoginScreen} />
+      <Stack.Screen name={SCREEN_NAMES.login} component={LoginScreen} />
       <Stack.Screen
-        name={screenConfig.name.firstLogin}
+        name={SCREEN_NAMES.firstLogin}
         component={FirstLoginScreen}
       />
     </Stack.Navigator>

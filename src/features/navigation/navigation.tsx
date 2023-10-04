@@ -1,4 +1,4 @@
-import {MainStack} from './main-stack';
+import {MainNavigator} from './main-navigator';
 import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {AuthStack} from './auth-stack';
@@ -42,7 +42,7 @@ export function Navigation() {
   return (
     <NavigationContainer>
       {!initialRender &&
-        (user?.isAuthenticated ? <MainStack /> : <AuthStack />)}
+        (user?.isAuthenticated ? <MainNavigator /> : <AuthStack />)}
     </NavigationContainer>
   );
 }
