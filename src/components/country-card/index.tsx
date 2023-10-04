@@ -6,16 +6,21 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
+  GestureResponderEvent,
 } from 'react-native';
 interface ICountryCard {
   source: ImageSourcePropType;
   country: 'Korea' | 'VietNam';
+  onPress?: ((event: GestureResponderEvent) => void) | undefined;
 }
 const CountryCard = (props: ICountryCard) => {
-  const {source, country} = props;
+  const {source, country, onPress} = props;
   return (
     <View style={styles.wrapper}>
-      <TouchableOpacity style={styles.cardImage} accessibilityRole="button">
+      <TouchableOpacity
+        onPress={onPress}
+        style={styles.cardImage}
+        accessibilityRole="button">
         <Image source={source} style={styles.image} />
       </TouchableOpacity>
       <Text>{country}</Text>
