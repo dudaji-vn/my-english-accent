@@ -1,31 +1,54 @@
+import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {Box, Button, Text, View} from 'native-base';
-
-import {Logo} from '../../../components/icons';
 import React from 'react';
-import {User} from '../../../types/user';
+import {Logo} from '../../../components/icons';
+import {IUserLoginDTO} from '../../../interfaces/api/Auth';
+import {authService} from '../../../services/auth.service';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useDispatch} from 'react-redux';
+import {keyStorage} from '../../../consts';
+import {setIsAuthenticate, setUser} from '../../../redux/reducers/user.reducer';
 import {googleLogin} from '../login/google-login';
 
 export default function LoginScreen() {
-  const [userInfo, setUserInfo] = React.useState<User>({} as User);
-  const onGoogleButtonPress = async (): Promise<User> => {
-    const googleUser = await googleLogin();
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+  const dispatch = useDispatch();
 
-    // main flow login
-    //- check user in db(firebase) by googleUser uid
-    // -> if not exist(mean first login) -> redirect to first login screen
-    // -> if exist -> redirect to home screen
+  const onGoogleButtonPress = async () => {
+    try {
+      const googleUser = await googleLogin();
 
-    // temp for testing
-    const user: User = {
-      id: googleUser.uid,
-      name: googleUser.displayName || '',
-      displayName: googleUser.displayName || '',
-      email: googleUser.email!,
-      avatar: googleUser.photoURL || '',
-      firstLanguage: 'vi',
-    };
-    setUserInfo(user);
-    return user;
+      if (googleUser.email! && googleUser.uid) {
+        dispatch(
+          setUser({
+            email: googleUser.email,
+            avatar: googleUser.photoURL,
+            userId: googleUser.uid,
+          }),
+        );
+        const userRequest: IUserLoginDTO = {
+          email: googleUser.email,
+          userId: googleUser.uid,
+        };
+        authService
+          .login(userRequest)
+          .then(token => {
+            dispatch(setIsAuthenticate(true));
+            AsyncStorage.setItem(keyStorage.accessToken, token);
+            console.log('login success');
+            console.log(token);
+          })
+          .catch(err => {
+            navigation.navigate('firstLogin');
+            console.log(err.message);
+          });
+      }
+    } catch (err) {
+      console.log('Error authentication');
+      console.log(err);
+    }
   };
   return (
     <View
@@ -36,7 +59,7 @@ export default function LoginScreen() {
       <Box alignItems="center">
         <Logo />
         <Button rounded="lg" mt="10" onPress={onGoogleButtonPress} bg="white">
-          <Text>Sign in with Google account </Text>
+          <Text>Sign in with Google account</Text>
         </Button>
       </Box>
     </View>
