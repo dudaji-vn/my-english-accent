@@ -20,7 +20,7 @@ export const SettingNavigator = () => (
               },
               {
                 name: SCREEN_NAMES.settingsProfile,
-                displayName: 'Edit Profile',
+                displayName: 'Edit profile',
               },
             ]}
           />
