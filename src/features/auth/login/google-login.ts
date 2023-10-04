@@ -1,9 +1,9 @@
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
+import {googleClientId} from '../../../configs';
 GoogleSignin.configure({
-  webClientId:
-    '87150114919-c8fv6vqb433lcmb3n6vc92d2q5688nd4.apps.googleusercontent.com',
+  webClientId: googleClientId,
 });
 export const googleLogin = async (): Promise<FirebaseAuthTypes.User> => {
   // Check if your device supports Google Play

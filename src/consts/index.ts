@@ -11,4 +11,5 @@ export const colors = {
   darkerBackground: '#f2f2f2',
   lighterBackground: '#fcfcfc',
   error: '#ff4040',
+  text: '#333333',
 };

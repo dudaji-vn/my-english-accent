@@ -1,93 +1,265 @@
-import {Button} from 'native-base';
 import * as React from 'react';
-import {FC, useState} from 'react';
+import {Dispatch, FC, SetStateAction, useEffect, useState} from 'react';
 import {StatusBar, StyleSheet, Text, TextInput, View} from 'react-native';
-import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
-import CountryCard from '../../../components/country-card';
-import {colors} from '../../../consts';
-import commonStyles from '../../../styles/common';
+import {Route, SceneRendererProps, TabView} from 'react-native-tab-view';
 import AppButton from '../../../components/app-button';
+import CountryCard from '../../../components/country-card';
+import CustomCard from '../../../components/custom-card';
+import CustomTabBar from '../../../components/custom-library/CustomTabBar';
+import Row from '../../../components/row';
+import {colors, keyStorage} from '../../../consts';
+import {IUserRegisterDTO} from '../../../interfaces/api/Auth';
+import {useRootSelector} from '../../../redux/reducers';
+import {authService} from '../../../services/auth.service';
+import commonStyles from '../../../styles/common';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
+import {setIsAuthenticate} from '../../../redux/reducers/user.reducer';
+interface IRouteProps {
+  jumpTo: (key: string) => void;
+  userData: IUserRegisterDTO;
+  setUserData: Dispatch<SetStateAction<IUserRegisterDTO>>;
+}
+const FirstRoute = (props: IRouteProps) => {
+  const {jumpTo, userData, setUserData} = props;
 
-const FirstRoute = () => (
-  <View style={[styles.container]}>
-    <Text style={{marginTop: 60, fontSize: 32}}>Hi, your full name is</Text>
+  return (
+    <View style={[styles.container]}>
+      <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
+        Hi, your
+        <Text style={commonStyles.textHightLight}> full name</Text> is
+      </Text>
+      <View style={[commonStyles.marginBottom60, {marginTop: 60}]}>
+        <TextInput
+          onChangeText={value => {
+            setUserData(prev => {
+              return {
+                ...prev,
+                fullName: value,
+              };
+            });
+          }}
+          value={userData.fullName}
+          placeholder="ex: Jonas Brothers"
+          style={styles.inputText}
+        />
+      </View>
 
-    <View style={{marginTop: 60}}>
-      <TextInput placeholder="ex: Jonas Brothers" style={styles.inputText} />
-    </View>
-
-    <Button style={styles.button} flexDirection={'row'} bg="highlight">
-      <Text style={{color: '#fff'}}>Next step</Text>
-    </Button>
-  </View>
-);
-
-const SecondRoute = () => (
-  <View style={[styles.container]}>
-    <Text style={{marginTop: 60, fontSize: 32}}>
-      How’s about your nick name?
-    </Text>
-
-    <View style={{marginTop: 60}}>
-      <TextInput placeholder="ex: Jonas Brothers" style={styles.inputText} />
-    </View>
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 16,
-        justifyContent: 'center',
-      }}>
       <AppButton
-        type="transparent"
-        title="Back"
-        buttonStyle={{
-          width: '40%',
-          borderWidth: 1,
-          borderColor: colors.primary,
-        }}
-      />
-
-      <AppButton
+        title="Next step"
         type="highlight"
-        title="Save"
-        buttonStyle={{width: '40%', borderColor: colors.primary}}
+        disabled={!userData.fullName}
+        onPress={() => {
+          jumpTo('second');
+        }}
+        fullWidth
+        buttonStyle={[commonStyles.marginTop160]}
       />
     </View>
-  </View>
-);
+  );
+};
 
-const ThirdRoute = () => (
-  <View style={[styles.container]}>
-    <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
-      Where’s you
-      <Text style={commonStyles.textHightLight}> come from</Text> ?
-    </Text>
+const SecondRoute = (props: IRouteProps) => {
+  const {jumpTo, userData, setUserData} = props;
+  return (
+    <View style={[styles.container]}>
+      <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
+        How’s about your
+        <Text style={commonStyles.textHightLight}> nick name</Text> ?
+      </Text>
 
-    <View
-      style={{
-        gap: 12,
-        alignItems: 'center',
-        flexDirection: 'row',
-      }}>
-      <CountryCard
-        country="Korea"
-        source={require('../../../assets/images/KoreanFlagIcon.png')}
-      />
-      <CountryCard
-        country="VietNam"
-        source={require('../../../assets/images/VietNamFlagIcon.png')}
-      />
+      <View>
+        <TextInput
+          maxLength={16}
+          value={userData.displayName}
+          onChangeText={value => {
+            setUserData(prev => {
+              return {
+                ...prev,
+                displayName: value,
+              };
+            });
+          }}
+          placeholder="ex: Jonas Brothers"
+          style={styles.inputText}
+        />
+        <Text style={commonStyles.textNote}>(Limit 16 characters)</Text>
+      </View>
+      <Row rowStyle={[{gap: 16, marginTop: 214}]}>
+        <AppButton
+          onPress={() => jumpTo('first')}
+          type="transparent"
+          title="Back"
+        />
+        <AppButton
+          disabled={!userData.displayName}
+          onPress={() => jumpTo('third')}
+          type="highlight"
+          title="Next"
+        />
+      </Row>
     </View>
-  </View>
-);
-const FourRoute = () => (
-  <View style={[styles.container]}>
-    <Text>Your current role is?</Text>
-  </View>
-);
+  );
+};
+
+const ThirdRoute = (props: IRouteProps) => {
+  const {jumpTo, userData, setUserData} = props;
+  return (
+    <View style={[styles.container]}>
+      <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
+        Where’re you
+        <Text style={commonStyles.textHightLight}> come from</Text> ?
+      </Text>
+      <View
+        style={[
+          {
+            gap: 12,
+            alignItems: 'center',
+            flexDirection: 'row',
+            marginBottom: 120,
+          },
+        ]}>
+        <CountryCard
+          isActive={userData.nativeLanguage === 'Korea'}
+          onPress={() => {
+            setUserData(prev => {
+              return {
+                ...prev,
+                nativeLanguage: 'Korea',
+              };
+            });
+          }}
+          country="Korea"
+          source={require('../../../assets/images/KoreanFlagIcon.png')}
+        />
+        <CountryCard
+          isActive={userData.nativeLanguage === 'VietNam'}
+          onPress={() => {
+            setUserData(prev => {
+              return {
+                ...prev,
+                nativeLanguage: 'VietNam',
+              };
+            });
+          }}
+          country="VietNam"
+          source={require('../../../assets/images/VietNamFlagIcon.png')}
+        />
+      </View>
+      <Row rowStyle={{gap: 10}}>
+        <AppButton
+          onPress={() => jumpTo('second')}
+          type="transparent"
+          title="Back"
+        />
+        <AppButton
+          onPress={() => jumpTo('four')}
+          type="highlight"
+          title="Next"
+        />
+      </Row>
+    </View>
+  );
+};
+const FourRoute = (props: IRouteProps) => {
+  const {jumpTo, userData, setUserData} = props;
+  const dispatch = useDispatch();
+  const allRoles = [
+    {
+      title: 'Developer',
+      image: require('../../../assets/images/Dev.png'),
+    },
+    {
+      title: 'Designer',
+      image: require('../../../assets/images/Designer.png'),
+    },
+    {
+      title: 'Others',
+      image: require('../../../assets/images/Other.png'),
+    },
+  ];
+  return (
+    <View style={[styles.container]}>
+      <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
+        Your
+        <Text style={commonStyles.textHightLight}> current role</Text> is ?
+      </Text>
+
+      <Row rowStyle={[{gap: 10, marginBottom: 170, flexDirection: 'row'}]}>
+        {allRoles.map((item, index) => {
+          return (
+            <CustomCard
+              isActive={userData.role === allRoles[index].title}
+              containerStyle={{flex: 1}}
+              onPress={() => {
+                setUserData(prev => {
+                  return {
+                    ...prev,
+                    role: allRoles[index].title,
+                  };
+                });
+              }}
+              key={index}
+              source={item.image}
+              title={item.title}
+            />
+          );
+        })}
+      </Row>
+
+      <Row rowStyle={{gap: 16}}>
+        <AppButton
+          onPress={() => jumpTo('third')}
+          type="transparent"
+          title="Back"
+        />
+        <AppButton
+          onPress={() => {
+            if (userData) {
+              authService
+                .register(userData)
+                .then(token => {
+                  AsyncStorage.setItem(keyStorage.accessToken, token);
+                  dispatch(setIsAuthenticate(true));
+                })
+                .catch(err => {
+                  console.log(err.message);
+                  console.log(err?.response.data);
+                });
+            }
+          }}
+          type="highlight"
+          title="Save"
+        />
+      </Row>
+    </View>
+  );
+};
+
 const FirstLoginScreen: FC = () => {
   const [index, setIndex] = useState(0);
+  const user = useRootSelector(x => x.user);
+  const [userData, setUserData] = useState<IUserRegisterDTO>({
+    userId: '',
+    avatar: '',
+    email: '',
+    displayName: '',
+    fullName: '',
+    nativeLanguage: 'Korea',
+    role: 'Developer',
+  });
+  useEffect(() => {
+    if (user?.email) {
+      setUserData(prev => {
+        return {
+          ...prev,
+          email: user.email,
+          avatar: user.avatar,
+          userId: user.userId,
+        };
+      });
+    }
+  }, [user]);
 
   const routes = [
     {key: 'first', title: ''},
@@ -100,32 +272,57 @@ const FirstLoginScreen: FC = () => {
     setIndex(selectedIndex);
   };
 
-  const renderTabBar = (props: any) => {
-    return (
-      <TabBar
-        {...props}
-        indicatorStyle={{backgroundColor: colors.highlight}}
-        style={{backgroundColor: 'white'}}
-      />
-    );
+  const renderScene = <T extends Route>(
+    props: SceneRendererProps & {route: T},
+  ) => {
+    const {route, jumpTo} = props;
+    switch (route.key) {
+      case 'first':
+        return (
+          <FirstRoute
+            userData={userData}
+            setUserData={setUserData}
+            jumpTo={jumpTo}
+          />
+        );
+      case 'second':
+        return (
+          <SecondRoute
+            userData={userData}
+            setUserData={setUserData}
+            jumpTo={jumpTo}
+          />
+        );
+      case 'third':
+        return (
+          <ThirdRoute
+            userData={userData}
+            setUserData={setUserData}
+            jumpTo={jumpTo}
+          />
+        );
+      case 'four':
+        return (
+          <FourRoute
+            userData={userData}
+            setUserData={setUserData}
+            jumpTo={jumpTo}
+          />
+        );
+    }
   };
-
-  const renderScene = SceneMap({
-    first: FirstRoute,
-    second: SecondRoute,
-    third: ThirdRoute,
-    four: FourRoute,
-  });
-
   return (
-    <View style={{flex: 1}}>
-      <View style={styles.header}>
+    <View style={[{flex: 1}]}>
+      <Row rowStyle={styles.header}>
         <Text style={styles.headerText}>Let’s get start</Text>
-      </View>
+        <View style={styles.progress}>
+          <Text style={styles.progressText}>{`${index + 1}/4`}</Text>
+        </View>
+      </Row>
       <TabView
+        renderTabBar={props => <CustomTabBar {...props} />}
         navigationState={{index, routes}}
         renderScene={renderScene}
-        renderTabBar={renderTabBar}
         onIndexChange={handleIndexChange}
       />
     </View>
@@ -140,41 +337,37 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     position: 'relative',
-    marginLeft: 2,
-    marginRight: 2,
+    marginLeft: 20,
+    marginRight: 20,
     marginTop: 60,
   },
+  progress: {
+    height: 30,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.highlight,
+    paddingVertical: 4,
+  },
+  progressText: {
+    fontWeight: '400',
+    fontSize: 16,
+    color: colors.highlight,
+    marginHorizontal: 14,
+  },
   header: {
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
+    marginTop: 40,
+    marginLeft: 20,
+    marginRight: 20,
     opacity: 0.6,
     color: '#333333',
   },
   headerText: {
     fontSize: 26,
-    fontWeight: 'bold',
+    fontWeight: '400',
   },
   tabBar: {
     flexDirection: 'row',
     paddingTop: StatusBar.currentHeight || 0,
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    padding: 16,
-  },
-  tabUnderline: {
-    position: 'absolute',
-    bottom: 0,
-    height: 2,
-    width: `${25}%`,
-    backgroundColor: 'blue',
-  },
-  button: {
-    width: '100%',
-    position: 'absolute',
-    bottom: 60,
   },
   inputText: {
     fontSize: 32,
