@@ -1,15 +1,19 @@
 import {ChevronLeftIcon, DotIcon} from '../icons';
 import {HStack, Heading} from 'native-base';
 import React, {Key} from 'react';
+import {StyleSheet, TouchableOpacity} from 'react-native';
 
 import {COLORS} from '../../constants/design-system';
-import {StyleSheet} from 'react-native';
+import {NativeStackHeaderProps} from '@react-navigation/native-stack';
 
 type Props = {
-  routes: String[];
-};
+  routes: {
+    name: string;
+    displayName: string;
+  }[];
+} & NativeStackHeaderProps;
 
-export const NestedHeader = ({routes}: Props) => {
+export const NestedHeader = ({routes, navigation}: Props) => {
   return (
     <HStack
       style={styles.container}
@@ -17,13 +21,19 @@ export const NestedHeader = ({routes}: Props) => {
       alignItems={'center'}
       bg="white"
       space={2}>
-      <ChevronLeftIcon />
+      <TouchableOpacity onPress={navigation.goBack}>
+        <ChevronLeftIcon />
+      </TouchableOpacity>
       {routes.map((route, index) => (
-        <React.Fragment key={route as Key}>
+        <React.Fragment key={route.name as Key}>
           <Heading
+            onPress={() => navigation.navigate(route.name)}
             color={COLORS.text}
-            style={[styles.fontSizes, {opacity: index === 0 ? 0.3 : 1}]}>
-            {route}
+            style={[
+              styles.fontSizes,
+              index === routes.length - 1 ? null : styles.textOpacity,
+            ]}>
+            {route.displayName}
           </Heading>
           {index === 0 && <DotIcon />}
         </React.Fragment>
@@ -38,5 +48,8 @@ const styles = StyleSheet.create({
   },
   fontSizes: {
     fontSize: 22,
+  },
+  textOpacity: {
+    opacity: 0.3,
   },
 });

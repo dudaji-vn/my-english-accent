@@ -9,8 +9,21 @@ export const SettingNavigator = () => (
   <Stack.Navigator>
     <Stack.Screen
       options={{
+        // eslint-disable-next-line react/no-unstable-nested-components
         header: props => (
-          <NestedHeader {...props} routes={['Settings', 'Edit profile']} />
+          <NestedHeader
+            {...props}
+            routes={[
+              {
+                name: SCREEN_NAMES.settings,
+                displayName: 'Setting',
+              },
+              {
+                name: SCREEN_NAMES.settingsProfile,
+                displayName: 'Edit Profile',
+              },
+            ]}
+          />
         ),
       }}
       name={SCREEN_NAMES.settingsProfile}
