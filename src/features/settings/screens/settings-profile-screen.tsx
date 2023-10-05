@@ -17,7 +17,9 @@ import {Input} from '../../../components/form';
 import KRFlag from '../../../assets/images/KoreanFlagIcon.png';
 import React from 'react';
 import VNFlag from '../../../assets/images/VietNamFlagIcon.png';
-import devImg from '../../../assets/images/dev.png';
+import designerImg from '../../../assets/images/Designer.png';
+import devImg from '../../../assets/images/Dev.png';
+import otherImg from '../../../assets/images/Other.png';
 
 const FULL_NAME_MAX_LENGTH = 60;
 const DISPLAY_NAME_MAX_LENGTH = 16;
@@ -255,28 +257,14 @@ const positions: {
   {
     content: {
       name: 'Designer',
-      icon: (
-        <Image
-          w={10}
-          h={10}
-          alt="Designer icon"
-          source={require('../../../assets/images/de.png')}
-        />
-      ),
+      icon: <Image w={10} h={10} alt="Designer icon" source={designerImg} />,
     },
     value: 'designer',
   },
   {
     content: {
       name: 'Others',
-      icon: (
-        <Image
-          w={10}
-          h={10}
-          alt="Other icon"
-          source={require('../../../assets/images/bu.png')}
-        />
-      ),
+      icon: <Image w={10} h={10} alt="Other icon" source={otherImg} />,
     },
     value: 'others',
   },
