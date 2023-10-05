@@ -20,7 +20,7 @@ import {SCREEN_NAMES} from '../../../constants/screen';
 
 const SettingsScreen = ({navigation}: any) => {
   return (
-    <ScrollView paddingBottom={72} bgColor="white" height="full" px={4}>
+    <ScrollView bgColor="white" height="full" px={4}>
       <VStack space={8}>
         <VStack space={4}>
           <HStack alignItems="center" space={4}>
@@ -140,7 +140,7 @@ const SettingsScreen = ({navigation}: any) => {
           rounded="md">
           <Text color={COLORS.highlight}>Sign out</Text>
         </Button>
-        <View width="full" bg="black" mb={16} />
+        <View width="full" bg="black" mb={24} />
       </VStack>
     </ScrollView>
   );

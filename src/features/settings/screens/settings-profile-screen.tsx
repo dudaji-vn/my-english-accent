@@ -3,19 +3,24 @@ import {
   FormControl,
   HStack,
   Image,
-  Input,
+  Pressable,
   ScrollView,
   Text,
   VStack,
   View,
 } from 'native-base';
+import {Controller, useForm} from 'react-hook-form';
 import {Language, Position, User} from '../../../types/user';
 
 import {COLORS} from '../../../constants/design-system';
+import {Input} from '../../../components/form';
 import KRFlag from '../../../assets/images/KoreanFlagIcon.png';
 import React from 'react';
 import VNFlag from '../../../assets/images/VietNamFlagIcon.png';
 import devImg from '../../../assets/images/dev.png';
+
+const FULL_NAME_MAX_LENGTH = 60;
+const DISPLAY_NAME_MAX_LENGTH = 16;
 
 type Props = {};
 const user: User = {
@@ -29,56 +34,131 @@ const user: User = {
 };
 
 const SettingsProfileScreen = (props: Props) => {
+  const {
+    control,
+    handleSubmit,
+    formState: {errors, isDirty},
+  } = useForm({
+    defaultValues: {
+      fullName: user.name,
+      displayName: user.displayName,
+      firstLanguage: user.firstLanguage,
+      position: user.position,
+    },
+    mode: 'onChange',
+  });
+  const onSubmit = (data: any) => {
+    alert(JSON.stringify(data));
+    console.log(data);
+  };
+
+  const isValid = isDirty && Object.keys(errors).length === 0;
+
   return (
-    <ScrollView bg="white" px={5}>
+    <ScrollView keyboardShouldPersistTaps={'handled'} bg="white" px={5}>
       <FormControl>
         <VStack space={10}>
           <Section title="Name">
-            <View>
-              <FormControl.Label>
-                <Text fontWeight="semibold">Your full name</Text>
-              </FormControl.Label>
+            <Controller
+              shouldUnregister
+              control={control}
+              rules={{
+                required: {
+                  value: true,
+                  message: 'This field is required',
+                },
 
-              <Input
-                defaultValue={user.name}
-                placeholder="Enter your full name"
-              />
-            </View>
-            <View>
-              <FormControl.Label>
-                <Text fontWeight="semibold">Your display name</Text>
-              </FormControl.Label>
-              <Input
-                defaultValue={user.displayName}
-                placeholder="Enter your display name"
-              />
-            </View>
+                maxLength: {
+                  value: FULL_NAME_MAX_LENGTH,
+                  message: `This field must be less than ${FULL_NAME_MAX_LENGTH} characters`,
+                },
+              }}
+              render={({field: {onChange, onBlur, value}}) => (
+                <Input
+                  label="Your full name"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Enter your full name"
+                  error={errors.fullName?.message}
+                />
+              )}
+              name="fullName"
+            />
+            <Controller
+              shouldUnregister
+              control={control}
+              rules={{
+                required: {
+                  value: true,
+                  message: 'This field is required',
+                },
+
+                maxLength: {
+                  value: DISPLAY_NAME_MAX_LENGTH,
+                  message: `This field must be less than ${DISPLAY_NAME_MAX_LENGTH} characters`,
+                },
+              }}
+              render={({field: {onChange, onBlur, value}}) => (
+                <Input
+                  label="Your display name"
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Enter your display name"
+                  error={errors.displayName?.message}
+                  maxLength={DISPLAY_NAME_MAX_LENGTH + 1}
+                />
+              )}
+              name="displayName"
+            />
           </Section>
           <Section title="Nationality">
-            <HStack space={5}>
-              {nationals.map(({content, value}) => (
-                <RadioCard
-                  key={value}
-                  isActive={user.firstLanguage === value}
-                  content={content}
-                />
-              ))}
-            </HStack>
+            <Controller
+              control={control}
+              render={({field: {onChange, value: _value}}) => (
+                <HStack space={5}>
+                  {nationals.map(({content, value}) => (
+                    <RadioCard
+                      key={value}
+                      isActive={_value === value}
+                      content={content}
+                      onPress={() => onChange(value)}
+                    />
+                  ))}
+                </HStack>
+              )}
+              name="firstLanguage"
+            />
           </Section>
           <Section title="Position">
-            <HStack space={5}>
-              {positions.map(({content, value}) => (
-                <RadioCard
-                  key={value}
-                  isActive={user.position === value}
-                  content={content}
-                />
-              ))}
-            </HStack>
+            <Controller
+              control={control}
+              render={({field: {onChange, value: _value}}) => (
+                <HStack space={5}>
+                  {positions.map(({content, value}) => (
+                    <RadioCard
+                      key={value}
+                      isActive={_value === value}
+                      content={content}
+                      onPress={() => onChange(value)}
+                    />
+                  ))}
+                </HStack>
+              )}
+              name="position"
+            />
           </Section>
-          <Button h={14.5} bg={COLORS.highlight} rounded="lg">
+          <Button
+            opacity={isValid ? 1 : 0.3}
+            disabled={!isValid}
+            onPress={handleSubmit(onSubmit)}
+            h={14.5}
+            bg={COLORS.highlight}
+            rounded="lg">
             <Text color="white">Save your changes</Text>
           </Button>
+
           <View />
         </VStack>
       </FormControl>
@@ -112,30 +192,32 @@ type Content = {
 type RadioCardProps = {
   isActive?: boolean;
   content: Content;
+  onPress?: () => void;
 };
-const RadioCard = ({isActive, content}: RadioCardProps) => {
+const RadioCard = ({isActive, content, onPress}: RadioCardProps) => {
   return (
-    <VStack flex={1} space={2}>
-      <View
-        shadow={isActive ? 1 : 0}
-        opacity={isActive ? 1 : 0.5}
-        borderWidth={isActive ? 1 : 0}
-        borderColor={COLORS.highlight}
-        justifyContent="center"
-        alignItems="center"
-        rounded="lg"
-        bg={isActive ? 'white' : COLORS.darkerBackground}
-        h={15}>
-        {content.icon}
-      </View>
-      <Text
-        fontSize="md"
-        fontWeight={isActive ? 'bold' : 'normal'}
-        textAlign="center"
-        color={COLORS.text}>
-        {content.name}
-      </Text>
-    </VStack>
+    <Pressable flex={1} onPress={onPress}>
+      <VStack opacity={isActive ? 1 : 0.6} space={2}>
+        <View
+          shadow={isActive ? 1 : 'none'}
+          borderWidth={isActive ? 1 : 0}
+          borderColor={COLORS.highlight}
+          justifyContent="center"
+          alignItems="center"
+          rounded="lg"
+          bg={isActive ? 'white' : COLORS.darkerBackground}
+          h={15}>
+          {content.icon}
+        </View>
+        <Text
+          fontSize="md"
+          fontWeight={isActive ? 'bold' : 'normal'}
+          textAlign="center"
+          color={COLORS.text}>
+          {content.name}
+        </Text>
+      </VStack>
+    </Pressable>
   );
 };
 
