@@ -6,7 +6,7 @@ export const colors = {
   secondary: '#183773',
   primary: '#3060BF',
   highlight: '#4080FF',
-  stroke: '#333',
+  stroke: '#CCCCCC',
   background: '#fafafa',
   darkerBackground: '#f2f2f2',
   lighterBackground: '#fcfcfc',

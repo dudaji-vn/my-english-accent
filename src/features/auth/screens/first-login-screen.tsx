@@ -33,6 +33,7 @@ const FirstRoute = (props: IRouteProps) => {
       </Text>
       <View style={[commonStyles.marginBottom60, {marginTop: 60}]}>
         <TextInput
+          placeholderTextColor={colors.stroke}
           onChangeText={value => {
             setUserData(prev => {
               return {
@@ -65,13 +66,20 @@ const SecondRoute = (props: IRouteProps) => {
   const {jumpTo, userData, setUserData} = props;
   return (
     <View style={[styles.container]}>
-      <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
+      <Text
+        style={[
+          commonStyles.marginBottom32,
+          commonStyles.textNormal,
+          commonStyles.textCenter,
+          commonStyles.paddingHorizontal20,
+        ]}>
         How’s about your
         <Text style={commonStyles.textHightLight}> nick name</Text> ?
       </Text>
 
       <View>
         <TextInput
+          placeholderTextColor={colors.stroke}
           maxLength={16}
           value={userData.displayName}
           onChangeText={value => {
@@ -108,7 +116,12 @@ const ThirdRoute = (props: IRouteProps) => {
   const {jumpTo, userData, setUserData} = props;
   return (
     <View style={[styles.container]}>
-      <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
+      <Text
+        style={[
+          commonStyles.marginBottom32,
+          commonStyles.textNormal,
+          commonStyles.textCenter,
+        ]}>
         Where’re you
         <Text style={commonStyles.textHightLight}> come from</Text> ?
       </Text>
@@ -384,6 +397,10 @@ const styles = StyleSheet.create({
   inputText: {
     fontSize: 32,
     textAlign: 'center',
+    borderBottomWidth: 1,
+    borderColor: '#CCC',
+    borderStyle: 'dotted',
+    marginBottom: 12,
   },
 });
 

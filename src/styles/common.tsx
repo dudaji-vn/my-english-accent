@@ -10,7 +10,7 @@ const commonStyles = StyleSheet.create({
   },
   textHightLight: {
     fontFamily: 'OpenSans-Bold',
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: 32,
     lineHeight: 43.58,
     color: '#4080FF',
