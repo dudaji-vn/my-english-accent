@@ -6,7 +6,7 @@ import FirstLoginScreen from '../auth/screens/first-login-screen';
 import LoginScreen from '../auth/screens/login-screen';
 const Stack = createNativeStackNavigator();
 
-export const AuthStack = () => {
+export const AuthNavigator = () => {
   const user = useRootSelector(item => item.user);
   if (user?.isAuthenticated) {
     return null;

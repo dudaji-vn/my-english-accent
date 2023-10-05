@@ -1,12 +1,13 @@
-import {MainNavigator} from './main-navigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {AuthStack} from './auth-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux';
 import {keyStorage} from '../../consts';
 import {useRootSelector} from '../../redux/reducers';
-import {useDispatch} from 'react-redux';
 import {setIsAuthenticate} from '../../redux/reducers/user.reducer';
+
+import {MainNavigator} from './main-navigator';
+import {AuthNavigator} from './auth-navigator';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 
 export function Navigation() {
@@ -15,11 +16,9 @@ export function Navigation() {
   const [initialRender, setInitialRender] = useState(true);
 
   useEffect(() => {
-    // AsyncStorage.removeItem(keyStorage.accessToken);
-
     const fetchAccessToken = async () => {
+      // AsyncStorage.removeItem(keyStorage.accessToken);
       // await GoogleSignin.revokeAccess();
-
       // // Sign out from Google.
       // await GoogleSignin.signOut();
       try {
@@ -30,7 +29,9 @@ export function Navigation() {
             dispatch(setIsAuthenticate(true));
           }, 1000);
         }
-        setInitialRender(false);
+        setTimeout(() => {
+          setInitialRender(false);
+        }, 1000);
       } catch (error) {
         console.error('Error fetching access token:', error);
       }
@@ -42,7 +43,7 @@ export function Navigation() {
   return (
     <NavigationContainer>
       {!initialRender &&
-        (user?.isAuthenticated ? <MainNavigator /> : <AuthStack />)}
+        (user?.isAuthenticated ? <MainNavigator /> : <AuthNavigator />)}
     </NavigationContainer>
   );
 }

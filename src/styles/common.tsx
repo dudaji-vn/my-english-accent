@@ -59,6 +59,9 @@ const commonStyles = StyleSheet.create({
   marginTop160: {
     marginTop: 160,
   },
+  textCenter: {
+    textAlign: 'center',
+  },
 });
 
 export default commonStyles;

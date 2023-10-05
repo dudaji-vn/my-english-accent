@@ -11,10 +11,12 @@ import {colors, keyStorage} from '../../../consts';
 import {IUserRegisterDTO} from '../../../interfaces/api/Auth';
 import {useRootSelector} from '../../../redux/reducers';
 import {authService} from '../../../services/auth.service';
-import commonStyles from '../../../styles/common';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {setIsAuthenticate} from '../../../redux/reducers/user.reducer';
+import commonStyles from '../../../styles/common';
+import CreateUserLoading from './create-user-loading';
 interface IRouteProps {
   jumpTo: (key: string) => void;
   userData: IUserRegisterDTO;
@@ -153,6 +155,7 @@ const ThirdRoute = (props: IRouteProps) => {
           title="Back"
         />
         <AppButton
+          disabled={!userData.nativeLanguage}
           onPress={() => jumpTo('four')}
           type="highlight"
           title="Next"
@@ -164,6 +167,7 @@ const ThirdRoute = (props: IRouteProps) => {
 const FourRoute = (props: IRouteProps) => {
   const {jumpTo, userData, setUserData} = props;
   const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const allRoles = [
     {
       title: 'Developer',
@@ -178,7 +182,7 @@ const FourRoute = (props: IRouteProps) => {
       image: require('../../../assets/images/Other.png'),
     },
   ];
-  return (
+  return !isLoading ? (
     <View style={[styles.container]}>
       <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
         Your
@@ -190,7 +194,10 @@ const FourRoute = (props: IRouteProps) => {
           return (
             <CustomCard
               isActive={userData.role === allRoles[index].title}
-              containerStyle={{flex: 1}}
+              containerStyle={[
+                userData.role === allRoles[index].title && {opacity: 1},
+                {flex: 1, opacity: 0.6},
+              ]}
               onPress={() => {
                 setUserData(prev => {
                   return {
@@ -214,8 +221,10 @@ const FourRoute = (props: IRouteProps) => {
           title="Back"
         />
         <AppButton
+          disabled={!userData.role}
           onPress={() => {
             if (userData) {
+              setIsLoading(true);
               authService
                 .register(userData)
                 .then(token => {
@@ -233,6 +242,8 @@ const FourRoute = (props: IRouteProps) => {
         />
       </Row>
     </View>
+  ) : (
+    <CreateUserLoading />
   );
 };
 
@@ -245,8 +256,8 @@ const FirstLoginScreen: FC = () => {
     email: '',
     displayName: '',
     fullName: '',
-    nativeLanguage: 'Korea',
-    role: 'Developer',
+    nativeLanguage: '',
+    role: '',
   });
   useEffect(() => {
     if (user?.email) {
@@ -320,6 +331,7 @@ const FirstLoginScreen: FC = () => {
         </View>
       </Row>
       <TabView
+        swipeEnabled={false}
         renderTabBar={props => <CustomTabBar {...props} />}
         navigationState={{index, routes}}
         renderScene={renderScene}
@@ -371,6 +383,7 @@ const styles = StyleSheet.create({
   },
   inputText: {
     fontSize: 32,
+    textAlign: 'center',
   },
 });
 
