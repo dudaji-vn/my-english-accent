@@ -49,6 +49,17 @@ const theme = extendTheme({
         fontSize: 'md',
       },
     },
+    Button: {
+      defaultProps: {
+        rounded: 'lg',
+        _pressed: {
+          bg: 'primary',
+        },
+        _text: {
+          color: 'white',
+        },
+      },
+    },
   },
 });
 
