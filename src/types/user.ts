@@ -1,10 +1,10 @@
 import {BaseEntity} from './base-entity';
 
-type Language =
+export type Language =
   | 'en' // English
   | 'ko' // Korean
   | 'vi'; // Vietnamese
-
+export type Position = 'developer' | 'designer' | 'others';
 type AppSetting = {
   autoPlay: boolean;
 };
@@ -15,5 +15,6 @@ export type User = {
   displayName: string;
   avatar: string;
   firstLanguage: Language;
+  position: Position;
   appSetting?: AppSetting;
 } & BaseEntity;

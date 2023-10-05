@@ -6,4 +6,6 @@ export const SCREEN_NAMES = {
   record: 'record',
   settings: 'settings',
   game: 'game',
+  settingsNavigator: 'settings-navigator',
+  settingsProfile: 'settings-profile',
 };
