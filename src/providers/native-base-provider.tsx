@@ -54,7 +54,7 @@ const theme = extendTheme({
         height: 14,
         rounded: 'lg',
         _text: {
-          fontWeight: 'bold',
+          fontWeight: 'semibold',
           fontSize: 'md',
         },
       },
@@ -82,6 +82,14 @@ const theme = extendTheme({
           _text: {
             color: 'white',
           },
+        },
+      },
+    },
+    Modal: {
+      defaultProps: {
+        _backdrop: {
+          bg: '#000',
+          opacity: 0.7,
         },
       },
     },
