@@ -42,7 +42,6 @@ export default class AuthService {
       'userId',
       'avatar',
       'email',
-      'department',
       'displayName',
       'fullName',
       'nativeLanguage'

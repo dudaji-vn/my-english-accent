@@ -1,7 +1,7 @@
 export const SCREEN_NAMES = {
   home: 'home',
   login: 'login',
-  signup: 'signup',
+  firstLogin: 'firstLogin',
   listen: 'listen',
   record: 'record',
   settings: 'settings',

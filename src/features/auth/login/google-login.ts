@@ -1,18 +1,21 @@
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
+import {GoogleSignin, User} from '@react-native-google-signin/google-signin';
+
+import {googleClientId} from '../../../configs';
+import {IUserLoginDTO} from '../../../interfaces/api/Auth';
 GoogleSignin.configure({
-  webClientId:
-    '87150114919-c8fv6vqb433lcmb3n6vc92d2q5688nd4.apps.googleusercontent.com',
+  webClientId: googleClientId,
 });
-export const googleLogin = async (): Promise<FirebaseAuthTypes.User> => {
+
+export const googleLogin = async (): Promise<User> => {
   // Check if your device supports Google Play
-  await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+  //await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
   // Get the users ID token
-  const {idToken} = await GoogleSignin.signIn();
+  const googleSignin = await GoogleSignin.signIn();
+
   // Create a Google credential with the token
-  const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+  //const googleCredential = auth.GoogleAuthProvider.credential(x.idToken);
   // Sign-in the user with the credential
-  const {user} = await auth().signInWithCredential(googleCredential);
-  return user;
+
+  return googleSignin;
 };

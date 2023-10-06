@@ -6,16 +6,23 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
+  GestureResponderEvent,
 } from 'react-native';
+import {colors} from '../../consts';
 interface ICountryCard {
   source: ImageSourcePropType;
   country: 'Korea' | 'VietNam';
+  onPress?: ((event: GestureResponderEvent) => void) | undefined;
+  isActive?: boolean;
 }
 const CountryCard = (props: ICountryCard) => {
-  const {source, country} = props;
+  const {source, country, onPress, isActive} = props;
   return (
-    <View style={styles.wrapper}>
-      <TouchableOpacity style={styles.cardImage} accessibilityRole="button">
+    <View style={[styles.wrapper]}>
+      <TouchableOpacity
+        onPress={onPress}
+        style={[styles.cardImage, isActive && styles.cardActive]}
+        accessibilityRole="button">
         <Image source={source} style={styles.image} />
       </TouchableOpacity>
       <Text>{country}</Text>
@@ -30,15 +37,21 @@ const styles = StyleSheet.create({
   cardImage: {
     backgroundColor: 'white',
     borderRadius: 8,
-    elevation: 3,
-    shadowOffset: {width: 0, height: 2},
-    shadowColor: 'black',
-    shadowOpacity: 0.2,
     paddingLeft: 40,
     paddingRight: 40,
     paddingTop: 40,
     paddingBottom: 40,
     marginBottom: 4,
+    shadowColor: 'rgba(0, 0, 0, 0.25)',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    opacity: 0.6,
+  },
+  cardActive: {
+    borderColor: colors.highlight,
+    borderWidth: 2,
+    opacity: 1,
   },
   image: {
     width: 80,

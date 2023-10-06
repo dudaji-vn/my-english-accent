@@ -5,6 +5,7 @@ import {
   ViewStyle,
   TextStyle,
   StyleSheet,
+  StyleProp,
 } from 'react-native';
 import {colors} from '../../consts';
 
@@ -12,9 +13,11 @@ type TypeButton = 'highlight' | 'transparent';
 interface AppButtonProps {
   onPress?: () => void;
   title: string;
-  buttonStyle?: ViewStyle;
+  buttonStyle?: StyleProp<ViewStyle> | undefined;
   textStyle?: TextStyle;
   type: TypeButton;
+  fullWidth?: boolean;
+  disabled?: boolean;
 }
 
 const AppButton: FC<AppButtonProps> = ({
@@ -22,7 +25,9 @@ const AppButton: FC<AppButtonProps> = ({
   title,
   buttonStyle,
   textStyle,
+  fullWidth,
   type = 'highlight',
+  disabled,
 }) => {
   const getTypeButton = (type: TypeButton) => {
     switch (type) {
@@ -33,7 +38,7 @@ const AppButton: FC<AppButtonProps> = ({
         return styles.buttonTransparent;
 
       default:
-        return styles.button;
+        return styles.buttonHighLight;
     }
   };
   const getTypeText = (type: TypeButton) => {
@@ -45,12 +50,19 @@ const AppButton: FC<AppButtonProps> = ({
         return styles.buttonTextTransparent;
 
       default:
-        return styles.button;
+        return styles.buttonHighLight;
     }
   };
   return (
     <TouchableOpacity
-      style={[getTypeButton(type), buttonStyle]}
+      disabled={disabled}
+      style={[
+        getTypeButton(type),
+        styles.button,
+        buttonStyle,
+        fullWidth && {width: '100%'},
+        disabled && {backgroundColor: '#bdd0f6'},
+      ]}
       onPress={onPress}>
       <Text style={[getTypeText(type), textStyle]}>{title}</Text>
     </TouchableOpacity>
@@ -59,33 +71,31 @@ const AppButton: FC<AppButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: 'blue',
-    padding: 10,
-    borderRadius: 5,
+    borderRadius: 8,
     alignItems: 'center',
+    minWidth: 160,
   },
   buttonHighLight: {
-    backgroundColor: '#4080FF',
     padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
+    backgroundColor: '#4080FF',
   },
   buttonTransparent: {
+    paddingVertical: 8,
     backgroundColor: '#FFF',
-    padding: 10,
-    borderRadius: 8,
-    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
   buttonTextTransparent: {
     color: colors.highlight,
+    fontSize: 16,
   },
   buttonTextHighLight: {
-    color: 'white', // Default text color
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },
   buttonText: {
-    color: 'white', // Default text color
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },
