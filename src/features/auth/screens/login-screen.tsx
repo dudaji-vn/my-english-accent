@@ -75,7 +75,7 @@ export default function LoginScreen() {
         height={14}
         _pressed={{bg: '#E6E6E6'}}
         bg={COLORS.background}
-        onPress={() => navigation.navigate('firstLogin')}>
+        onPress={onGoogleButtonPress}>
         <HStack space={2}>
           <GoogleIcon />
           <Text color={COLORS.text}>Sign in with Google account</Text>
