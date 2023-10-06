@@ -7,7 +7,6 @@ import {Image, StatusBar, StyleSheet, TextInput} from 'react-native';
 import {Route, SceneRendererProps, TabView} from 'react-native-tab-view';
 import {colors, keyStorage} from '../../../consts';
 
-import AppButton from '../../../components/app-button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryCard from '../../../components/country-card';
 import CreateUserLoading from './create-user-loading';
@@ -437,6 +436,7 @@ const styles = StyleSheet.create({
     borderStyle: 'dotted',
     marginBottom: 12,
     width: fullWidth - GRID.gap * 2,
+    color: colors.text,
   },
 });
 
