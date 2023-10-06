@@ -1,6 +1,14 @@
 import * as React from 'react';
 import {Dispatch, FC, SetStateAction, useEffect, useState} from 'react';
-import {StatusBar, StyleSheet, Text, TextInput, View} from 'react-native';
+import {
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  ImageBackground,
+  Image,
+} from 'react-native';
 import {Route, SceneRendererProps, TabView} from 'react-native-tab-view';
 import AppButton from '../../../components/app-button';
 import CountryCard from '../../../components/country-card';
@@ -11,7 +19,9 @@ import {colors, keyStorage} from '../../../consts';
 import {IUserRegisterDTO} from '../../../interfaces/api/Auth';
 import {useRootSelector} from '../../../redux/reducers';
 import {authService} from '../../../services/auth.service';
+import {Dimensions} from 'react-native';
 
+var fullWidth = Dimensions.get('window').width;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch} from 'react-redux';
 import {setIsAuthenticate} from '../../../redux/reducers/user.reducer';
@@ -27,6 +37,9 @@ const FirstRoute = (props: IRouteProps) => {
 
   return (
     <View style={[styles.container]}>
+      <Image
+        style={styles.backgroundImage as any}
+        source={require('../../../assets/images/BgWave.png')}></Image>
       <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
         Hi, your
         <Text style={commonStyles.textHightLight}> full name</Text> is
@@ -66,6 +79,9 @@ const SecondRoute = (props: IRouteProps) => {
   const {jumpTo, userData, setUserData} = props;
   return (
     <View style={[styles.container]}>
+      <Image
+        style={styles.backgroundImage as any}
+        source={require('../../../assets/images/BgWave.png')}></Image>
       <Text
         style={[
           commonStyles.marginBottom32,
@@ -116,6 +132,9 @@ const ThirdRoute = (props: IRouteProps) => {
   const {jumpTo, userData, setUserData} = props;
   return (
     <View style={[styles.container]}>
+      <Image
+        style={styles.backgroundImage as any}
+        source={require('../../../assets/images/BgWave.png')}></Image>
       <Text
         style={[
           commonStyles.marginBottom32,
@@ -197,19 +216,23 @@ const FourRoute = (props: IRouteProps) => {
   ];
   return !isLoading ? (
     <View style={[styles.container]}>
+      <Image
+        style={styles.backgroundImage as any}
+        source={require('../../../assets/images/BgWave.png')}></Image>
       <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
         Your
         <Text style={commonStyles.textHightLight}> current role</Text> is ?
       </Text>
-
       <Row rowStyle={[{gap: 10, marginBottom: 170, flexDirection: 'row'}]}>
         {allRoles.map((item, index) => {
           return (
             <CustomCard
               isActive={userData.role === allRoles[index].title}
               containerStyle={[
-                userData.role === allRoles[index].title && {opacity: 1},
-                {flex: 1, opacity: 0.6},
+                userData.role === allRoles[index].title
+                  ? {opacity: 1}
+                  : {opacity: 0.6},
+                {flex: 1},
               ]}
               onPress={() => {
                 setUserData(prev => {
@@ -357,6 +380,13 @@ const FirstLoginScreen: FC = () => {
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
+  },
+  backgroundImage: {
+    position: 'absolute',
+    width: fullWidth,
+    height: 228,
+    top: -80,
+    zIndex: -1,
   },
   container: {
     flex: 1,
