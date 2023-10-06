@@ -1,20 +1,22 @@
-import {ParamListBase, useNavigation} from '@react-navigation/native';
-import {Box, Button, Text, View} from 'native-base';
-import React from 'react';
+import {Box, Button, HStack, Text, View} from 'native-base';
 import {GoogleIcon, Logo} from '../../../components/icons';
+import {Image, StyleSheet, TouchableOpacity} from 'react-native';
+import {ParamListBase, useNavigation} from '@react-navigation/native';
+import {setIsAuthenticate, setUser} from '../../../redux/reducers/user.reducer';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {COLORS} from '../../../constants/design-system';
 import {Dimensions} from 'react-native';
+import {IUserLoginDTO} from '../../../interfaces/api/Auth';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import React from 'react';
+import {authService} from '../../../services/auth.service';
+import commonStyles from '../../../styles/common';
+import {googleLogin} from '../login/google-login';
+import {keyStorage} from '../../../consts';
+import {useDispatch} from 'react-redux';
 
 var fullWidth = Dimensions.get('window').width;
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useDispatch} from 'react-redux';
-import {keyStorage} from '../../../consts';
-import {setIsAuthenticate, setUser} from '../../../redux/reducers/user.reducer';
-import {googleLogin} from '../login/google-login';
-import {IUserLoginDTO} from '../../../interfaces/api/Auth';
-import {authService} from '../../../services/auth.service';
-import {Image, StyleSheet, TouchableOpacity} from 'react-native';
-import commonStyles from '../../../styles/common';
 
 export default function LoginScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
@@ -63,17 +65,22 @@ export default function LoginScreen() {
       alignItems="center">
       <Image
         style={styles.backgroundImage}
-        source={require('../../../assets/images/BgWaveDark.png')}></Image>
+        source={require('../../../assets/images/BgWaveDark.png')}
+      />
       <Logo />
-      <Box alignItems="center">
-        <TouchableOpacity
-          style={styles.googleButton}
-          onPress={onGoogleButtonPress}>
-          <GoogleIcon />
 
-          <Text style={[styles.textButton]}>Sign in with Google account</Text>
-        </TouchableOpacity>
-      </Box>
+      <Button
+        marginTop={20}
+        width={fullWidth - 40}
+        height={14}
+        _pressed={{bg: '#E6E6E6'}}
+        bg={COLORS.background}
+        onPress={() => navigation.navigate('firstLogin')}>
+        <HStack space={2}>
+          <GoogleIcon />
+          <Text color={COLORS.text}>Sign in with Google account</Text>
+        </HStack>
+      </Button>
     </View>
   );
 }

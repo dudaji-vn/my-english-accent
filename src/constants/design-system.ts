@@ -10,3 +10,11 @@ export const COLORS = {
   lighterBackground: '#fcfcfc',
   error: '#ff4040',
 };
+export const OPACITY = {
+  normal: 0.6,
+  low: 0.3,
+};
+
+export const GRID = {
+  gap: 20,
+};
