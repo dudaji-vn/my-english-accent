@@ -1,8 +1,10 @@
 import {ParamListBase, useNavigation} from '@react-navigation/native';
 import {Box, Button, Text, View} from 'native-base';
 import React from 'react';
-import {Logo} from '../../../components/icons';
+import {GoogleIcon, Logo} from '../../../components/icons';
+import {Dimensions} from 'react-native';
 
+var fullWidth = Dimensions.get('window').width;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useDispatch} from 'react-redux';
@@ -57,21 +59,31 @@ export default function LoginScreen() {
       bg="highlight"
       height="full"
       justifyContent="center"
+      style={{position: 'relative'}}
       alignItems="center">
+      <Image
+        style={styles.backgroundImage}
+        source={require('../../../assets/images/BgWaveDark.png')}></Image>
+      <Logo />
       <Box alignItems="center">
-        <Logo />
-
         <TouchableOpacity
-          style={style.googleButton}
+          style={styles.googleButton}
           onPress={onGoogleButtonPress}>
-          <Image source={require('../../../assets/images/GoogleLogo.png')} />
-          <Text style={[style.textButton]}>Sign in with Google account</Text>
+          <GoogleIcon />
+
+          <Text style={[styles.textButton]}>Sign in with Google account</Text>
         </TouchableOpacity>
       </Box>
     </View>
   );
 }
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
+  backgroundImage: {
+    position: 'absolute',
+    width: fullWidth,
+    height: 228,
+    top: 200,
+  },
   googleButton: {
     flexDirection: 'row',
     backgroundColor: '#f2f2f2',
