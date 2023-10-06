@@ -4,7 +4,7 @@ export const COLORS = {
   primary: '#3060BF',
   highlight: '#4080FF',
   text: '#333',
-  stroke: '#333',
+  stroke: '#CCC',
   background: '#fafafa',
   darkerBackground: '#f2f2f2',
   lighterBackground: '#fcfcfc',
