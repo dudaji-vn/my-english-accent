@@ -1,32 +1,29 @@
 import * as React from 'react';
+
+import {Button, Text, View} from 'native-base';
+import {COLORS, GRID} from '../../../constants/design-system';
 import {Dispatch, FC, SetStateAction, useEffect, useState} from 'react';
-import {
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  ImageBackground,
-  Image,
-} from 'react-native';
+import {Image, StatusBar, StyleSheet, TextInput} from 'react-native';
 import {Route, SceneRendererProps, TabView} from 'react-native-tab-view';
+import {colors, keyStorage} from '../../../consts';
+
 import AppButton from '../../../components/app-button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryCard from '../../../components/country-card';
+import CreateUserLoading from './create-user-loading';
 import CustomCard from '../../../components/custom-card';
 import CustomTabBar from '../../../components/custom-library/CustomTabBar';
-import Row from '../../../components/row';
-import {colors, keyStorage} from '../../../consts';
-import {IUserRegisterDTO} from '../../../interfaces/api/Auth';
-import {useRootSelector} from '../../../redux/reducers';
-import {authService} from '../../../services/auth.service';
 import {Dimensions} from 'react-native';
+import {IUserRegisterDTO} from '../../../interfaces/api/Auth';
+import Row from '../../../components/row';
+import {authService} from '../../../services/auth.service';
+import commonStyles from '../../../styles/common';
+import {setIsAuthenticate} from '../../../redux/reducers/user.reducer';
+import {useDispatch} from 'react-redux';
+import {useRootSelector} from '../../../redux/reducers';
 
 var fullWidth = Dimensions.get('window').width;
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useDispatch} from 'react-redux';
-import {setIsAuthenticate} from '../../../redux/reducers/user.reducer';
-import commonStyles from '../../../styles/common';
-import CreateUserLoading from './create-user-loading';
+
 interface IRouteProps {
   jumpTo: (key: string) => void;
   userData: IUserRegisterDTO;
@@ -39,13 +36,15 @@ const FirstRoute = (props: IRouteProps) => {
     <View style={[styles.container]}>
       <Image
         style={styles.backgroundImage as any}
-        source={require('../../../assets/images/BgWave.png')}></Image>
+        source={require('../../../assets/images/BgWave.png')}
+      />
       <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
         Hi, your
         <Text style={commonStyles.textHightLight}> full name</Text> is
       </Text>
       <View style={[commonStyles.marginBottom60, {marginTop: 60}]}>
         <TextInput
+          textAlign="center"
           placeholderTextColor={colors.stroke}
           onChangeText={value => {
             setUserData(prev => {
@@ -56,21 +55,23 @@ const FirstRoute = (props: IRouteProps) => {
             });
           }}
           value={userData.fullName}
-          placeholder="ex: Jonas Brothers"
+          placeholder={`ex: ${userData.fullName}`}
           style={styles.inputText}
+          selectionColor={COLORS.highlight}
         />
       </View>
 
-      <AppButton
-        title="Next step"
-        type="highlight"
-        disabled={!userData.fullName}
+      <Button
+        mt={160}
         onPress={() => {
           jumpTo('second');
         }}
-        fullWidth
-        buttonStyle={[commonStyles.marginTop160]}
-      />
+        opacity={userData.fullName ? 1 : 0.6}
+        disabled={!userData.fullName}
+        w={fullWidth - GRID.gap * 2}
+        bg={colors.highlight}>
+        Next step
+      </Button>
     </View>
   );
 };
@@ -81,7 +82,8 @@ const SecondRoute = (props: IRouteProps) => {
     <View style={[styles.container]}>
       <Image
         style={styles.backgroundImage as any}
-        source={require('../../../assets/images/BgWave.png')}></Image>
+        source={require('../../../assets/images/BgWave.png')}
+      />
       <Text
         style={[
           commonStyles.marginBottom32,
@@ -95,6 +97,8 @@ const SecondRoute = (props: IRouteProps) => {
 
       <View>
         <TextInput
+          textAlign="center"
+          selectionColor={COLORS.highlight}
           placeholderTextColor={colors.stroke}
           maxLength={16}
           value={userData.displayName}
@@ -112,17 +116,17 @@ const SecondRoute = (props: IRouteProps) => {
         <Text style={commonStyles.textNote}>(Limit 16 characters)</Text>
       </View>
       <Row rowStyle={[{gap: 16, marginTop: 214}]}>
-        <AppButton
-          onPress={() => jumpTo('first')}
-          type="transparent"
-          title="Back"
-        />
-        <AppButton
+        <Button variant="outline" flex={1} onPress={() => jumpTo('first')}>
+          Back
+        </Button>
+
+        <Button
+          opacity={userData.displayName ? 1 : 0.6}
+          flex={1}
           disabled={!userData.displayName}
-          onPress={() => jumpTo('third')}
-          type="highlight"
-          title="Next"
-        />
+          onPress={() => jumpTo('third')}>
+          Next
+        </Button>
       </Row>
     </View>
   );
@@ -134,7 +138,8 @@ const ThirdRoute = (props: IRouteProps) => {
     <View style={[styles.container]}>
       <Image
         style={styles.backgroundImage as any}
-        source={require('../../../assets/images/BgWave.png')}></Image>
+        source={require('../../../assets/images/BgWave.png')}
+      />
       <Text
         style={[
           commonStyles.marginBottom32,
@@ -181,17 +186,17 @@ const ThirdRoute = (props: IRouteProps) => {
         />
       </View>
       <Row rowStyle={{gap: 10}}>
-        <AppButton
-          onPress={() => jumpTo('second')}
-          type="transparent"
-          title="Back"
-        />
-        <AppButton
+        <Button variant="outline" flex={1} onPress={() => jumpTo('second')}>
+          Back
+        </Button>
+
+        <Button
+          opacity={userData.nativeLanguage ? 1 : 0.6}
           disabled={!userData.nativeLanguage}
           onPress={() => jumpTo('four')}
-          type="highlight"
-          title="Next"
-        />
+          flex={1}>
+          Next
+        </Button>
       </Row>
     </View>
   );
@@ -218,7 +223,8 @@ const FourRoute = (props: IRouteProps) => {
     <View style={[styles.container]}>
       <Image
         style={styles.backgroundImage as any}
-        source={require('../../../assets/images/BgWave.png')}></Image>
+        source={require('../../../assets/images/BgWave.png')}
+      />
       <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
         Your
         <Text style={commonStyles.textHightLight}> current role</Text> is ?
@@ -251,12 +257,12 @@ const FourRoute = (props: IRouteProps) => {
       </Row>
 
       <Row rowStyle={{gap: 16}}>
-        <AppButton
-          onPress={() => jumpTo('third')}
-          type="transparent"
-          title="Back"
-        />
-        <AppButton
+        <Button variant="outline" flex={1} onPress={() => jumpTo('third')}>
+          Back
+        </Button>
+        <Button
+          opacity={userData.role ? 1 : 0.6}
+          flex={1}
           disabled={!userData.role}
           onPress={() => {
             if (userData) {
@@ -272,10 +278,9 @@ const FourRoute = (props: IRouteProps) => {
                   console.log(err?.response.data);
                 });
             }
-          }}
-          type="highlight"
-          title="Save"
-        />
+          }}>
+          Save
+        </Button>
       </Row>
     </View>
   ) : (
@@ -425,12 +430,13 @@ const styles = StyleSheet.create({
     paddingTop: StatusBar.currentHeight || 0,
   },
   inputText: {
+    textAlignVertical: 'top',
     fontSize: 32,
-    textAlign: 'center',
     borderBottomWidth: 1,
     borderColor: '#CCC',
     borderStyle: 'dotted',
     marginBottom: 12,
+    width: fullWidth - GRID.gap * 2,
   },
 });
 

@@ -1,14 +1,16 @@
-import {Text} from 'native-base';
-import React from 'react';
 import {
+  GestureResponderEvent,
   Image,
   ImageSourcePropType,
   StyleSheet,
-  View,
   TouchableOpacity,
-  GestureResponderEvent,
+  View,
 } from 'react-native';
+
+import React from 'react';
+import {Text} from 'native-base';
 import {colors} from '../../consts';
+
 interface ICountryCard {
   source: ImageSourcePropType;
   country: 'Korea' | 'VietNam';

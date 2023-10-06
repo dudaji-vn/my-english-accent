@@ -1,14 +1,14 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {useDispatch} from 'react-redux';
-import {keyStorage} from '../../consts';
-import {useRootSelector} from '../../redux/reducers';
-import {setIsAuthenticate} from '../../redux/reducers/user.reducer';
 
-import {MainNavigator} from './main-navigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AuthNavigator} from './auth-navigator';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {MainNavigator} from './main-navigator';
+import {NavigationContainer} from '@react-navigation/native';
+import {keyStorage} from '../../consts';
+import {setIsAuthenticate} from '../../redux/reducers/user.reducer';
+import {useDispatch} from 'react-redux';
+import {useRootSelector} from '../../redux/reducers';
 
 export function Navigation() {
   const user = useRootSelector(item => item.user);
@@ -38,6 +38,7 @@ export function Navigation() {
     };
 
     fetchAccessToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.isAuthenticated]);
 
   return (

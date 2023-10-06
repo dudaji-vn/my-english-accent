@@ -51,12 +51,37 @@ const theme = extendTheme({
     },
     Button: {
       defaultProps: {
+        height: 14,
         rounded: 'lg',
-        _pressed: {
-          bg: 'primary',
-        },
         _text: {
-          color: 'white',
+          fontWeight: 'bold',
+          fontSize: 'md',
+        },
+      },
+      variants: {
+        outline: {
+          bg: 'white',
+          borderColor: 'highlight',
+          borderWidth: 1,
+          _pressed: {
+            bg: 'white',
+            borderColor: 'primary',
+            _text: {
+              color: 'primary',
+            },
+          },
+          _text: {
+            color: 'highlight',
+          },
+        },
+        solid: {
+          bg: 'highlight',
+          _pressed: {
+            bg: 'primary',
+          },
+          _text: {
+            color: 'white',
+          },
         },
       },
     },
