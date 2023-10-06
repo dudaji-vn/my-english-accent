@@ -1,20 +1,19 @@
-import {Box, Button, HStack, Text, View} from 'native-base';
-import {GoogleIcon, Logo} from '../../../components/icons';
-import {Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {ParamListBase, useNavigation} from '@react-navigation/native';
+import {Button, HStack, Text, View} from 'native-base';
+import {Image, StyleSheet} from 'react-native';
+import {GoogleIcon, Logo} from '../../../components/icons';
 import {setIsAuthenticate, setUser} from '../../../redux/reducers/user.reducer';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {COLORS} from '../../../constants/design-system';
-import {Dimensions} from 'react-native';
-import {IUserLoginDTO} from '../../../interfaces/api/Auth';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import React from 'react';
-import {authService} from '../../../services/auth.service';
-import commonStyles from '../../../styles/common';
-import {googleLogin} from '../login/google-login';
-import {keyStorage} from '../../../consts';
+import {Dimensions} from 'react-native';
 import {useDispatch} from 'react-redux';
+import {COLORS} from '../../../constants/design-system';
+import {keyStorage} from '../../../consts';
+import {IUserLoginDTO} from '../../../interfaces/api/Auth';
+import {authService} from '../../../services/auth.service';
+import {googleLogin} from '../login/google-login';
 
 var fullWidth = Dimensions.get('window').width;
 
@@ -32,6 +31,7 @@ export default function LoginScreen() {
             email: googleUser.user.email,
             avatar: googleUser.user.photo,
             userId: googleUser.user.id,
+            name: googleUser.user.name,
           }),
         );
         const userRequest: IUserLoginDTO = {
@@ -75,7 +75,7 @@ export default function LoginScreen() {
         height={14}
         _pressed={{bg: '#E6E6E6'}}
         bg={COLORS.background}
-        onPress={() => navigation.navigate('firstLogin')}>
+        onPress={onGoogleButtonPress}>
         <HStack space={2}>
           <GoogleIcon />
           <Text color={COLORS.text}>Sign in with Google account</Text>

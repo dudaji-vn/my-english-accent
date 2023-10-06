@@ -11,6 +11,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import {colors} from '../../consts';
+import {Pressable} from 'native-base';
 
 interface ICountryCardProps {
   source?: ImageSourcePropType;
@@ -28,7 +29,7 @@ const CustomCard = (props: ICountryCardProps) => {
   return (
     <View style={[styles.wrapper, containerStyle]}>
       {source && (
-        <TouchableOpacity
+        <Pressable
           onPress={onPress}
           style={[
             styles.cardImage,
@@ -41,7 +42,7 @@ const CustomCard = (props: ICountryCardProps) => {
             style={{width: '100%', height: '100%'}}
             resizeMode="contain"
           />
-        </TouchableOpacity>
+        </Pressable>
       )}
 
       {title && <Text>{title}</Text>}
@@ -65,10 +66,11 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 1,
     shadowRadius: 4,
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   cardActive: {
     borderColor: colors.highlight,
-    borderWidth: 2,
   },
   textContainer: {
     alignItems: 'center',

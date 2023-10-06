@@ -2,12 +2,11 @@ import * as React from 'react';
 
 import {Button, Text, View} from 'native-base';
 import {COLORS, GRID} from '../../../constants/design-system';
-import {Dispatch, FC, SetStateAction, useEffect, useState} from 'react';
+import {Dispatch, FC, SetStateAction, useEffect, useRef, useState} from 'react';
 import {Image, StatusBar, StyleSheet, TextInput} from 'react-native';
 import {Route, SceneRendererProps, TabView} from 'react-native-tab-view';
 import {colors, keyStorage} from '../../../consts';
 
-import AppButton from '../../../components/app-button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryCard from '../../../components/country-card';
 import CreateUserLoading from './create-user-loading';
@@ -31,7 +30,7 @@ interface IRouteProps {
 }
 const FirstRoute = (props: IRouteProps) => {
   const {jumpTo, userData, setUserData} = props;
-
+  const user = useRootSelector(x => x.user);
   return (
     <View style={[styles.container]}>
       <Image
@@ -44,6 +43,7 @@ const FirstRoute = (props: IRouteProps) => {
       </Text>
       <View style={[commonStyles.marginBottom60, {marginTop: 60}]}>
         <TextInput
+          autoFocus={true}
           textAlign="center"
           placeholderTextColor={colors.stroke}
           onChangeText={value => {
@@ -55,7 +55,7 @@ const FirstRoute = (props: IRouteProps) => {
             });
           }}
           value={userData.fullName}
-          placeholder={`ex: ${userData.fullName}`}
+          placeholder={`ex: ${user?.name}`}
           style={styles.inputText}
           selectionColor={COLORS.highlight}
         />
@@ -97,6 +97,7 @@ const SecondRoute = (props: IRouteProps) => {
 
       <View>
         <TextInput
+          autoFocus={true}
           textAlign="center"
           selectionColor={COLORS.highlight}
           placeholderTextColor={colors.stroke}
@@ -110,7 +111,7 @@ const SecondRoute = (props: IRouteProps) => {
               };
             });
           }}
-          placeholder="ex: Jonas Brothers"
+          placeholder="Enter here"
           style={styles.inputText}
         />
         <Text style={commonStyles.textNote}>(Limit 16 characters)</Text>
@@ -225,7 +226,7 @@ const FourRoute = (props: IRouteProps) => {
         style={styles.backgroundImage as any}
         source={require('../../../assets/images/BgWave.png')}
       />
-      <Text style={[commonStyles.marginBottom32, commonStyles.textNormal]}>
+      <Text style={[commonStyles.marginBottom80, commonStyles.textNormal]}>
         Your
         <Text style={commonStyles.textHightLight}> current role</Text> is ?
       </Text>
@@ -437,6 +438,7 @@ const styles = StyleSheet.create({
     borderStyle: 'dotted',
     marginBottom: 12,
     width: fullWidth - GRID.gap * 2,
+    color: colors.text,
   },
 });
 

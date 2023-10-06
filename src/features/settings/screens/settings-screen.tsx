@@ -14,7 +14,7 @@ import {
 import {StyleSheet, TouchableOpacity} from 'react-native';
 
 import {COLORS} from '../../../constants/design-system';
-import {QuestionOutlineIcon} from '../../../components/icons';
+import {HelpCircle} from 'react-native-feather';
 import React from 'react';
 import {SCREEN_NAMES} from '../../../constants/screen';
 
@@ -29,50 +29,40 @@ const SettingsScreen = ({navigation}: any) => {
               Nguyen Minh Nhat
             </Text>
           </HStack>
-          <TouchableOpacity
+          <SettingButton
+            title="Edit Profile"
             onPress={() => {
-              // hide tab bar when navigate to settings profile screen
               navigation.setOptions({tabBarStyle: {display: 'none'}});
               navigation.navigate(SCREEN_NAMES.settingsNavigator, {
                 screen: SCREEN_NAMES.settingsProfile,
               });
             }}
-            style={styles.btn}>
-            <HStack alignItems="center" justifyContent="space-between">
-              <Text fontSize="md" color={COLORS.text}>
-                Edit Profile
-              </Text>
-              <ChevronRightIcon />
-            </HStack>
-          </TouchableOpacity>
+            leftElement={<ChevronRightIcon />}
+          />
         </VStack>
         <VStack space={4}>
           <Heading color={COLORS.text} fontSize="md">
             App's Setting
           </Heading>
           <VStack space={1}>
-            <TouchableOpacity style={styles.btn}>
-              <HStack alignItems="center" justifyContent="space-between">
+            <SettingButton
+              onPress={() => {}}
+              leftElement={<ChevronRightIcon />}
+              title="App's permission"
+            />
+            <SettingButton
+              onPress={() => {}}
+              leftElement={<ChevronRightIcon />}>
+              <HStack alignItems="center" space={4}>
                 <Text fontSize="md" color={COLORS.text}>
-                  App's permission
+                  Auto download
                 </Text>
-                <ChevronRightIcon />
-              </HStack>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btn}>
-              <HStack alignItems="center" justifyContent="space-between">
-                <HStack alignItems="center" space={4}>
-                  <Text fontSize="md" color={COLORS.text}>
-                    Auto download
-                  </Text>
 
-                  <TouchableOpacity style={styles.questionIcon}>
-                    <QuestionOutlineIcon />
-                  </TouchableOpacity>
-                </HStack>
-                <ChevronRightIcon />
+                <TouchableOpacity style={styles.questionIcon}>
+                  <HelpCircle color={COLORS.text} width={20} height={20} />
+                </TouchableOpacity>
               </HStack>
-            </TouchableOpacity>
+            </SettingButton>
           </VStack>
         </VStack>
         <VStack space={4}>
@@ -154,7 +144,7 @@ const styles = StyleSheet.create({
     height: 60,
   },
   btn: {
-    backgroundColor: COLORS.darkerBackground,
+    backgroundColor: COLORS.background,
     height: 56,
     borderRadius: 8,
     padding: 16,
@@ -167,3 +157,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+type SettingButtonProps = {
+  title?: string;
+  onPress: () => void;
+  leftElement?: React.ReactNode;
+  children?: React.ReactNode;
+};
+
+const SettingButton = ({
+  title,
+  children,
+  onPress,
+  leftElement,
+}: SettingButtonProps) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.btn}>
+      <HStack alignItems="center" justifyContent="space-between">
+        {title && (
+          <Text fontSize="md" color={COLORS.text}>
+            {title}
+          </Text>
+        )}
+        {children && children}
+        {leftElement && leftElement}
+      </HStack>
+    </TouchableOpacity>
+  );
+};
