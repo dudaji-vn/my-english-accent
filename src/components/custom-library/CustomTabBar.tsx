@@ -20,7 +20,7 @@ const CustomTabBar = <T extends Route>({
           key={route.key}
           style={[
             styles.tabItem,
-            i === index ? styles.activeTab : styles.normalTab,
+            i <= index ? styles.activeTab : styles.normalTab,
           ]}
           onPress={() => jumpTo(route.key)}>
           <Text style={styles.tabText}>{route.title}</Text>
