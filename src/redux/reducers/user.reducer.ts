@@ -6,6 +6,7 @@ const initialState: IUserStore = {
   avatar: '',
   userId: '',
   isAuthenticated: false,
+  name: '',
 };
 
 const userSlice: any = createSlice({
