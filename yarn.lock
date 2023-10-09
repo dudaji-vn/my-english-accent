@@ -6882,6 +6882,11 @@ react-native-fs@^2.20.0:
     base-64 "^0.1.0"
     utf8 "^3.0.0"
 
+react-native-image-crop-picker@^0.40.0:
+  version "0.40.0"
+  resolved "https://registry.yarnpkg.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.40.0.tgz#cf378a4cbdb64b9b6ff94399b8515ff3bdccbf9c"
+  integrity sha512-FpqiCS4CiPQp8qIorlELWKbpi1d9lyhJki9spZr4LShv9hk65GWo6tYJupfTV19o5XcRwJn8d4MHIUoyWMJRTQ==
+
 react-native-pager-view@^6.2.1:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.2.1.tgz#985d21bbb7d7bc012f4c142dedbb98ce4bdea104"
