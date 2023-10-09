@@ -158,6 +158,7 @@ const SettingsScreen = ({navigation}: any) => {
           <Modal.Content width={fullWidth - GRID.gap * 2}>
             <ModalCard
               title="Sign out?"
+              description="Are you sure you want to sign out?"
               cancelButton={
                 <Button
                   onPress={hideLogoutModal}
@@ -170,11 +171,8 @@ const SettingsScreen = ({navigation}: any) => {
                 <Button onPress={handleLogout} ref={initialRef}>
                   Sign out
                 </Button>
-              }>
-              <Text fontSize="md" color={COLORS.text}>
-                Are you sure to sign out?
-              </Text>
-            </ModalCard>
+              }
+            />
           </Modal.Content>
         </Modal>
         <View width="full" bg="black" mb={24} />

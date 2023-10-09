@@ -6,7 +6,7 @@ import React from 'react';
 
 type Props = {
   title?: string;
-  onPress: () => void;
+  onPress?: () => void;
   leftElement?: React.ReactNode;
   children?: React.ReactNode;
 };
@@ -18,7 +18,7 @@ export const SettingButton = ({
   leftElement,
 }: Props) => {
   return (
-    <TouchableOpacity onPress={onPress} style={styles.btn}>
+    <TouchableOpacity disabled={!onPress} onPress={onPress} style={styles.btn}>
       <HStack alignItems="center" justifyContent="space-between">
         {title && (
           <Text fontSize="md" color={COLORS.text}>

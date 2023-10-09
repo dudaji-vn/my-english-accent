@@ -18,12 +18,9 @@ export function Navigation() {
 
   useEffect(() => {
     const fetchAccessToken = async () => {
-      // AsyncStorage.removeItem(keyStorage.accessToken);
-      // await GoogleSignin.revokeAccess();
-      // // Sign out from Google.
-      // await GoogleSignin.signOut();
       try {
         const token = await AsyncStorage.getItem(keyStorage.accessToken);
+        console.log('token', token);
 
         if (token) {
           setTimeout(() => {
@@ -51,6 +48,9 @@ export function Navigation() {
           profile: data,
         }),
       );
+    },
+    onError: error => {
+      console.log('get profile error', error);
     },
   });
 

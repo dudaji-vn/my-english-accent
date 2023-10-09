@@ -27,7 +27,7 @@ export const NestedHeader = ({routes, navigation}: Props) => {
       {routes.map((route, index) => (
         <React.Fragment key={route.name as Key}>
           <Heading
-            onPress={() => navigation.navigate(route.name)}
+            onPress={() => navigation.goBack()}
             color={COLORS.text}
             style={[
               styles.fontSizes,

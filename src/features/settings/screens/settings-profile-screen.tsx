@@ -2,7 +2,6 @@ import {
   Button,
   FormControl,
   HStack,
-  Modal,
   ScrollView,
   Text,
   VStack,
@@ -12,24 +11,23 @@ import {
 import {Controller, useForm} from 'react-hook-form';
 import {nationals, positions} from '../configs';
 
-import {COLORS, GRID} from '../../../constants/design-system';
-import {Input} from '../../../components/form';
 import {NavigationProp} from '@react-navigation/native';
-import {RadioCard} from '../components/radio-card';
-import React from 'react';
-import {useRootSelector} from '../../../redux/reducers';
 import {useMutation} from '@tanstack/react-query';
-import {userService} from '../../../services/user.service';
-import {updateProfile} from '../../../redux/reducers/user.reducer';
+import React from 'react';
 import {useDispatch} from 'react-redux';
-import Toast from '../../../components/toast/toast';
-import {useModal} from '../../../hooks/use-modal';
+import {Input} from '../../../components/form';
+import {Modal} from '../../../components/modal';
 import {ModalCard} from '../../../components/modal-card';
-import {Alert, Dimensions} from 'react-native';
+import Toast from '../../../components/toast/toast';
+import {COLORS} from '../../../constants/design-system';
+import {useModal} from '../../../hooks/use-modal';
+import {useRootSelector} from '../../../redux/reducers';
+import {updateProfile} from '../../../redux/reducers/user.reducer';
+import {userService} from '../../../services/user.service';
+import {RadioCard} from '../components/radio-card';
 
 const FULL_NAME_MAX_LENGTH = 60;
 const DISPLAY_NAME_MAX_LENGTH = 16;
-const fullWidth = Dimensions.get('window').width;
 
 type Props = {
   navigation: NavigationProp<any>;
@@ -37,13 +35,15 @@ type Props = {
 
 const SettingsProfileScreen = ({navigation}: Props) => {
   const user = useRootSelector(state => state.user.profile)!;
-  const {close, finalRef, initialRef, isShowing} = useModal();
+  const {close, isShowing, open} = useModal();
+  const [allowGoBack, setAllowGoBack] = React.useState(false);
   const toast = useToast();
   const dispatch = useDispatch();
   const {mutate, isLoading} = useMutation({
     mutationFn: userService.updateUser,
     onSuccess: data => {
       dispatch(updateProfile(data));
+      reset(data);
       toast.show({
         render(props) {
           return (
@@ -62,6 +62,7 @@ const SettingsProfileScreen = ({navigation}: Props) => {
   const {
     control,
     handleSubmit,
+    reset,
     formState: {errors, isDirty},
   } = useForm({
     defaultValues: {
@@ -80,7 +81,7 @@ const SettingsProfileScreen = ({navigation}: Props) => {
   React.useEffect(
     () =>
       navigation.addListener('beforeRemove', e => {
-        if (!isDirty) {
+        if (!isDirty || allowGoBack) {
           // If we don't have unsaved changes, then we don't need to do anything
           return;
         }
@@ -88,25 +89,11 @@ const SettingsProfileScreen = ({navigation}: Props) => {
         // Prevent default behavior of leaving the screen
         e.preventDefault();
 
-        // Prompt the user before leaving the screen
-        Alert.alert(
-          'Discard changes?',
-          'You have unsaved changes. Are you sure to discard them and leave the screen?',
-          [
-            {text: "Don't leave", style: 'cancel', onPress: () => {}},
-            {
-              text: 'Discard',
-              style: 'destructive',
-              // If the user confirmed, then we dispatch the action we blocked earlier
-              // This will continue the action that had triggered the removal of the screen
-              onPress: () => navigation.dispatch(e.data.action),
-            },
-          ],
-        );
+        open();
       }),
-    [navigation, isDirty],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [navigation, isDirty, allowGoBack],
   );
-
   return (
     <ScrollView keyboardShouldPersistTaps={'handled'} bg="white" px={5}>
       <FormControl>
@@ -216,29 +203,27 @@ const SettingsProfileScreen = ({navigation}: Props) => {
           <View />
         </VStack>
       </FormControl>
-      <Modal
-        isOpen={isShowing}
-        onClose={close}
-        initialFocusRef={initialRef}
-        finalFocusRef={finalRef}>
-        <Modal.Content width={fullWidth - GRID.gap * 2}>
-          <ModalCard
-            title="Go back?"
-            cancelButton={
-              <Button onPress={close} ref={finalRef} variant="outline">
-                Cancel
-              </Button>
-            }
-            confirmButton={
-              <Button onPress={navigation.goBack} ref={initialRef}>
-                Go back
-              </Button>
-            }>
-            <Text fontSize="md" color={COLORS.text}>
-              Are you sure to go back? Your changes won’t be saved.
-            </Text>
-          </ModalCard>
-        </Modal.Content>
+      <Modal isOpen={isShowing} onClose={close}>
+        <ModalCard
+          title="Go back?"
+          description="Are you sure to go back? Your changes won’t be saved."
+          cancelButton={
+            <Button onPress={close} variant="outline">
+              Cancel
+            </Button>
+          }
+          confirmButton={
+            <Button
+              onPress={() => {
+                setAllowGoBack(true);
+                setTimeout(() => {
+                  navigation.goBack();
+                }, 100);
+              }}>
+              Go back
+            </Button>
+          }
+        />
       </Modal>
     </ScrollView>
   );
