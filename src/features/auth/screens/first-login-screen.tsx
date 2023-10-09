@@ -20,6 +20,7 @@ import commonStyles from '../../../styles/common';
 import {setIsAuthenticate} from '../../../redux/reducers/user.reducer';
 import {useDispatch} from 'react-redux';
 import {useRootSelector} from '../../../redux/reducers';
+import {Role} from '../../../types/user';
 
 var fullWidth = Dimensions.get('window').width;
 
@@ -158,12 +159,12 @@ const ThirdRoute = (props: IRouteProps) => {
           },
         ]}>
         <CountryCard
-          isActive={userData.nativeLanguage === 'Korea'}
+          isActive={userData.nativeLanguage === 'ko'}
           onPress={() => {
             setUserData(prev => {
               return {
                 ...prev,
-                nativeLanguage: 'Korea',
+                nativeLanguage: 'ko',
               };
             });
           }}
@@ -171,12 +172,12 @@ const ThirdRoute = (props: IRouteProps) => {
           source={require('../../../assets/images/KoreanFlagIcon.png')}
         />
         <CountryCard
-          isActive={userData.nativeLanguage === 'VietNam'}
+          isActive={userData.nativeLanguage === 'vi'}
           onPress={() => {
             setUserData(prev => {
               return {
                 ...prev,
-                nativeLanguage: 'VietNam',
+                nativeLanguage: 'vi',
               };
             });
           }}
@@ -200,24 +201,33 @@ const ThirdRoute = (props: IRouteProps) => {
     </View>
   );
 };
+const allRoles: {
+  title: string;
+  image: any;
+  value: Role;
+}[] = [
+  {
+    title: 'Developer',
+    image: require('../../../assets/images/Dev.png'),
+    value: 'developer',
+  },
+  {
+    title: 'Designer',
+    image: require('../../../assets/images/Designer.png'),
+    value: 'designer',
+  },
+  {
+    title: 'Others',
+    image: require('../../../assets/images/Other.png'),
+    value: 'others',
+  },
+];
+
 const FourRoute = (props: IRouteProps) => {
   const {jumpTo, userData, setUserData} = props;
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const allRoles = [
-    {
-      title: 'Developer',
-      image: require('../../../assets/images/Dev.png'),
-    },
-    {
-      title: 'Designer',
-      image: require('../../../assets/images/Designer.png'),
-    },
-    {
-      title: 'Others',
-      image: require('../../../assets/images/Other.png'),
-    },
-  ];
+
   return !isLoading ? (
     <View style={[styles.container]}>
       <Image
@@ -232,7 +242,7 @@ const FourRoute = (props: IRouteProps) => {
         {allRoles.map((item, index) => {
           return (
             <CustomCard
-              isActive={userData.role === allRoles[index].title}
+              isActive={userData.role === allRoles[index].value}
               containerStyle={[
                 userData.role === allRoles[index].title
                   ? {opacity: 1}
@@ -243,7 +253,7 @@ const FourRoute = (props: IRouteProps) => {
                 setUserData(prev => {
                   return {
                     ...prev,
-                    role: allRoles[index].title,
+                    role: allRoles[index].value,
                   };
                 });
               }}
@@ -296,8 +306,8 @@ const FirstLoginScreen: FC = () => {
     email: '',
     displayName: '',
     fullName: '',
-    nativeLanguage: '',
-    role: '',
+    nativeLanguage: 'en',
+    role: 'developer',
   });
   useEffect(() => {
     if (user?.email) {
