@@ -19,4 +19,5 @@ export interface IUserUpdateDTO {
   displayName?: string
   role?: Role
   nativeLanguage?: Language
+  autoDownload?: boolean
 }

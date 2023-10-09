@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String
+    },
+    autoDownload: {
+      type: Boolean,
+      default: false
     }
   },
   {
