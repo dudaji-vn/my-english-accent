@@ -17,4 +17,5 @@ export type User = {
   nativeLanguage: Language;
   role: Role;
   appSetting?: AppSetting;
+  autoDownload?: boolean;
 } & BaseEntity;
