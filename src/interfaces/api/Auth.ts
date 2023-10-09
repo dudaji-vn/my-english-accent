@@ -1,3 +1,5 @@
+import {Language, Role} from '../../types/user';
+
 export interface IUserLoginDTO {
   userId: string;
   email: string;
@@ -5,8 +7,8 @@ export interface IUserLoginDTO {
 export interface IUserRegisterDTO {
   userId: string;
   email: string;
-  role: string;
-  nativeLanguage: string;
+  role: Role;
+  nativeLanguage: Language;
   avatar: string;
   fullName: string;
   displayName: string;

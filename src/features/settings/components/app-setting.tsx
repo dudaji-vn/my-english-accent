@@ -17,8 +17,11 @@ import {SettingButton} from './setting-button';
 import {SettingSection} from './setting-section';
 import {Switch} from 'react-native-switch';
 import {requestPermissions} from '../utils/request-permissions';
+import {useModal} from '../../../hooks/use-modal';
 
+const fullWidth = Dimensions.get('window').width;
 export const AppSetting = () => {
+  const {close, open, isShowing} = useModal();
   const [isEnabled, setIsEnabled] = React.useState(false);
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
   const [isShowQuestion, setIsShowQuestion] = React.useState(false);
@@ -26,14 +29,11 @@ export const AppSetting = () => {
   const hideQuestion = () => setIsShowQuestion(false);
   const initialRef = React.useRef(null);
   const finalRef = React.useRef(null);
-  const fullWidth = Dimensions.get('window').width;
   return (
     <SettingSection title="App's Setting">
       <VStack space={1}>
         <SettingButton
-          onPress={() => {
-            requestPermissions();
-          }}
+          onPress={open}
           leftElement={<ChevronRightIcon />}
           title="App's permission"
         />
@@ -82,9 +82,7 @@ export const AppSetting = () => {
                       variant="outline">
                       I got it
                     </Button>
-                  }
-                  onConfirm={hideQuestion}
-                  onCancel={hideQuestion}>
+                  }>
                   <Text fontSize="md" color={COLORS.text}>
                     When you enable “
                     <Text fontWeight="semibold">Auto download</Text>”, we will
@@ -97,6 +95,31 @@ export const AppSetting = () => {
           </HStack>
         </SettingButton>
       </VStack>
+      <Modal
+        isOpen={isShowing}
+        onClose={close}
+        initialFocusRef={initialRef}
+        finalFocusRef={finalRef}>
+        <Modal.Content width={fullWidth - GRID.gap * 2}>
+          <ModalCard
+            title="App’s permissions"
+            description="Please kindly accept these permissions to allow the app runs smoothly!"
+            cancelButton={
+              <Button onPress={close} ref={finalRef}>
+                Go to setting
+              </Button>
+            }>
+            <VStack space={2}>
+              <Text fontSize="md" color={COLORS.text}>
+                - Microphone
+              </Text>
+              <Text fontSize="md" color={COLORS.text}>
+                - Storage
+              </Text>
+            </VStack>
+          </ModalCard>
+        </Modal.Content>
+      </Modal>
     </SettingSection>
   );
 };

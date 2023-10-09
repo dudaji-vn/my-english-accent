@@ -18,7 +18,7 @@ import {COLORS} from '../../../constants/design-system';
 import React from 'react';
 import {SettingButton} from './setting-button';
 import {SettingSection} from './setting-section';
-import {openDownloadFolder} from '../utils/open-download-folder';
+import {openDownloadsDirectory} from '../utils/open-download-folder';
 
 type DeviceStorage = {
   total: StorageInfo;
@@ -99,7 +99,7 @@ export const DataAndStorage = () => {
         </HStack>
         <SettingButton
           title="Manage downloaded files"
-          onPress={openDownloadFolder}
+          onPress={openDownloadsDirectory}
           leftElement={<ChevronRightIcon />}
         />
       </VStack>

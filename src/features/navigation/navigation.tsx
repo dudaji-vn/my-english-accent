@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {AuthNavigator} from './auth-navigator';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {MainNavigator} from './main-navigator';
 import {NavigationContainer} from '@react-navigation/native';
-import {keyStorage} from '../../consts';
-import {setIsAuthenticate} from '../../redux/reducers/user.reducer';
 import {useDispatch} from 'react-redux';
+import {keyStorage} from '../../consts';
 import {useRootSelector} from '../../redux/reducers';
+import {setIsAuthenticate, setUser} from '../../redux/reducers/user.reducer';
+import {AuthNavigator} from './auth-navigator';
+import {MainNavigator} from './main-navigator';
+import {authService} from '../../services/auth.service';
 
 export function Navigation() {
   const user = useRootSelector(item => item.user);
@@ -40,6 +41,18 @@ export function Navigation() {
     fetchAccessToken();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.isAuthenticated]);
+  useQuery({
+    queryKey: ['profile'],
+    queryFn: authService.getProfile,
+    enabled: user?.isAuthenticated,
+    onSuccess: data => {
+      dispatch(
+        setUser({
+          profile: data,
+        }),
+      );
+    },
+  });
 
   return (
     <NavigationContainer>

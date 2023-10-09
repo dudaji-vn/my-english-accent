@@ -2,59 +2,110 @@ import {
   Button,
   FormControl,
   HStack,
-  Image,
-  Pressable,
+  Modal,
   ScrollView,
   Text,
   VStack,
   View,
+  useToast,
 } from 'native-base';
 import {Controller, useForm} from 'react-hook-form';
-import {Language, Position, User} from '../../../types/user';
+import {nationals, positions} from '../configs';
 
-import {COLORS} from '../../../constants/design-system';
+import {COLORS, GRID} from '../../../constants/design-system';
 import {Input} from '../../../components/form';
-import KRFlag from '../../../assets/images/KoreanFlagIcon.png';
+import {NavigationProp} from '@react-navigation/native';
+import {RadioCard} from '../components/radio-card';
 import React from 'react';
-import VNFlag from '../../../assets/images/VietNamFlagIcon.png';
-import designerImg from '../../../assets/images/Designer.png';
-import devImg from '../../../assets/images/Dev.png';
-import otherImg from '../../../assets/images/Other.png';
+import {useRootSelector} from '../../../redux/reducers';
+import {useMutation} from '@tanstack/react-query';
+import {userService} from '../../../services/user.service';
+import {updateProfile} from '../../../redux/reducers/user.reducer';
+import {useDispatch} from 'react-redux';
+import Toast from '../../../components/toast/toast';
+import {useModal} from '../../../hooks/use-modal';
+import {ModalCard} from '../../../components/modal-card';
+import {Alert, Dimensions} from 'react-native';
 
 const FULL_NAME_MAX_LENGTH = 60;
 const DISPLAY_NAME_MAX_LENGTH = 16;
+const fullWidth = Dimensions.get('window').width;
 
-type Props = {};
-const user: User = {
-  avatar: 'https://i.pravatar.cc/300',
-  name: 'Nguyen Minh Nhat',
-  displayName: 'Sun',
-  email: 'Example@gmail.com',
-  firstLanguage: 'vi',
-  id: '1',
-  position: 'developer',
+type Props = {
+  navigation: NavigationProp<any>;
 };
 
-const SettingsProfileScreen = (props: Props) => {
+const SettingsProfileScreen = ({navigation}: Props) => {
+  const user = useRootSelector(state => state.user.profile)!;
+  const {close, finalRef, initialRef, isShowing} = useModal();
+  const toast = useToast();
+  const dispatch = useDispatch();
+  const {mutate, isLoading} = useMutation({
+    mutationFn: userService.updateUser,
+    onSuccess: data => {
+      dispatch(updateProfile(data));
+      toast.show({
+        render(props) {
+          return (
+            <Toast {...props} status="success">
+              Your changes have been saved!
+            </Toast>
+          );
+        },
+        placement: 'bottom',
+      });
+    },
+    onError: (error, variables) => {
+      console.log('update user error', error, variables);
+    },
+  });
   const {
     control,
     handleSubmit,
     formState: {errors, isDirty},
   } = useForm({
     defaultValues: {
-      fullName: user.name,
+      fullName: user.fullName,
       displayName: user.displayName,
-      firstLanguage: user.firstLanguage,
-      position: user.position,
+      nativeLanguage: user.nativeLanguage,
+      role: user.role,
     },
     mode: 'onChange',
   });
   const onSubmit = (data: any) => {
-    alert(JSON.stringify(data));
-    console.log(data);
+    mutate(data);
   };
 
   const isValid = isDirty && Object.keys(errors).length === 0;
+  React.useEffect(
+    () =>
+      navigation.addListener('beforeRemove', e => {
+        if (!isDirty) {
+          // If we don't have unsaved changes, then we don't need to do anything
+          return;
+        }
+
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+
+        // Prompt the user before leaving the screen
+        Alert.alert(
+          'Discard changes?',
+          'You have unsaved changes. Are you sure to discard them and leave the screen?',
+          [
+            {text: "Don't leave", style: 'cancel', onPress: () => {}},
+            {
+              text: 'Discard',
+              style: 'destructive',
+              // If the user confirmed, then we dispatch the action we blocked earlier
+              // This will continue the action that had triggered the removal of the screen
+              onPress: () => navigation.dispatch(e.data.action),
+            },
+          ],
+        );
+      }),
+    [navigation, isDirty],
+  );
 
   return (
     <ScrollView keyboardShouldPersistTaps={'handled'} bg="white" px={5}>
@@ -82,7 +133,7 @@ const SettingsProfileScreen = (props: Props) => {
                   onChangeText={onChange}
                   value={value}
                   placeholder="Enter your full name"
-                  error={errors.fullName?.message}
+                  error={errors.fullName?.message || ''}
                 />
               )}
               name="fullName"
@@ -130,7 +181,7 @@ const SettingsProfileScreen = (props: Props) => {
                   ))}
                 </HStack>
               )}
-              name="firstLanguage"
+              name="nativeLanguage"
             />
           </Section>
           <Section title="Position">
@@ -148,10 +199,11 @@ const SettingsProfileScreen = (props: Props) => {
                   ))}
                 </HStack>
               )}
-              name="position"
+              name="role"
             />
           </Section>
           <Button
+            isLoading={isLoading}
             opacity={isValid ? 1 : 0.3}
             disabled={!isValid}
             onPress={handleSubmit(onSubmit)}
@@ -164,6 +216,30 @@ const SettingsProfileScreen = (props: Props) => {
           <View />
         </VStack>
       </FormControl>
+      <Modal
+        isOpen={isShowing}
+        onClose={close}
+        initialFocusRef={initialRef}
+        finalFocusRef={finalRef}>
+        <Modal.Content width={fullWidth - GRID.gap * 2}>
+          <ModalCard
+            title="Go back?"
+            cancelButton={
+              <Button onPress={close} ref={finalRef} variant="outline">
+                Cancel
+              </Button>
+            }
+            confirmButton={
+              <Button onPress={navigation.goBack} ref={initialRef}>
+                Go back
+              </Button>
+            }>
+            <Text fontSize="md" color={COLORS.text}>
+              Are you sure to go back? Your changes won’t be saved.
+            </Text>
+          </ModalCard>
+        </Modal.Content>
+      </Modal>
     </ScrollView>
   );
 };
@@ -186,86 +262,3 @@ const Section = ({
     </VStack>
   );
 };
-type Content = {
-  name: string;
-  icon: React.ReactNode;
-};
-
-type RadioCardProps = {
-  isActive?: boolean;
-  content: Content;
-  onPress?: () => void;
-};
-const RadioCard = ({isActive, content, onPress}: RadioCardProps) => {
-  return (
-    <Pressable flex={1} onPress={onPress}>
-      <VStack opacity={isActive ? 1 : 0.6} space={2}>
-        <View
-          shadow={isActive ? 1 : 'none'}
-          borderWidth={isActive ? 1 : 0}
-          borderColor={COLORS.highlight}
-          justifyContent="center"
-          alignItems="center"
-          rounded="lg"
-          bg={isActive ? 'white' : COLORS.darkerBackground}
-          h={15}>
-          {content.icon}
-        </View>
-        <Text
-          fontSize="md"
-          fontWeight={isActive ? 'bold' : 'normal'}
-          textAlign="center"
-          color={COLORS.text}>
-          {content.name}
-        </Text>
-      </VStack>
-    </Pressable>
-  );
-};
-
-const nationals: {
-  content: Content;
-  value: Language;
-}[] = [
-  {
-    content: {
-      name: 'Korea',
-      icon: <Image w={8} h={8} alt="Korean flag" source={KRFlag} />,
-    },
-    value: 'ko',
-  },
-  {
-    content: {
-      name: 'Vietnam',
-      icon: <Image w={8} h={8} alt="Vietnamese flag" source={VNFlag} />,
-    },
-    value: 'vi',
-  },
-];
-
-const positions: {
-  content: Content;
-  value: Position;
-}[] = [
-  {
-    content: {
-      name: 'Developer',
-      icon: <Image w={10} h={10} alt="Developer icon" source={devImg} />,
-    },
-    value: 'developer',
-  },
-  {
-    content: {
-      name: 'Designer',
-      icon: <Image w={10} h={10} alt="Designer icon" source={designerImg} />,
-    },
-    value: 'designer',
-  },
-  {
-    content: {
-      name: 'Others',
-      icon: <Image w={10} h={10} alt="Other icon" source={otherImg} />,
-    },
-    value: 'others',
-  },
-];
