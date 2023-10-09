@@ -1,7 +1,7 @@
 import {NativeBaseProvider as LibProvider, extendTheme} from 'native-base';
 
-import {COLORS} from '../constants/design-system';
 import React from 'react';
+import {COLORS} from '../constants/design-system';
 
 const theme = extendTheme({
   fonts: {
@@ -24,6 +24,7 @@ const theme = extendTheme({
   sizes: {
     14: 56,
     15: 60,
+    29: 116,
     '14.5': 58,
   },
   components: {
@@ -51,7 +52,9 @@ const theme = extendTheme({
     },
     Button: {
       defaultProps: {
-        height: 14,
+        px: 8,
+        py: 4,
+        minW: 29,
         rounded: 'lg',
         _text: {
           fontWeight: 'semibold',
