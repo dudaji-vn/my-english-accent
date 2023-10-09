@@ -1,3 +1,5 @@
+import { Language, Role } from '../../entities/User'
+
 export interface IUserLoginDTO {
   userId: string
   email: string
@@ -10,4 +12,11 @@ export interface IUserRegisterDTO {
   avatar: string
   fullName: string
   displayName: string
+}
+export interface IUserUpdateDTO {
+  avatar?: string
+  fullName?: string
+  displayName?: string
+  role?: Role
+  nativeLanguage?: Language
 }

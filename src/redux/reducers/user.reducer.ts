@@ -1,10 +1,12 @@
-import {createSlice} from '@reduxjs/toolkit';
 import {IUserStore} from '../interface/IUserStore';
+import {User} from '../../types/user';
+import {createSlice} from '@reduxjs/toolkit';
 
 const initialState: IUserStore = {
   email: '',
   avatar: '',
   userId: '',
+  profile: {} as User,
   isAuthenticated: false,
 };
 
@@ -24,8 +26,17 @@ const userSlice: any = createSlice({
         ...action.payload,
       };
     },
+    updateProfile: (state, action) => {
+      return {
+        ...state,
+        profile: {
+          ...state.profile,
+          ...action.payload,
+        },
+      };
+    },
   },
 });
 
-export const {setUser, setIsAuthenticate} = userSlice.actions;
+export const {setUser, updateProfile, setIsAuthenticate} = userSlice.actions;
 export default userSlice.reducer;

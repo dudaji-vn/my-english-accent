@@ -20,8 +20,8 @@ export class HttpService {
           const accessToken = await AsyncStorage.getItem(
             keyStorage.accessToken,
           );
-
           if (accessToken) {
+            console.log('accessToken', accessToken);
             config.headers.Authorization = `Bearer ${accessToken}`;
           }
         } catch (error) {

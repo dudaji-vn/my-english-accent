@@ -15,5 +15,9 @@ userRouter.get(
   auth,
   catchAsync(userController.getAllUser.bind(userController))
 )
-
+userRouter.patch(
+  '/',
+  auth,
+  catchAsync(userController.updateUser.bind(userController))
+)
 export default userRouter
