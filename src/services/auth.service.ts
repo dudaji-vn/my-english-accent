@@ -1,7 +1,8 @@
-import httpService from './http.service';
 import {authEndpoint} from '../configs';
-import {IApiResponse} from '../interfaces/api/Http';
 import {IUserLoginDTO, IUserRegisterDTO} from '../interfaces/api/Auth';
+import {IApiResponse} from '../interfaces/api/Http';
+import {User} from '../types/user';
+import httpService from './http.service';
 
 class AuthService {
   async login(user: IUserLoginDTO): Promise<string> {
@@ -16,6 +17,11 @@ class AuthService {
       authEndpoint.register,
       user,
     );
+    return res.data.data;
+  }
+  async getProfile(): Promise<User> {
+    const res = await httpService.get<IApiResponse<User>>(authEndpoint.profile);
+    console.log('🙂', res.data.data);
     return res.data.data;
   }
 }

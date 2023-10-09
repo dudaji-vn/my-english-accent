@@ -19,6 +19,10 @@ export class AuthController {
     const dataRes = await this.authService.register(userRequestDto)
     return res.success(dataRes)
   }
+  async getProfile(req: IRequest, res: IResponse) {
+    const dataRes = req.user
+    return res.success(dataRes)
+  }
 }
 
 export default AuthController
