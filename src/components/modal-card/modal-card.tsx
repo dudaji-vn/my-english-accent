@@ -1,9 +1,9 @@
-import {HStack, Heading, Text, VStack} from 'native-base';
+import {HStack, Heading, Text, VStack, View} from 'native-base';
 
 import React from 'react';
 
 type Props = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   title: string;
   description?: string;
   confirmButton?: React.ReactNode;
@@ -14,14 +14,14 @@ type Props = {
 export const ModalCard = (props: Props) => {
   return (
     <VStack p={8} space={8} justifyContent="center">
-      <VStack space={4}>
+      <VStack space={8}>
         <Heading textAlign="center" fontSize="xl" fontWeight="medium">
           {props.title}
         </Heading>
         {props?.description && (
           <Text textAlign="center">{props.description}</Text>
         )}
-        {props.children}
+        {props.children && <View>{props.children}</View>}
       </VStack>
       <HStack space={8} justifyContent="center">
         {props.cancelButton}
