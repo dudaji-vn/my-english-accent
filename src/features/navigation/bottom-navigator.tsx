@@ -12,6 +12,7 @@ import {SCREEN_NAMES} from '../../constants/screen';
 import SettingsScreen from '../settings/screens/settings-screen';
 import {StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import MainRecordScreen from '../record/screens/main-record-screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -34,7 +35,13 @@ export const BottomNavigator = () => {
       })}
       tabBar={props => <Navbar routeIconsMap={routeIconsMap} {...props} />}>
       <Tab.Screen name={SCREEN_NAMES.listen} component={ListenScreen} />
-      <Tab.Screen name={SCREEN_NAMES.record} component={ListenScreen} />
+      <Tab.Screen
+        name={SCREEN_NAMES.record}
+        options={{
+          title: 'Record',
+        }}
+        component={MainRecordScreen}
+      />
       <Tab.Screen name={SCREEN_NAMES.game} component={ListenScreen} />
       <Tab.Screen
         name={SCREEN_NAMES.settings}

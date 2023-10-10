@@ -96,6 +96,13 @@ const theme = extendTheme({
         },
       },
     },
+    Progress: {
+      defaultProps: {
+        __filledTrack: {
+          bg: 'highlight',
+        },
+      },
+    },
   },
 });
 
