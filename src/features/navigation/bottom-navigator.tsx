@@ -14,7 +14,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MainRecordScreen from '../record/screens/main-record-screen';
 import ExampleComponentsScreen from '../example/screens/example-components-screen';
 import ListenScreen from '../listen/screens/listen-screen';
-import ListenNavigator from './listen-navigator';
+import {ListenNavigator} from './listen-navigator';
 
 const Tab = createBottomTabNavigator();
 
