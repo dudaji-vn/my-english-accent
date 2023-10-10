@@ -1,4 +1,6 @@
 import mongoose from 'mongoose'
+export type Role = 'developer' | 'designer' | 'others'
+export type Language = 'en' | 'vi' | 'ko'
 const userSchema = new mongoose.Schema(
   {
     userId: {
@@ -21,13 +23,20 @@ const userSchema = new mongoose.Schema(
     },
     nativeLanguage: {
       type: String,
+      enum: ['en', 'vi', 'ko'],
       required: true
     },
     role: {
-      type: String
+      type: String,
+      enum: ['developer', 'designer', 'other'],
+      required: true
     },
     avatar: {
       type: String
+    },
+    autoDownload: {
+      type: Boolean,
+      default: false
     }
   },
   {

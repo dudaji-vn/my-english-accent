@@ -8,20 +8,24 @@ const auth = async (
   next: NextFunction
 ) => {
   try {
-    const token = req.header('Authorization')
+    let token = req.header('Authorization')
 
-    if (!token)
+    if (!token) {
       return res.status(400).json({ msg: 'Invalid Authentication.' })
+    }
+    token = token.split(' ')[1]
     const tokenSecret = process.env.ACCESS_TOKEN_SECRET
     if (!tokenSecret) {
       throw Error('token secret is required')
     }
+
     const decoded = jwt.verify(token, tokenSecret) as any
 
-    if (!decoded)
+    if (!decoded) {
       return res
         .status(400)
         .json({ message: 'Invalid Authentication.' })
+    }
 
     const user = await UserModel.findOne({ _id: decoded.userId })
     if (!user) {

@@ -4,17 +4,18 @@ export type Language =
   | 'en' // English
   | 'ko' // Korean
   | 'vi'; // Vietnamese
-export type Position = 'developer' | 'designer' | 'others';
+export type Role = 'developer' | 'designer' | 'others';
 type AppSetting = {
   autoPlay: boolean;
 };
 
 export type User = {
   email: string;
-  name: string;
+  fullName: string;
   displayName: string;
   avatar: string;
-  firstLanguage: Language;
-  position: Position;
+  nativeLanguage: Language;
+  role: Role;
   appSetting?: AppSetting;
+  autoDownload?: boolean;
 } & BaseEntity;

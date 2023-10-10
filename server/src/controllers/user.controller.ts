@@ -9,4 +9,11 @@ export default class UserController {
     const users = await this.userService.getAll()
     return res.success(users)
   }
+  async updateUser(req: IRequest, res: IResponse) {
+    const user = await this.userService.updateUser(
+      req.body,
+      req.user._id
+    )
+    return res.success(user)
+  }
 }

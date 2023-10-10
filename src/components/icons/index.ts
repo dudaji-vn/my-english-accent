@@ -8,3 +8,4 @@ export * from './question-outline-icon';
 export * from './subtract';
 export * from './dot-icon';
 export * from './chevron-left-icon';
+export * from './pencil-icon';
