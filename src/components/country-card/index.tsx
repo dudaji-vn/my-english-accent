@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import React from 'react';
-import {Text} from 'native-base';
+import {Pressable, Text} from 'native-base';
 import {colors} from '../../consts';
 
 interface ICountryCard {
@@ -21,12 +21,12 @@ const CountryCard = (props: ICountryCard) => {
   const {source, country, onPress, isActive} = props;
   return (
     <View style={[styles.wrapper]}>
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
-        style={[styles.cardImage, isActive && styles.cardActive]}
-        accessibilityRole="button">
+        style={[styles.cardImage, isActive && styles.cardActive]}>
         <Image source={source} style={styles.image} />
-      </TouchableOpacity>
+      </Pressable>
+
       <Text>{country}</Text>
     </View>
   );
@@ -49,10 +49,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
     shadowRadius: 4,
     opacity: 0.6,
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
   cardActive: {
     borderColor: colors.highlight,
-    borderWidth: 2,
+
     opacity: 1,
   },
   image: {

@@ -6,4 +6,5 @@ export interface IUserStore {
   isAuthenticated: false;
   profile: User;
   userId: string;
+  name: string;
 }

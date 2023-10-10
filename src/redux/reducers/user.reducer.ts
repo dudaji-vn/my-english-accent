@@ -8,6 +8,7 @@ const initialState: IUserStore = {
   userId: '',
   profile: {} as User,
   isAuthenticated: false,
+  name: '',
 };
 
 const userSlice: any = createSlice({

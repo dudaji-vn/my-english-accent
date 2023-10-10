@@ -31,6 +31,7 @@ export default function LoginScreen() {
             email: googleUser.user.email,
             avatar: googleUser.user.photo,
             userId: googleUser.user.id,
+            name: googleUser.user.name,
           }),
         );
         const userRequest: IUserLoginDTO = {
