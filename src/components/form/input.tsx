@@ -1,17 +1,15 @@
-import {AlertCircle, XCircle} from 'react-native-feather';
 import {
   FormControl,
   IInputProps,
-  Image,
   Input as NBInput,
-  Pressable,
   Text,
   View,
 } from 'native-base';
+import {AlertCircle, XCircle} from 'react-native-feather';
 
-import {COLORS} from '../../constants/design-system';
 import React from 'react';
 import {TouchableWithoutFeedback} from 'react-native';
+import {COLORS} from '../../constants/design-system';
 
 type Props = {
   label?: string;

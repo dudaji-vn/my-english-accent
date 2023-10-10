@@ -26,6 +26,7 @@ const theme = extendTheme({
     15: 60,
     29: 116,
     '14.5': 58,
+    46: 184,
   },
   components: {
     Input: {
@@ -93,6 +94,13 @@ const theme = extendTheme({
         _backdrop: {
           bg: '#000',
           opacity: 0.7,
+        },
+      },
+    },
+    Progress: {
+      defaultProps: {
+        __filledTrack: {
+          bg: 'highlight',
         },
       },
     },
