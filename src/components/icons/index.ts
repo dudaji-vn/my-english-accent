@@ -11,3 +11,4 @@ export * from './chevron-left-icon';
 export * from './pencil-icon';
 export * from './mic-filled-icon';
 export * from './filter-icon';
+export * from './mic-check-icon';

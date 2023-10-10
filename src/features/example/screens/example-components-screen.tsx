@@ -4,7 +4,7 @@ import MainLayout from '../../../components/layout/main-layout';
 import {Topic, TopicCard} from '../../../components/topic-card';
 import {HStack, Text, VStack} from 'native-base';
 import {WordItem} from '../../../components/word-item';
-import {MicFilledIcon} from '../../../components/icons';
+import {MicCheckIcon, MicFilledIcon} from '../../../components/icons';
 import {COLORS} from '../../../constants/design-system';
 import {Filter} from '../../../components/filter';
 import {AppProgress} from '../../../components/app-progress';
@@ -67,10 +67,11 @@ const ExampleComponentsScreen = ({}: Props) => {
                 word={topic.text}
                 status={topic.isRecorded ? 'disabled' : 'active'}
                 leftElement={
-                  <MicFilledIcon
-                    opacity={topic.isRecorded ? 1 : 0.1}
-                    color={topic.isRecorded ? COLORS.highlight : COLORS.text}
-                  />
+                  topic.isRecorded ? (
+                    <MicCheckIcon />
+                  ) : (
+                    <MicFilledIcon opacity={0.1} color={COLORS.text} />
+                  )
                 }
               />
             ))}
