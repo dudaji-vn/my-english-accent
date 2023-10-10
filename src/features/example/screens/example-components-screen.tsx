@@ -1,11 +1,12 @@
 import {NavigationProp} from '@react-navigation/native';
-import React from 'react';
-import MainLayout from '../../../components/layout/main-layout';
-import {Topic, TopicCard} from '../../../components/topic-card';
 import {HStack, Text, VStack} from 'native-base';
+import React from 'react';
+
+import ScrollViewLayout from '../../../components/layout/scroll-view-layout';
+import {Topic, TopicCard} from '../../../components/topic-card';
+import {COLORS} from '../../../constants/design-system';
 import {WordItem} from '../../../components/word-item';
 import {MicCheckIcon, MicFilledIcon} from '../../../components/icons';
-import {COLORS} from '../../../constants/design-system';
 import {Filter} from '../../../components/filter';
 import {AppProgress} from '../../../components/app-progress';
 import {Headphones} from 'react-native-feather';
@@ -50,7 +51,7 @@ const words: {
 
 const ExampleComponentsScreen = ({}: Props) => {
   return (
-    <MainLayout>
+    <ScrollViewLayout>
       <VStack space={10}>
         <Section title="Topic Card">
           <HStack space={4} justifyContent="space-between">
@@ -103,7 +104,7 @@ const ExampleComponentsScreen = ({}: Props) => {
           />
         </Section>
       </VStack>
-    </MainLayout>
+    </ScrollViewLayout>
   );
 };
 
