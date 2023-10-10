@@ -1,4 +1,4 @@
-import {ScrollView, View} from 'native-base';
+import {View} from 'native-base';
 import React from 'react';
 
 type Props = {
@@ -7,10 +7,9 @@ type Props = {
 
 const MainLayout = (props: Props) => {
   return (
-    <ScrollView bgColor="white" height="full" px={4}>
+    <View bgColor="white" height="full" px={4}>
       {props.children}
-      <View width="full" bg="black" mb={24} />
-    </ScrollView>
+    </View>
   );
 };
 
