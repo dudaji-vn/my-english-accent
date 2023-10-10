@@ -7,6 +7,8 @@ import {WordItem} from '../../../components/word-item';
 import {MicFilledIcon} from '../../../components/icons';
 import {COLORS} from '../../../constants/design-system';
 import {Filter} from '../../../components/filter';
+import {AppProgress} from '../../../components/app-progress';
+import {Headphones} from 'react-native-feather';
 
 const designerImg = require('../../../assets/images/Designer.png');
 
@@ -49,7 +51,7 @@ const words: {
 const ExampleComponentsScreen = ({}: Props) => {
   return (
     <MainLayout>
-      <VStack space={4}>
+      <VStack space={10}>
         <Section title="Topic Card">
           <HStack space={4} justifyContent="space-between">
             {data.map((topic, index) => (
@@ -91,6 +93,12 @@ const ExampleComponentsScreen = ({}: Props) => {
                 value: 'not-recorded',
               },
             ]}
+          />
+        </Section>
+        <Section title="App Progress">
+          <AppProgress
+            progress={40}
+            startIcon={<Headphones color="white" width={20} height={20} />}
           />
         </Section>
       </VStack>
