@@ -9,6 +9,7 @@ export const COLORS = {
   darkerBackground: '#f2f2f2',
   lighterBackground: '#fcfcfc',
   error: '#ff4040',
+  errorClick: '#D93636',
 };
 export const OPACITY = {
   normal: 0.6,
