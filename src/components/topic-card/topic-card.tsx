@@ -39,7 +39,8 @@ export const TopicCard = (props: Props) => {
         opacity={props.isActive ? 1 : 0.3}
         borderWidth={1}
         borderColor={props.isActive ? COLORS.highlight : COLORS.stroke}
-        p={4}
+        px={4}
+        py={3}
         rounded="lg"
         bg={COLORS.background}>
         <HStack space={4}>
