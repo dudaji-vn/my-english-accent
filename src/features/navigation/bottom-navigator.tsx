@@ -13,6 +13,7 @@ import SettingsScreen from '../settings/screens/settings-screen';
 import {StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MainRecordScreen from '../record/screens/main-record-screen';
+import ExampleComponentsScreen from '../example/screens/example-components-screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,7 +43,10 @@ export const BottomNavigator = () => {
         }}
         component={MainRecordScreen}
       />
-      <Tab.Screen name={SCREEN_NAMES.game} component={ListenScreen} />
+      <Tab.Screen
+        name={SCREEN_NAMES.game}
+        component={ExampleComponentsScreen}
+      />
       <Tab.Screen
         name={SCREEN_NAMES.settings}
         options={{
