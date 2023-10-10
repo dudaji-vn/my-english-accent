@@ -14,20 +14,22 @@ type Props = {
 export const ModalCard = (props: Props) => {
   return (
     <VStack p={8} space={8} justifyContent="center">
-      <VStack space={8}>
+      <VStack space={4}>
         <Heading textAlign="center" fontSize="xl" fontWeight="medium">
           {props.title}
         </Heading>
-        {props?.description && (
-          <Text textAlign="center">{props.description}</Text>
-        )}
-        {props.children && <View>{props.children}</View>}
+        <VStack space={8}>
+          {props.children && <View>{props.children}</View>}
+          {props?.description && (
+            <Text textAlign="center">{props.description}</Text>
+          )}
+          <HStack space={8} justifyContent="center">
+            {props.cancelButton}
+            {props.confirmButton}
+          </HStack>
+          {props.footer}
+        </VStack>
       </VStack>
-      <HStack space={8} justifyContent="center">
-        {props.cancelButton}
-        {props.confirmButton}
-      </HStack>
-      {props.footer}
     </VStack>
   );
 };
