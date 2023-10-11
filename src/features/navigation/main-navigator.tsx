@@ -3,6 +3,7 @@ import React from 'react';
 import {SCREEN_NAMES} from '../../constants/screen';
 import {SettingNavigator} from './settings-navigator';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {ListenNavigator} from './listen-navigator';
 const Stack = createNativeStackNavigator();
 
 export const MainNavigator = () => {
@@ -16,6 +17,10 @@ export const MainNavigator = () => {
       <Stack.Screen
         name={SCREEN_NAMES.settingsNavigator}
         component={SettingNavigator}
+      />
+      <Stack.Screen
+        name={SCREEN_NAMES.listeningsNavigator}
+        component={ListenNavigator}
       />
     </Stack.Navigator>
   );

@@ -1,6 +1,5 @@
 export const PATH = {
   auth: '/auth',
-  room: '/room',
-  message: '/message',
+  file: '/file',
   user: '/user'
 }
