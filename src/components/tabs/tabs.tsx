@@ -14,7 +14,7 @@ const initialLayout = {
 export type TabData = {
   key: string;
   title: string;
-  content: React.ReactNode;
+  content: React.ComponentType<any>;
 };
 type Props = {
   tabs: TabData[];
