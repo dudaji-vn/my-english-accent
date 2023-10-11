@@ -11,21 +11,11 @@ const data = [
   {id: '4', text: 'Item 4'},
   {id: '5', text: 'Item 1'},
   {id: '6', text: 'Item 2'},
-  {id: '7', text: 'Item 3'},
-  {id: '8', text: 'Item 4'},
-  {id: '1', text: 'Item 1'},
-  {id: '9', text: 'Item 2'},
-  {id: '10', text: 'Item 3'},
-  {id: '11', text: 'Item 4'},
-  {id: '12', text: 'Item 2'},
-  {id: '13', text: 'Item 3'},
-  {id: '14', text: 'Item 4'},
-  // Add more items as needed
 ];
 
 const ListGroup = () => {
   return (
-    <View style={{height: 600, marginHorizontal: -10}}>
+    <View style={{marginHorizontal: -10, maxHeight: 900}}>
       <FlatList
         horizontal={false}
         nestedScrollEnabled={true}
