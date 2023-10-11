@@ -29,6 +29,7 @@
     "react-native-device-info": "^10.11.0",
     "react-native-feather": "^1.1.2",
     "react-native-fs": "^2.20.0",
+    "react-native-highlight-words": "^1.0.1",
     "react-native-image-crop-picker": "^0.40.0",
     "react-native-pager-view": "^6.2.1",
     "react-native-permissions": "^3.9.3",
