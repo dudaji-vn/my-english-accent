@@ -1,3 +1,4 @@
+import {useNavigation} from '@react-navigation/native';
 import * as React from 'react';
 import {FC, useState} from 'react';
 import {
@@ -12,12 +13,12 @@ import {Route, SceneRendererProps, TabView} from 'react-native-tab-view';
 import SearchIcon from '../../../components/icons/search-icon';
 import Row from '../../../components/row';
 import {COLORS} from '../../../constants/design-system';
+import {SCREEN_NAMES} from '../../../constants/screen';
 import {colors} from '../../../consts';
 import CustomTabBarListen from '../components/CustomTabBarListen';
 import IndividualTab from './individual/individual-tab';
-import {useNavigation} from '@react-navigation/native';
-import {SCREEN_NAMES} from '../../../constants/screen';
-import {IndividualNavigator} from './individual/individual-navigator';
+
+import MainGroupScreen from './group/main-group-screen';
 
 var fullWidth = Dimensions.get('window').width;
 
@@ -42,9 +43,9 @@ const ListenScreen: FC = () => {
     const {route, jumpTo} = props;
     switch (route.key) {
       case 'first':
-        return <IndividualNavigator />;
-      case 'second':
         return <IndividualTab />;
+      case 'second':
+        return <MainGroupScreen />;
       case 'third':
         return <IndividualTab />;
       case 'four':
@@ -52,12 +53,14 @@ const ListenScreen: FC = () => {
     }
   };
   return (
-    <View style={[{flex: 1}]}>
+    <View style={[{flex: 1, backgroundColor: '#fff'}]}>
       <Row rowStyle={styles.header}>
         <Text style={styles.headerText}>Listen</Text>
         <Pressable
           onPress={() => {
-            navigation.navigate(SCREEN_NAMES.searchListen);
+            navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
+              screen: SCREEN_NAMES.searchListen,
+            });
           }}>
           <SearchIcon />
         </Pressable>
