@@ -12,6 +12,7 @@ export const COLORS = {
   errorClick: '#D93636',
   darkColor: '#000000',
   textPrimary: '#000000',
+  white: '#ffffff',
 };
 export const OPACITY = {
   normal: 0.6,
