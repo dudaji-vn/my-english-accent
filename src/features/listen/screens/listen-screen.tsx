@@ -66,6 +66,7 @@ const ListenScreen: FC = () => {
         </Pressable>
       </Row>
       <TabView
+        swipeEnabled={false}
         renderTabBar={props => <CustomTabBarListen {...props} />}
         navigationState={{index, routes}}
         renderScene={renderScene}
