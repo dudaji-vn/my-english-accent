@@ -1,6 +1,5 @@
 import {FlatList, HStack, VStack, View} from 'native-base';
 import React from 'react';
-import {Dimensions, StatusBar, useWindowDimensions} from 'react-native';
 import {Mic} from 'react-native-feather';
 import {AppProgress} from '../../../components/app-progress';
 import {Filter} from '../../../components/filter';
@@ -8,6 +7,8 @@ import {MicCheckIcon, MicFilledIcon} from '../../../components/icons';
 import {Topic, TopicCard} from '../../../components/topic-card';
 import {WordItem} from '../../../components/word-item';
 import {COLORS} from '../../../constants/design-system';
+import {useNavigation} from '@react-navigation/native';
+import {SCREEN_NAMES} from '../../../constants/screen';
 const designerImg = require('../../../assets/images/Designer.png');
 
 const generalImg = require('../../../assets/images/Chat.png');
@@ -87,6 +88,7 @@ const words: {
   },
 ];
 const Record = (props: Props) => {
+  const navigation = useNavigation();
   return (
     <VStack flex={1} pt={5}>
       <AppProgress
@@ -125,6 +127,11 @@ const Record = (props: Props) => {
         renderItem={({item, index}) => (
           <>
             <WordItem
+              onPress={() => {
+                navigation.navigate(SCREEN_NAMES.recordNavigator, {
+                  screen: SCREEN_NAMES.wordsRecord,
+                });
+              }}
               key={index}
               word={item.text}
               status={item.isRecorded ? 'disabled' : 'active'}
