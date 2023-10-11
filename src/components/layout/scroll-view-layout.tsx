@@ -7,7 +7,7 @@ type Props = {
 
 const ScrollViewLayout = (props: Props) => {
   return (
-    <ScrollView bgColor="white" height="full" px={4}>
+    <ScrollView paddingX={5} paddingY={4} bgColor="white" height="full" px={5}>
       {props.children}
       <View width="full" bg="black" mb={24} />
     </ScrollView>
