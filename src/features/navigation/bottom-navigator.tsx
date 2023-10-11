@@ -39,7 +39,7 @@ export const BottomNavigator = () => {
       <Tab.Screen
         options={{headerShown: false}}
         name={SCREEN_NAMES.listen}
-        component={ListenNavigator}
+        component={ListenScreen}
       />
       <Tab.Screen
         name={SCREEN_NAMES.record}
