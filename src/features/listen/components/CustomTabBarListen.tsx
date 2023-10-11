@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {
   NavigationState,
@@ -21,8 +21,8 @@ const CustomTabBarListen = <T extends Route>({
   jumpTo,
 }: SceneRendererProps & {navigationState: NavigationState<T>}) => {
   const {routes, index} = navigationState;
+  const [indexActive, setIndexActive] = useState(0);
 
-  console.log(routes);
   const icons = [
     {
       normal: <IndividualIcon />,
@@ -46,11 +46,16 @@ const CustomTabBarListen = <T extends Route>({
     <View style={styles.tabBar}>
       {routes.map((route, id) => (
         <Pressable
-          style={index === id && styles.activeTab}
+          style={indexActive === id && styles.activeTab}
           key={route.key}
-          onPress={() => jumpTo(route.key)}>
-          {index === id ? icons[id]?.active : icons[id]?.normal}
-          {index === id && <Text style={styles.tabText}>{route.title}</Text>}
+          onPress={() => {
+            jumpTo(route.key);
+            setIndexActive(id);
+          }}>
+          {indexActive === id ? icons[id]?.active : icons[id]?.normal}
+          {indexActive === id && (
+            <Text style={styles.tabText}>{route.title}</Text>
+          )}
         </Pressable>
       ))}
     </View>
@@ -63,7 +68,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginTop: 20,
     marginHorizontal: 20,
-    gap: 20,
+    gap: 10,
   },
   tabItem: {
     alignItems: 'center',
