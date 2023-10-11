@@ -7,6 +7,9 @@ const Stack = createNativeStackNavigator();
 export const RecordNavigator = () => (
   <Stack.Navigator>
     <Stack.Screen
+      options={{
+        headerShown: false,
+      }}
       name={SCREEN_NAMES.wordsRecord}
       component={WordsRecordScreen}
     />

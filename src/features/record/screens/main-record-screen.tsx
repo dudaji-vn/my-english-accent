@@ -12,7 +12,7 @@ const tabs: TabData[] = [
   {
     key: 'Record',
     title: 'Record',
-    content: () => <Record />,
+    content: Record,
   },
   {
     key: 'My record list',
