@@ -27,6 +27,7 @@ const theme = extendTheme({
     29: 116,
     '14.5': 58,
     46: 184,
+    31: 124,
   },
   components: {
     Input: {
