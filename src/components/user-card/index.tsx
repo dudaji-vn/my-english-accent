@@ -1,11 +1,20 @@
-import {Avatar, View} from 'native-base';
+import {Avatar, HStack, Pressable, Progress, View} from 'native-base';
 import React from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {COLORS} from '../../constants/design-system';
+import {useNavigation} from '@react-navigation/native';
+import {SCREEN_NAMES} from '../../constants/screen';
+import HeadPhoneListenIcon from '../icons/headphone-listen-icon';
 
 const UserCard = () => {
+  const navigation = useNavigation<any>();
+  const handleClick = () => {
+    navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
+      screen: SCREEN_NAMES.individualDetail,
+    });
+  };
   return (
-    <View style={styles.container}>
+    <Pressable onPress={handleClick} style={styles.container}>
       <View style={styles.avatar}>
         <Avatar
           width={15}
@@ -25,8 +34,18 @@ const UserCard = () => {
 
       <Text style={styles.textName}>Display name</Text>
       <Text style={styles.textRole}>Position</Text>
-      <Text style={styles.textSentences}>12 sentences</Text>
-    </View>
+      <Text style={styles.textSentences}>12 sentences1</Text>
+      <HStack space={2} width={'100%'} alignItems={'center'}>
+        <HeadPhoneListenIcon />
+        <Progress
+          flex={1}
+          _filledTrack={{
+            bg: COLORS.highlight,
+          }}
+          value={40}
+        />
+      </HStack>
+    </Pressable>
   );
 };
 
@@ -39,6 +58,11 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 16,
     borderRadius: 8,
+    shadowColor: '#161616',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   avatar: {
     position: 'relative',
@@ -67,6 +91,7 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontWeight: '400',
     fontSize: 16,
+    marginBottom: 20,
   },
 });
 export default UserCard;
