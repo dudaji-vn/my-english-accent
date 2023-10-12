@@ -2,6 +2,7 @@ import {HStack, Image, Progress, Text, VStack, View} from 'native-base';
 import React, {useMemo} from 'react';
 import {ImageSourcePropType, TouchableOpacity} from 'react-native';
 import {COLORS} from '../../constants/design-system';
+
 export type Topic = {
   name: string;
   image: ImageSourcePropType;
@@ -47,7 +48,7 @@ export const TopicCard = (props: Props) => {
           <Image source={props.topic.image} alt="image" h={10} w={10} />
           {showContent && (
             <VStack>
-              <Text lineHeight="xs" fontWeight="medium" fontSize="xl">
+              <Text lineHeight="xs" fontWeight="medium" fontSize="lg">
                 {props.topic.name}
               </Text>
               <Text lineHeight="xs" fontWeight="normal">
