@@ -19,6 +19,9 @@ import CustomTabBarListen from '../components/CustomTabBarListen';
 import IndividualTab from './individual/individual-tab';
 
 import MainGroupScreen from './group/main-group-screen';
+import FavoriteNotFound from './favorite/not-found-favorite';
+import DownloadTab from './download/download-tab';
+import NotInternet from '../components/NotInternet';
 
 var fullWidth = Dimensions.get('window').width;
 
@@ -43,13 +46,13 @@ const ListenScreen: FC = () => {
     const {route, jumpTo} = props;
     switch (route.key) {
       case 'first':
-        return <IndividualTab />;
+        return <NotInternet /> || <IndividualTab />;
       case 'second':
         return <MainGroupScreen />;
       case 'third':
-        return <IndividualTab />;
+        return true ? <FavoriteNotFound /> : <IndividualTab />;
       case 'four':
-        return <IndividualTab />;
+        return <DownloadTab />;
     }
   };
   return (
@@ -66,6 +69,7 @@ const ListenScreen: FC = () => {
         </Pressable>
       </Row>
       <TabView
+        swipeEnabled={false}
         renderTabBar={props => <CustomTabBarListen {...props} />}
         navigationState={{index, routes}}
         renderScene={renderScene}

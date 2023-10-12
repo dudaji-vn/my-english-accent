@@ -9,7 +9,7 @@ import {colors} from '../../../consts';
 import IndividualIcon from '../../../components/icons/individual-icon';
 import GroupIcon from '../../../components/icons/group-icon';
 import FavoriteIcon from '../../../components/icons/favorite-icon';
-import DownloadIcon from '../../../components/icons/download-icon';
+import DownloadIconRound from '../../../components/icons/download-icon-round';
 import IndividualIconActive from '../../../components/icons/invidual-icon-active';
 import {Pressable} from 'native-base';
 import GroupIconActive from '../../../components/icons/group-icon-active';
@@ -37,7 +37,7 @@ const CustomTabBarListen = <T extends Route>({
       active: <FavoriteIconActive />,
     },
     {
-      normal: <DownloadIcon />,
+      normal: <DownloadIconRound />,
       active: <DownLoadIconActive />,
     },
   ];

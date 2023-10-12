@@ -1,18 +1,12 @@
 import {useNavigation} from '@react-navigation/native';
-import {Avatar, FlatList, Pressable, View} from 'native-base';
+import {Avatar, FlatList, HStack, View} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text} from 'react-native';
-import {COLORS} from '../../constants/design-system';
-import {SCREEN_NAMES} from '../../constants/screen';
+import {COLORS} from '../../../constants/design-system';
 
-const GroupCard = () => {
+const RowGroup = () => {
   const navigation = useNavigation<any>();
-  const handleClick = () => {
-    navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
-      screen: SCREEN_NAMES.listenDetailScreen,
-      params: {typeScreen: 'group'},
-    });
-  };
+  const handleClick = () => {};
   const listUsers: any = [
     {
       _id: '111',
@@ -61,68 +55,50 @@ const GroupCard = () => {
         {_id: 'none', remainingCount: `+${remainingCount}`},
       ];
       setUsers(newUsers);
+    } else {
+      setUsers(listUsers);
     }
   }, [users.length]);
 
-  const renderMember = ({item, index}: {item: any; index: number}) => {
-    return (
-      <View style={styles.avatar}>
-        <Avatar
-          backgroundColor={item?.remainingCount && COLORS.highlight}
-          size={'sm'}
-          source={{
-            uri:
-              item.name &&
-              'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
-          }}>
-          <Text style={{fontSize: 14, color: '#fff'}}>
-            {item.name ? item.name : item?.remainingCount}
-          </Text>
-        </Avatar>
-      </View>
-    );
-  };
   return (
-    <Pressable onPress={handleClick} style={styles.container}>
-      <FlatList
-        initialNumToRender={4}
-        data={users}
-        keyExtractor={(item, index) => item._id.toString()}
-        numColumns={2}
-        renderItem={renderMember}
-      />
-
-      <Text style={styles.textName}>Group name</Text>
-      <Text style={styles.textRole}>5 members</Text>
-      <Text style={styles.textSentences}>12 sentences</Text>
-    </Pressable>
+    <HStack alignItems={'center'}>
+      <View style={styles.container}>
+        {users.map((item: any, index) => {
+          return (
+            <View style={styles.avatar}>
+              <Avatar
+                backgroundColor={item?.remainingCount && COLORS.highlight}
+                size={'sm'}
+                source={{
+                  uri:
+                    item.name &&
+                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+                }}>
+                <Text style={{fontSize: 14, color: '#fff'}}>
+                  {item.name ? item.name : item?.remainingCount}
+                </Text>
+              </Avatar>
+            </View>
+          );
+        })}
+      </View>
+      <View>
+        <Text style={styles.textName}>Group name</Text>
+        <Text style={styles.textSentences}>11 sentences</Text>
+      </View>
+    </HStack>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.lighterBackground,
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    margin: 10,
-    padding: 16,
-    borderRadius: 8,
-    shadowColor: '#161616',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: 80,
+    gap: 4,
   },
   avatar: {
     position: 'relative',
-    margin: 2,
-  },
-  avatarImage: {},
-  flag: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
   },
 
   textName: {
@@ -143,4 +119,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-export default GroupCard;
+export default RowGroup;

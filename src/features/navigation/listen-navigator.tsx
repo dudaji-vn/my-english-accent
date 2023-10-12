@@ -1,11 +1,12 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SCREEN_NAMES} from '../../constants/screen';
-import SearchListenScreen from '../listen/screens/individual/search-listen-screen';
-import ListenScreen from '../listen/screens/listen-screen';
-import InvididualDetailScreen from '../listen/screens/individual/individual-detail-screen';
+import CreateGroupScreen from '../listen/screens/group/create-group-screen';
+import MainGroupScreen from '../listen/screens/group/main-group-screen';
+import ListenDetailScreen from '../listen/screens/individual/listen-detail-screen';
 import IndividualTab from '../listen/screens/individual/individual-tab';
 import ListAudioListenScreen from '../listen/screens/individual/list-audio-screen';
-import MainGroupScreen from '../listen/screens/group/main-group-screen';
+import SearchListenScreen from '../listen/screens/individual/search-listen-screen';
+import ListenScreen from '../listen/screens/listen-screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -19,14 +20,18 @@ export const ListenNavigator = () => {
       />
       <Stack.Screen name={SCREEN_NAMES.individual} component={IndividualTab} />
       <Stack.Screen
-        name={SCREEN_NAMES.individualDetail}
-        component={InvididualDetailScreen}
+        name={SCREEN_NAMES.listenDetailScreen}
+        component={ListenDetailScreen}
       />
       <Stack.Screen
         name={SCREEN_NAMES.listAudioListenScreen}
         component={ListAudioListenScreen}
       />
       <Stack.Screen name={SCREEN_NAMES.mainGroup} component={MainGroupScreen} />
+      <Stack.Screen
+        name={SCREEN_NAMES.createGroup}
+        component={CreateGroupScreen}
+      />
     </Stack.Navigator>
   );
 };

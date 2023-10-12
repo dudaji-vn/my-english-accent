@@ -10,7 +10,8 @@ const UserCard = () => {
   const navigation = useNavigation<any>();
   const handleClick = () => {
     navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
-      screen: SCREEN_NAMES.individualDetail,
+      screen: SCREEN_NAMES.listenDetailScreen,
+      params: {typeScreen: 'user'},
     });
   };
   return (

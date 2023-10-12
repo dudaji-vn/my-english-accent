@@ -1,17 +1,20 @@
-import {View, Text, FlatList} from 'native-base';
-import React from 'react';
+import {FlatList, Text, View} from 'native-base';
 import {SceneMap, TabView} from 'react-native-tab-view';
+import {COLORS} from '../../../constants/design-system';
 import CustomTabBarSearch from './CustomTabBarSearch';
 import ListUser from './ListUser';
-import {COLORS} from '../../../constants/design-system';
-import UserCard from '../../../components/user-card';
+import {useState} from 'react';
+import ListGroup from './ListGroup';
+import SearchNotFound from '../../../components/search-notfound';
 
 const SearchResult = () => {
   const data = [
     {
+      type: 'user',
       text: 'Individual (10)',
     },
-    {text: 'Group (10)'},
+
+    {type: 'group', text: 'Group (10)'},
   ];
   const FirstRoute = () => (
     <FlatList
@@ -22,35 +25,25 @@ const SearchResult = () => {
           <Text color={COLORS.highlight} marginY={5}>
             {item.text}
           </Text>
-          <ListUser />
+          {item.type === 'user' ? <ListUser /> : <ListGroup />}
         </View>
       )}
     />
-    // <View style={{backgroundColor: '#fff'}}>
-    //   <Text color={COLORS.highlight} marginY={5}>
-
-    //   </Text>
-    //   <ListUser />
-    //   <Text color={COLORS.highlight} marginY={5}>
-    //      (10)
-    //   </Text>
-    //   <ListUser />
-    // </View>
   );
 
   const SecondRoute = () => <View style={{flex: 1}} />;
 
   const renderScene = SceneMap({
-    first: FirstRoute,
-    second: SecondRoute,
-    third: FirstRoute,
+    allScreen: SearchNotFound || FirstRoute,
+    individualScreen: SecondRoute,
+    groupScreen: FirstRoute,
   });
 
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    {key: 'first', title: 'All (10)'},
-    {key: 'second', title: 'Individual (10)'},
-    {key: 'third', title: 'Group (0)'},
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
+    {key: 'allScreen', title: 'All (10)'},
+    {key: 'individualScreen', title: 'Individual (10)'},
+    {key: 'groupScreen', title: 'Group (0)'},
   ]);
   return (
     <TabView

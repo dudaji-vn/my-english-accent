@@ -1,11 +1,11 @@
 import {CloseIcon, HStack, Text} from 'native-base';
+import {useState} from 'react';
+import {FlatList, Pressable, SafeAreaView, View} from 'react-native';
 import BreadCrumb from '../../../../components/bread-crumb/bread-crumb';
 import {Input} from '../../../../components/form';
 import ScreenWrapper from '../../../../components/layout/screen-wrapper';
-import {FlatList, Pressable, SafeAreaView, View} from 'react-native';
-import {COLORS, OPACITY} from '../../../../constants/design-system';
 import {WordItem} from '../../../../components/word-item';
-import {useState} from 'react';
+import {COLORS, OPACITY} from '../../../../constants/design-system';
 import SearchResult from '../../components/SearchResult';
 
 const SearchListenScreen = () => {
@@ -51,9 +51,7 @@ const SearchListenScreen = () => {
       </SafeAreaView>
     );
   };
-  const renderResult = () => {
-    return <Text>Result</Text>;
-  };
+
   return (
     <ScreenWrapper>
       <HStack space={2} alignItems={'center'} marginBottom={5}>

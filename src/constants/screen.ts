@@ -11,7 +11,8 @@ export const SCREEN_NAMES = {
   listeningsNavigator: 'listeningsNavigator',
   searchListen: 'searchListen',
   individual: 'individual',
-  individualDetail: 'individualDetail',
+  listenDetailScreen: 'individualDetail',
   listAudioListenScreen: 'listAudioListenScreen',
   mainGroup: 'mainGroup',
+  createGroup: 'createGroup',
 };

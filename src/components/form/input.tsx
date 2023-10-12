@@ -10,13 +10,22 @@ import {AlertCircle, XCircle} from 'react-native-feather';
 import React from 'react';
 import {TouchableWithoutFeedback} from 'react-native';
 import {COLORS} from '../../constants/design-system';
+import SearchIcon from '../icons/search-icon';
 
 type Props = {
   label?: string;
   error?: string;
+  typeInput?: 'text' | 'search';
 } & IInputProps;
 
-export const Input = ({label, error, value, onBlur, ...props}: Props) => {
+export const Input = ({
+  label,
+  error,
+  value,
+  onBlur,
+  typeInput,
+  ...props
+}: Props) => {
   const [isFocused, setIsFocused] = React.useState(false);
 
   return (
@@ -35,6 +44,15 @@ export const Input = ({label, error, value, onBlur, ...props}: Props) => {
           setIsFocused(false);
         }}
         value={value}
+        InputLeftElement={
+          typeInput == 'search' && !isFocused && !value ? (
+            <View marginLeft={4}>
+              <SearchIcon />
+            </View>
+          ) : (
+            <></>
+          )
+        }
         InputRightElement={
           <>
             <View px={3}>
