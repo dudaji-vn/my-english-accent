@@ -27,6 +27,20 @@ const theme = extendTheme({
     29: 116,
     '14.5': 58,
     46: 184,
+    31: 124,
+    60: 240,
+    68: 272,
+  },
+  shadows: {
+    e3: {
+      shadowColor: 'rgba(22, 22, 22, 0.4)',
+      shadowOffset: {
+        width: -10,
+        height: -10,
+      },
+      shadowRadius: 24,
+      elevation: 8,
+    },
   },
   components: {
     Input: {
@@ -72,6 +86,7 @@ const theme = extendTheme({
             borderColor: 'primary',
             _text: {
               color: 'primary',
+              fontSize: 'md',
             },
           },
           _text: {
@@ -85,6 +100,18 @@ const theme = extendTheme({
           },
           _text: {
             color: 'white',
+          },
+        },
+        ghost: {
+          bg: 'transparent',
+          _pressed: {
+            bg: 'transparent',
+            _text: {
+              color: 'primary',
+            },
+          },
+          _text: {
+            color: 'highlight',
           },
         },
       },

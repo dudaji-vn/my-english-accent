@@ -14,13 +14,12 @@ export const AppProgress = (props: Props) => {
         {props.startIcon}
       </View>
       <VStack flex={1} justifyContent="space-between">
-        <Text>
-          Your progress:
+        <HStack space={2}>
+          <Text>Your progress:</Text>
           <Text color={COLORS.highlight} fontWeight="bold">
-            {' '}
             {props.progress}%
           </Text>
-        </Text>
+        </HStack>
         <Progress
           _filledTrack={{
             bg: 'highlight',

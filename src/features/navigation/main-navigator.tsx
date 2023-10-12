@@ -4,6 +4,7 @@ import {SCREEN_NAMES} from '../../constants/screen';
 import {SettingNavigator} from './settings-navigator';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {ListenNavigator} from './listen-navigator';
+import {RecordNavigator} from './record-navigator';
 const Stack = createNativeStackNavigator();
 
 export const MainNavigator = () => {
@@ -21,6 +22,10 @@ export const MainNavigator = () => {
       <Stack.Screen
         name={SCREEN_NAMES.listeningsNavigator}
         component={ListenNavigator}
+      />
+      <Stack.Screen
+        name={SCREEN_NAMES.recordNavigator}
+        component={RecordNavigator}
       />
     </Stack.Navigator>
   );

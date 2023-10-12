@@ -8,6 +8,8 @@ export const SCREEN_NAMES = {
   game: 'game',
   settingsNavigator: 'settings-navigator',
   settingsProfile: 'settings-profile',
+  recordNavigator: 'record-navigator',
+  wordsRecord: 'words-record',
   listeningsNavigator: 'listeningsNavigator',
   searchListen: 'searchListen',
   individual: 'individual',
