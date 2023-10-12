@@ -1,10 +1,10 @@
+import {BaseEntity} from './base-entity';
+import {Language} from './user';
+
 export type Dictionary = {
-  text: string;
-  textKorean: string;
-  textVietnam: string;
-  example: string;
-  exampleKR: string;
-  exampleVI: string;
+  text: Record<Language, string>;
+  pronunciation: string;
+  example: Record<Language, string>;
   wordType: string;
   category: string;
-};
+} & BaseEntity;

@@ -10,19 +10,57 @@ import {Modal} from '../../../components/modal';
 import {RecordCard} from '../components/record-card';
 import {WordContentCard} from '../components/word-content-card';
 import {SentenceContentCard} from '../components/sentence-content-card';
+import {request, PERMISSIONS} from 'react-native-permissions';
 
 type Props = {
   navigation: NavigationProp<any>;
 };
-
+const dictionary = {
+  id: '1',
+  text: {en: 'Hi', vi: 'Xin chào', ko: '안녕하세요'},
+  example: {
+    en: 'Hi, my name is John',
+    vi: 'Xin chào, tôi là John',
+    ko: '안녕하세요, 제 이름은 John입니다',
+  },
+  pronunciation: 'haɪ',
+  category: 'greeting',
+  wordType: 'noun',
+};
 const WordsRecordScreen = ({navigation}: Props) => {
   const {close, isShowing, open} = useModal();
-  const {onAllowGoBack} = useUnsavedChange(true, navigation, open);
+  const [recordedWord, setRecordedWord] = React.useState<{
+    id: string;
+    uri: string;
+    isSaved: boolean;
+  } | null>(null);
+  const [recordedSentence, setRecordedSentence] = React.useState<{
+    id: string;
+    uri: string;
+    isSaved: boolean;
+  } | null>(null);
+
+  React.useEffect(() => {
+    request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {
+      console.log(result);
+    });
+  }, []);
+  const isUnsaved = React.useMemo(() => {
+    if (!recordedWord && !recordedSentence) {
+      return false;
+    } else if (recordedWord && recordedSentence) {
+      return !recordedWord.isSaved || !recordedSentence.isSaved;
+    } else {
+      return !(recordedWord ? recordedWord.isSaved : recordedSentence?.isSaved);
+    }
+  }, [recordedWord, recordedSentence]);
+
+  const {onAllowGoBack} = useUnsavedChange(isUnsaved, navigation, open);
 
   return (
     <ScrollView bg="white">
       <HStack h={14} alignItems="center" justifyContent="space-between" px={5}>
-        <Pressable onPress={navigation.goBack}>
+        <Pressable p={4} onPress={navigation.goBack}>
           <X width={24} height={24} color={COLORS.text} />
         </Pressable>
         <HStack space={5}>
@@ -38,33 +76,44 @@ const WordsRecordScreen = ({navigation}: Props) => {
         </Pressable>
       </HStack>
       <VStack m={5} mt={1} space={5}>
-        <RecordCard>
-          <WordContentCard
-            word={{
-              text: 'Hi',
-              pronunciation: 'ˈyo͞ozər ˈin(t)ərˌfās',
-              meaning: 'Xin chào',
-            }}
-          />
+        <RecordCard
+          onHasRecord={uri => {
+            console.log(uri);
+            setRecordedWord({id: dictionary.id, uri, isSaved: false});
+          }}
+          onNoRecord={() => {
+            setRecordedWord(null);
+          }}>
+          <WordContentCard dictionary={dictionary} />
         </RecordCard>
-        <RecordCard>
-          <SentenceContentCard
-            dictionary={{
-              text: 'Hi',
-              textVietNam: 'Xin chào',
-              textKorean: '안녕하세요',
-              example: 'Hi, how are you?',
-              exampleVI: 'Xin chào, bạn có khỏe không?',
-              exampleKR: '안녕하세요, 어떻게 지내세요?',
-            }}
-          />
+        <RecordCard
+          onHasRecord={uri => {
+            console.log(uri);
+            setRecordedSentence({id: dictionary.id, uri, isSaved: false});
+          }}
+          onNoRecord={() => {
+            setRecordedSentence(null);
+          }}>
+          <SentenceContentCard dictionary={dictionary} />
         </RecordCard>
       </VStack>
       <HStack mt={5} mx={5} space={1}>
         <Button onPress={open} variant="ghost">
           Skip
         </Button>
-        <Button flex={1} h={16} onPress={open} variant="outline">
+        <Button
+          disabled={!recordedWord && !recordedSentence}
+          opacity={!recordedWord && !recordedSentence ? 0.3 : 1}
+          flex={1}
+          onPress={() => {
+            if (recordedWord) {
+              setRecordedWord(prev => ({...prev!, isSaved: true}));
+            }
+            if (recordedSentence) {
+              setRecordedSentence(prev => ({...prev!, isSaved: true}));
+            }
+          }}
+          variant="outline">
           Save
         </Button>
       </HStack>
