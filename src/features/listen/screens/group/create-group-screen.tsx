@@ -5,17 +5,16 @@ import {StyleSheet} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import BreadCrumb from '../../../../components/bread-crumb/bread-crumb';
 import {Input} from '../../../../components/form';
-import {PencilIcon} from '../../../../components/icons';
 import AddMemberIcon from '../../../../components/icons/add-member-icon';
 import AvatarIcon from '../../../../components/icons/avatar';
 import RemoveMemberIcon from '../../../../components/icons/remove-member-icon';
 import ScrollViewLayout from '../../../../components/layout/scroll-view-layout';
 import {Modal} from '../../../../components/modal';
 import {ModalCard} from '../../../../components/modal-card';
-import UserAvatar from '../../../../components/user-avatar';
 import {COLORS} from '../../../../constants/design-system';
 import {useModal} from '../../../../hooks/use-modal';
 import {uploadImage} from '../../../../utils/upload-image';
+import RowUserAvatar from '../../components/RowUserAvatar';
 const CreateGroupScreen = () => {
   const {close, isShowing, open} = useModal();
   const [allowGoBack, setAllowGoBack] = useState(false);
@@ -56,7 +55,6 @@ const CreateGroupScreen = () => {
       <View style={styles.groupContainer} bg={COLORS.white}>
         <Pressable onPress={handleCropAvatar} mb={8} alignItems={'center'}>
           <AvatarIcon />
-          <View style={styles.pencilIcon}></View>
         </Pressable>
         <Text mb={2}>What's your group name?</Text>
         <Input placeholder="Enter group name" />
@@ -75,18 +73,7 @@ const CreateGroupScreen = () => {
                 alignItems={'center'}
                 justifyContent={'space-between'}
                 key={index}>
-                <HStack space={4} alignItems={'center'}>
-                  <UserAvatar nation="ko" />
-                  <View>
-                    <Text style={styles.textName}>Display name</Text>
-                    <Text
-                      opacity={0.4}
-                      fontWeight={'400'}
-                      style={styles.textRole}>
-                      Position
-                    </Text>
-                  </View>
-                </HStack>
+                <RowUserAvatar />
                 <Pressable>
                   {index % 2 == 0 ? <AddMemberIcon /> : <RemoveMemberIcon />}
                 </Pressable>
@@ -133,16 +120,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 40,
   },
-  textName: {
-    color: COLORS.text,
-    fontWeight: '500',
-    fontSize: 16,
-  },
-  textRole: {
-    color: COLORS.text,
-    fontWeight: '300',
-    fontSize: 16,
-  },
+
   pencilIcon: {
     borderRadius: 99,
     backgroundColor: '#7F7F7F',

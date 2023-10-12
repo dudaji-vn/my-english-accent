@@ -2,7 +2,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {SCREEN_NAMES} from '../../constants/screen';
 import CreateGroupScreen from '../listen/screens/group/create-group-screen';
 import MainGroupScreen from '../listen/screens/group/main-group-screen';
-import InvididualDetailScreen from '../listen/screens/individual/individual-detail-screen';
+import ListenDetailScreen from '../listen/screens/individual/listen-detail-screen';
 import IndividualTab from '../listen/screens/individual/individual-tab';
 import ListAudioListenScreen from '../listen/screens/individual/list-audio-screen';
 import SearchListenScreen from '../listen/screens/individual/search-listen-screen';
@@ -20,8 +20,8 @@ export const ListenNavigator = () => {
       />
       <Stack.Screen name={SCREEN_NAMES.individual} component={IndividualTab} />
       <Stack.Screen
-        name={SCREEN_NAMES.individualDetail}
-        component={InvididualDetailScreen}
+        name={SCREEN_NAMES.listenDetailScreen}
+        component={ListenDetailScreen}
       />
       <Stack.Screen
         name={SCREEN_NAMES.listAudioListenScreen}
