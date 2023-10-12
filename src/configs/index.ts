@@ -1,3 +1,8 @@
+import {ImageSourcePropType} from 'react-native';
+import {Language} from '../types/user';
+const VNFlag = require('../assets/images/VietNamFlagIcon.png');
+const KRFlag = require('../assets/images/KoreanFlagIcon.png');
+
 // import {API_URL} from '@env';
 export const baseApiUrl = 'http://10.0.100.14:5000/';
 export const googleClientId =
@@ -11,4 +16,10 @@ export const authEndpoint = {
 
 export const userEndpoint = {
   base: 'api/user',
+};
+
+export const flagMap: Record<Language, ImageSourcePropType | undefined> = {
+  en: undefined,
+  ko: KRFlag,
+  vi: VNFlag,
 };
