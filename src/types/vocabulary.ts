@@ -1,10 +1,10 @@
 import {BaseEntity} from './base-entity';
 import {Language} from './user';
 
-export type Dictionary = {
+export type Vocabulary = {
   text: Record<Language, string>;
   pronunciation: string;
   example: Record<Language, string>;
-  wordType: string;
+  type: string;
   category: string;
 } & BaseEntity;

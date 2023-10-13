@@ -6,13 +6,13 @@ import {COLORS} from '../../../constants/design-system';
 import {StyleSheet} from 'react-native';
 import {flagMap} from '../../../configs';
 import {useRootSelector} from '../../../redux/reducers';
-import {Dictionary} from '../../../types/dictionary';
+import {Vocabulary} from '../../../types/vocabulary';
 
 type Props = {
-  dictionary: Dictionary;
+  vocabulary: Vocabulary;
 };
 
-export const SentenceContentCard = ({dictionary}: Props) => {
+export const SentenceContentCard = ({vocabulary}: Props) => {
   const nativeLanguage = useRootSelector(
     state => state.user.profile.nativeLanguage,
   )!;
@@ -25,14 +25,14 @@ export const SentenceContentCard = ({dictionary}: Props) => {
           highlightStyle={{
             color: COLORS.highlight,
           }}
-          searchWords={[dictionary.text.en]}
-          textToHighlight={dictionary.example.en}
+          searchWords={[vocabulary.text.en]}
+          textToHighlight={vocabulary.example.en}
         />
       </HStack>
       <HStack mt={3} alignItems="center" space={2}>
         <Image w={6} h={6} alt="Korean flag" source={flagMap[nativeLanguage]} />
         <Text opacity={0.6} fontSize="md" color={COLORS.text}>
-          {dictionary.example[nativeLanguage]}
+          {vocabulary.example[nativeLanguage]}
         </Text>
       </HStack>
     </VStack>

@@ -1,13 +1,14 @@
 import { injectable } from 'tsyringe'
 import fs from 'fs'
 import * as fastCsv from 'fast-csv'
-import DictionaryModel from '../entities/Dictionary'
+import VocabularyModel from '../entities/Vocabulary'
 
 @injectable()
 export default class FileService {
   private async parseCsvRow(row: string[], category: string) {
     const [
       wordOrExpression,
+      pronunciation,
       textKorean,
       textVietNam,
       example,
@@ -18,6 +19,7 @@ export default class FileService {
 
     if (
       wordOrExpression &&
+      pronunciation &&
       textKorean &&
       textVietNam &&
       example &&
@@ -27,13 +29,18 @@ export default class FileService {
       wordOrExpression !== 'word/expression'
     ) {
       return {
-        wordOrExpression,
-        textKorean,
-        textVietNam,
-        example,
-        exampleVI,
-        exampleKR,
-        wordType,
+        text: {
+          en: wordOrExpression,
+          vi: textVietNam,
+          ko: textKorean
+        },
+        pronunciation,
+        example: {
+          en: example,
+          vi: exampleVI,
+          ko: exampleKR
+        },
+        type: wordType,
         category
       }
     }
@@ -61,7 +68,7 @@ export default class FileService {
 
   private async insertDataIntoDatabase(data: any[]) {
     try {
-      const result = await DictionaryModel.insertMany(data)
+      const result = await VocabularyModel.insertMany(data)
       console.log('Documents inserted:', result)
     } catch (err) {
       console.error('Error inserting documents:', err)
@@ -69,17 +76,17 @@ export default class FileService {
   }
 
   async syncDataFromExcel() {
-    await DictionaryModel.deleteMany()
+    await VocabularyModel.deleteMany()
     await this.handleStoreFile(
-      './resource/MEA-Voca-General.csv',
+      './resource/MEA_Voca_General.csv',
       'general'
     )
     await this.handleStoreFile(
-      './resource/MEA-Voca-Designer.csv',
+      './resource/MEA_Voca_Designer.csv',
       'designer'
     )
     await this.handleStoreFile(
-      './resource/MEA-Voca-Developer.csv',
+      './resource/MEA_Voca_Develops.csv',
       'developer'
     )
     return 'sync data'

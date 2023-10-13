@@ -15,7 +15,7 @@ import {request, PERMISSIONS} from 'react-native-permissions';
 type Props = {
   navigation: NavigationProp<any>;
 };
-const dictionary = {
+const vocabulary = {
   id: '1',
   text: {en: 'Hi', vi: 'Xin chào', ko: '안녕하세요'},
   example: {
@@ -24,8 +24,8 @@ const dictionary = {
     ko: '안녕하세요, 제 이름은 John입니다',
   },
   pronunciation: 'haɪ',
-  category: 'greeting',
-  wordType: 'noun',
+  category: 'developer',
+  type: 'noun',
 };
 const WordsRecordScreen = ({navigation}: Props) => {
   const {close, isShowing, open} = useModal();
@@ -79,22 +79,22 @@ const WordsRecordScreen = ({navigation}: Props) => {
         <RecordCard
           onHasRecord={uri => {
             console.log(uri);
-            setRecordedWord({id: dictionary.id, uri, isSaved: false});
+            setRecordedWord({id: vocabulary.id, uri, isSaved: false});
           }}
           onNoRecord={() => {
             setRecordedWord(null);
           }}>
-          <WordContentCard dictionary={dictionary} />
+          <WordContentCard vocabulary={vocabulary} />
         </RecordCard>
         <RecordCard
           onHasRecord={uri => {
             console.log(uri);
-            setRecordedSentence({id: dictionary.id, uri, isSaved: false});
+            setRecordedSentence({id: vocabulary.id, uri, isSaved: false});
           }}
           onNoRecord={() => {
             setRecordedSentence(null);
           }}>
-          <SentenceContentCard dictionary={dictionary} />
+          <SentenceContentCard vocabulary={vocabulary} />
         </RecordCard>
       </VStack>
       <HStack mt={5} mx={5} space={1}>
