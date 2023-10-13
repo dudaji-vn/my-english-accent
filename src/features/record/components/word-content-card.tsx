@@ -3,30 +3,30 @@ import React from 'react';
 import {SpeakerIcon} from '../../../components/icons';
 import {COLORS} from '../../../constants/design-system';
 import {useRootSelector} from '../../../redux/reducers';
-import {Dictionary} from '../../../types/dictionary';
+import {Vocabulary} from '../../../types/vocabulary';
 import {flagMap} from '../../../configs';
 import {StyleSheet, Text} from 'react-native';
 
 type Props = {
-  dictionary: Dictionary;
+  vocabulary: Vocabulary;
 };
 
-export const WordContentCard = ({dictionary}: Props) => {
+export const WordContentCard = ({vocabulary}: Props) => {
   const nativeLanguage = useRootSelector(
     state => state.user.profile.nativeLanguage,
   )!;
   return (
     <VStack space={1}>
       <HStack alignItems="center" space={4}>
-        <Text style={styles.font}>{dictionary.text.en}</Text>
+        <Text style={styles.font}>{vocabulary.text.en}</Text>
         <Pressable>
           <SpeakerIcon />
         </Pressable>
       </HStack>
-      <Text style={styles.pronunciation}>/{dictionary.pronunciation}/</Text>
+      <Text style={styles.pronunciation}>/{vocabulary.pronunciation}/</Text>
       <HStack mt={3} alignItems="center" space={2}>
         <Image w={6} h={6} alt="Korean flag" source={flagMap[nativeLanguage]} />
-        <Text style={styles.example}>{dictionary.text[nativeLanguage]}</Text>
+        <Text style={styles.example}>{vocabulary.text[nativeLanguage]}</Text>
       </HStack>
     </VStack>
   );

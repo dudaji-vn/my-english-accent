@@ -2,12 +2,12 @@ import mongoose from 'mongoose'
 const recordSchema = new mongoose.Schema(
   {
     recordUrl: {
-      type: String,
-      required: true
+      word: String,
+      sentence: String
     },
-    dictionary: {
+    vocabulary: {
       type: mongoose.Types.ObjectId,
-      ref: 'dictionary',
+      ref: 'vocabulary',
       required: true
     },
     user: {
