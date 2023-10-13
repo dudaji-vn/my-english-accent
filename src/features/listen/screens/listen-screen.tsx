@@ -22,6 +22,7 @@ import MainGroupScreen from './group/main-group-screen';
 import FavoriteNotFound from './favorite/not-found-favorite';
 import DownloadTab from './download/download-tab';
 import NotInternet from '../components/NotInternet';
+import ListAudioListenScreen from './individual/list-audio-screen';
 
 var fullWidth = Dimensions.get('window').width;
 
@@ -46,7 +47,7 @@ const ListenScreen: FC = () => {
     const {route, jumpTo} = props;
     switch (route.key) {
       case 'first':
-        return <NotInternet /> || <IndividualTab />;
+        return <IndividualTab /> || <NotInternet />;
       case 'second':
         return <MainGroupScreen />;
       case 'third':

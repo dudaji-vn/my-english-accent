@@ -113,12 +113,7 @@ const ListenDetailScreen = ({route}: Props) => {
       />
       <HStack my={6} space={4} justifyContent="space-between">
         {data.map((topic, index) => (
-          <TopicCard
-            minimalOnInActive={index === 1}
-            isActive={index === 0}
-            key={index}
-            topic={topic}
-          />
+          <TopicCard isActive={index === 0} key={index} topic={topic} />
         ))}
       </HStack>
       <HStack justifyContent={'space-between'} mb={5}>
@@ -140,6 +135,7 @@ const ListenDetailScreen = ({route}: Props) => {
               onPress={() => {
                 navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
                   screen: SCREEN_NAMES.listAudioListenScreen,
+                  params: {typeScreen: 'group'},
                 });
               }}
               word={item}
