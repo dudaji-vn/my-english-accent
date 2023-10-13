@@ -33,6 +33,7 @@ type Props = {
 
 const data: Topic[] = [
   {
+    _id: '1',
     name: 'General',
     image: generalImg,
     description: 'General description',
@@ -40,6 +41,7 @@ const data: Topic[] = [
     numOfAchieved: 10,
   },
   {
+    _id: '2',
     name: 'Developer',
     image: designerImg,
     description: 'General description',
