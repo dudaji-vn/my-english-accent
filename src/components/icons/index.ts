@@ -12,3 +12,7 @@ export * from './pencil-icon';
 export * from './mic-filled-icon';
 export * from './filter-icon';
 export * from './mic-check-icon';
+export * from './speaker-icon';
+export * from './play-icon';
+export * from './trash-icon';
+export * from './pause-icon';
