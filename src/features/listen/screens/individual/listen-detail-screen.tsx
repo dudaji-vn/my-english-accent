@@ -1,21 +1,26 @@
-import {NavigationProp, RouteProp} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+} from '@react-navigation/native';
 import {HStack} from 'native-base';
 import React from 'react';
 
 import {FlatList, View} from 'react-native';
 import {Headphones} from 'react-native-feather';
 import {AppProgress} from '../../../../components/app-progress';
+import BreadCrumb from '../../../../components/bread-crumb/bread-crumb';
 import {Filter} from '../../../../components/filter';
 import DownLoadIcon from '../../../../components/icons/download-icon';
 import FillIcon from '../../../../components/icons/fill-icon';
 import InfoIcon from '../../../../components/icons/info-icon';
+import PlayAllIcon from '../../../../components/icons/play-all-icon';
 import ScreenWrapper from '../../../../components/layout/screen-wrapper';
 import {Topic, TopicCard} from '../../../../components/topic-card';
 import {WordItem} from '../../../../components/word-item';
-import RowUserAvatar from '../../components/RowUserAvatar';
-import PlayAllIcon from '../../../../components/icons/play-all-icon';
+import {SCREEN_NAMES} from '../../../../constants/screen';
 import RowGroup from '../../components/RowGroup';
-import BreadCrumb from '../../../../components/bread-crumb/bread-crumb';
+import RowUserAvatar from '../../components/RowUserAvatar';
 
 const designerImg = require('../../../../assets/images/Designer.png');
 
@@ -28,6 +33,7 @@ type Props = {
 
 const data: Topic[] = [
   {
+    _id: '1',
     name: 'General',
     image: generalImg,
     description: 'General description',
@@ -35,6 +41,7 @@ const data: Topic[] = [
     numOfAchieved: 10,
   },
   {
+    _id: '2',
     name: 'Developer',
     image: designerImg,
     description: 'General description',
@@ -83,6 +90,7 @@ const filterItems = [
 ];
 const ListenDetailScreen = ({route}: Props) => {
   const typeScreen = route.params?.typeScreen;
+  const navigation = useNavigation<any>();
 
   return (
     <ScreenWrapper>
@@ -99,7 +107,6 @@ const ListenDetailScreen = ({route}: Props) => {
           {typeScreen === 'group' ? <RowGroup /> : <RowUserAvatar />}
           <InfoIcon />
         </HStack>
-
         <DownLoadIcon />
       </HStack>
       <AppProgress
@@ -108,12 +115,7 @@ const ListenDetailScreen = ({route}: Props) => {
       />
       <HStack my={6} space={4} justifyContent="space-between">
         {data.map((topic, index) => (
-          <TopicCard
-            minimalOnInActive={index === 1}
-            isActive={index === 0}
-            key={index}
-            topic={topic}
-          />
+          <TopicCard isActive={index === 0} key={index} topic={topic} />
         ))}
       </HStack>
       <HStack justifyContent={'space-between'} mb={5}>
@@ -132,6 +134,12 @@ const ListenDetailScreen = ({route}: Props) => {
         renderItem={({item}) => (
           <View style={{marginBottom: 10}}>
             <WordItem
+              onPress={() => {
+                navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
+                  screen: SCREEN_NAMES.listAudioListenScreen,
+                  params: {typeScreen: 'group'},
+                });
+              }}
               word={item}
               status={'disabled'}
               leftElement={<FillIcon isFill />}

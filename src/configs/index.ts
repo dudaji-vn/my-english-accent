@@ -1,7 +1,7 @@
 import {ImageSourcePropType} from 'react-native';
 import {Language} from '../types/user';
-const VNFlag = require('../assets/images/VietNamFlagIcon.png');
-const KRFlag = require('../assets/images/KoreanFlagIcon.png');
+export const VNFlag = require('../assets/images/VietNamFlagIcon.png');
+export const KRFlag = require('../assets/images/KoreanFlagIcon.png');
 
 // import {API_URL} from '@env';
 export const baseApiUrl = 'http://10.0.100.14:5000/';

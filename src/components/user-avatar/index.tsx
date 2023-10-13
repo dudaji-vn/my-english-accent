@@ -1,13 +1,15 @@
 import {Avatar, View} from 'native-base';
+import {InterfaceAvatarProps} from 'native-base/lib/typescript/components/composites/Avatar/types';
 import React from 'react';
 import {StyleSheet} from 'react-native';
 
-interface IUserAvatarProps {
+interface IUserAvatarProps extends InterfaceAvatarProps {
   nation: 'ko' | 'vi';
   imageUrl?: string;
+  flagWidth?: number;
 }
 const UserAvatar = (props: IUserAvatarProps) => {
-  const {nation, imageUrl} = props;
+  const {nation, imageUrl, flagWidth} = props;
   return (
     <View style={styles.avatar}>
       <Avatar
@@ -15,12 +17,13 @@ const UserAvatar = (props: IUserAvatarProps) => {
         height={15}
         source={{
           uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
-        }}>
+        }}
+        {...props}>
         AJ
       </Avatar>
       <Avatar
-        width={6}
-        height={6}
+        width={flagWidth || 6}
+        height={flagWidth || 6}
         style={styles.flag}
         source={
           nation === 'ko'
@@ -34,8 +37,6 @@ const UserAvatar = (props: IUserAvatarProps) => {
 const styles = StyleSheet.create({
   avatar: {
     position: 'relative',
-    width: 60,
-    height: 60,
   },
   avatarImage: {},
   flag: {
