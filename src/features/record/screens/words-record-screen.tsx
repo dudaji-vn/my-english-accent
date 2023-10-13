@@ -59,8 +59,8 @@ const WordsRecordScreen = ({navigation}: Props) => {
 
   return (
     <ScrollView bg="white">
-      <HStack h={14} alignItems="center" justifyContent="space-between" px={5}>
-        <Pressable p={4} onPress={navigation.goBack}>
+      <HStack h={14} alignItems="center" justifyContent="space-between">
+        <Pressable p={5} onPress={navigation.goBack}>
           <X width={24} height={24} color={COLORS.text} />
         </Pressable>
         <HStack space={5}>
@@ -71,7 +71,7 @@ const WordsRecordScreen = ({navigation}: Props) => {
           </Text>
           <ChevronRight width={24} height={24} color={COLORS.text} />
         </HStack>
-        <Pressable onPress={() => navigation.navigate('Home')}>
+        <Pressable p={5} onPress={() => navigation.navigate('Home')}>
           <AlertCircle width={24} height={24} color={COLORS.text} />
         </Pressable>
       </HStack>

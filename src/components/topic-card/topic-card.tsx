@@ -4,6 +4,7 @@ import {ImageSourcePropType, TouchableOpacity} from 'react-native';
 import {COLORS} from '../../constants/design-system';
 
 export type Topic = {
+  _id: string;
   name: string;
   image: ImageSourcePropType;
   description: string;
@@ -14,6 +15,7 @@ type Props = {
   topic: Topic;
   isActive?: boolean;
   minimalOnInActive?: boolean;
+  onPress?: () => void;
 };
 
 export const TopicCard = (props: Props) => {
@@ -31,6 +33,7 @@ export const TopicCard = (props: Props) => {
 
   return (
     <TouchableOpacity
+      onPress={props.onPress}
       disabled={props.isActive}
       // eslint-disable-next-line react-native/no-inline-styles
       style={{
