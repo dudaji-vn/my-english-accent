@@ -1,4 +1,4 @@
-import {NavigationProp} from '@react-navigation/native';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
 import {Button, HStack, Pressable, ScrollView, Text, VStack} from 'native-base';
 import React from 'react';
 import {AlertCircle, ChevronLeft, ChevronRight, X} from 'react-native-feather';
@@ -14,9 +14,10 @@ import {request, PERMISSIONS} from 'react-native-permissions';
 
 type Props = {
   navigation: NavigationProp<any>;
+  route: RouteProp<any, any>;
 };
 const vocabulary = {
-  id: '1',
+  _id: '1',
   text: {en: 'Hi', vi: 'Xin chào', ko: '안녕하세요'},
   example: {
     en: 'Hi, my name is John',
@@ -27,15 +28,16 @@ const vocabulary = {
   category: 'developer',
   type: 'noun',
 };
-const WordsRecordScreen = ({navigation}: Props) => {
+const WordsRecordScreen = ({navigation, route}: Props) => {
+  const vocabularyId = route.params?.vocabularyId;
   const {close, isShowing, open} = useModal();
   const [recordedWord, setRecordedWord] = React.useState<{
-    id: string;
+    _id: string;
     uri: string;
     isSaved: boolean;
   } | null>(null);
   const [recordedSentence, setRecordedSentence] = React.useState<{
-    id: string;
+    _id: string;
     uri: string;
     isSaved: boolean;
   } | null>(null);
@@ -59,8 +61,8 @@ const WordsRecordScreen = ({navigation}: Props) => {
 
   return (
     <ScrollView bg="white">
-      <HStack h={14} alignItems="center" justifyContent="space-between" px={5}>
-        <Pressable p={4} onPress={navigation.goBack}>
+      <HStack h={14} alignItems="center" justifyContent="space-between">
+        <Pressable p={5} onPress={navigation.goBack}>
           <X width={24} height={24} color={COLORS.text} />
         </Pressable>
         <HStack space={5}>
@@ -71,7 +73,7 @@ const WordsRecordScreen = ({navigation}: Props) => {
           </Text>
           <ChevronRight width={24} height={24} color={COLORS.text} />
         </HStack>
-        <Pressable onPress={() => navigation.navigate('Home')}>
+        <Pressable p={5} onPress={() => navigation.navigate('Home')}>
           <AlertCircle width={24} height={24} color={COLORS.text} />
         </Pressable>
       </HStack>
@@ -79,7 +81,7 @@ const WordsRecordScreen = ({navigation}: Props) => {
         <RecordCard
           onHasRecord={uri => {
             console.log(uri);
-            setRecordedWord({id: vocabulary.id, uri, isSaved: false});
+            setRecordedWord({_id: vocabulary._id, uri, isSaved: false});
           }}
           onNoRecord={() => {
             setRecordedWord(null);
@@ -89,7 +91,7 @@ const WordsRecordScreen = ({navigation}: Props) => {
         <RecordCard
           onHasRecord={uri => {
             console.log(uri);
-            setRecordedSentence({id: vocabulary.id, uri, isSaved: false});
+            setRecordedSentence({_id: vocabulary._id, uri, isSaved: false});
           }}
           onNoRecord={() => {
             setRecordedSentence(null);

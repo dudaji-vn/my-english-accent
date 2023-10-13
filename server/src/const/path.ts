@@ -1,5 +1,7 @@
 export const PATH = {
   auth: '/auth',
   file: '/file',
-  user: '/user'
+  user: '/user',
+  vocabulary: '/vocabulary',
+  record: '/record'
 }

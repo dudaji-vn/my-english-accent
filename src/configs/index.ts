@@ -18,6 +18,14 @@ export const userEndpoint = {
   base: 'api/user',
 };
 
+export const vocabularyEndpoint = {
+  base: 'api/vocabulary',
+};
+
+export const recordEndpoint = {
+  base: 'api/record',
+};
+
 export const flagMap: Record<Language, ImageSourcePropType | undefined> = {
   en: undefined,
   ko: KRFlag,

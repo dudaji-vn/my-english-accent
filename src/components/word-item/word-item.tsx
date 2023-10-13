@@ -1,7 +1,7 @@
-import {HStack, Text} from 'native-base';
+import {HStack} from 'native-base';
 import React from 'react';
 import {COLORS} from '../../constants/design-system';
-import {TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 
 type Props = {
   word: string;
@@ -28,15 +28,17 @@ export const WordItem = (props: Props) => {
         px={4}
         py={5}>
         <Text
-          textTransform="capitalize"
-          fontWeight="bold"
-          color={
-            props.status === 'active'
-              ? COLORS.highlight
-              : props.status === 'disabled'
-              ? COLORS.stroke
-              : COLORS.text
-          }>
+          style={[
+            styles.text,
+            {
+              color:
+                props.status === 'active'
+                  ? COLORS.highlight
+                  : props.status === 'disabled'
+                  ? COLORS.stroke
+                  : COLORS.text,
+            },
+          ]}>
           {props.word}
         </Text>
         {props.leftElement}
@@ -44,3 +46,10 @@ export const WordItem = (props: Props) => {
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  text: {
+    fontSize: 16,
+    fontWeight: '400',
+  },
+});
