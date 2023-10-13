@@ -5,8 +5,8 @@ import RNFetchBlob from 'rn-fetch-blob';
 import uuid from 'react-native-uuid';
 const recorder = new AudioRecorderPlayer();
 
-export const useAudioRecord = () => {
-  const [cacheFilePath, setCacheFilePath] = React.useState('');
+export const useAudioRecord = (path?: string) => {
+  const [cacheFilePath, setCacheFilePath] = React.useState(path || '');
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [isRecording, setIsRecording] = React.useState(false);
   const [metering, setMetering] = React.useState(-36);
@@ -25,7 +25,6 @@ export const useAudioRecord = () => {
     recorder.addRecordBackListener(e => {
       const currentMetering = e.currentMetering || -36;
       setMetering(currentMetering);
-      
     });
   }
 
