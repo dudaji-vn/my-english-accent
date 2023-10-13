@@ -15,3 +15,13 @@ export interface IMedia {
   type: string
   url: string
 }
+
+export interface ICursorParams {
+  limit?: number
+  cursor?: string
+}
+export interface ICursorResponse<T> {
+  items: T[]
+  endCursor: string
+  hasNextPage: boolean
+}

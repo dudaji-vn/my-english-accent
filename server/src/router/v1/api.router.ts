@@ -3,6 +3,8 @@ import { PATH } from '../../const/path'
 import authRouter from './auth.router'
 import userRouter from './user.router'
 import fileRouter from './file.router'
+import vocabularyRouter from './vocabulary.router'
+import recordRouter from './record.router'
 
 const apiRouterV1 = express.Router()
 
@@ -18,6 +20,14 @@ const listApi = [
   {
     path: PATH.file,
     router: fileRouter
+  },
+  {
+    path: PATH.vocabulary,
+    router: vocabularyRouter
+  },
+  {
+    path: PATH.record,
+    router: recordRouter
   }
 ]
 listApi.forEach((item) => {

@@ -94,6 +94,9 @@ export default class FileService {
 
   private async handleStoreFile(source: string, category: string) {
     const generalData = await this.processCsvFile(source, category)
-    await this.insertDataIntoDatabase(generalData)
+    const sortedData = generalData.sort((a, b) =>
+      a.text.en.toLowerCase().localeCompare(b.text.en.toLowerCase())
+    )
+    await this.insertDataIntoDatabase(sortedData)
   }
 }
