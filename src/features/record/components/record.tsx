@@ -16,6 +16,7 @@ import {
 } from '../../../services/vocabulary.service';
 import {recordService} from '../../../services/record.service';
 import {useRootSelector} from '../../../redux/reducers';
+import {Vocabulary} from '../../../types/vocabulary';
 const designerImg = require('../../../assets/images/Designer.png');
 
 const generalImg = require('../../../assets/images/Chat.png');
@@ -92,9 +93,12 @@ const Record = ({}: Props) => {
 
   const vocabularies = data?.items || [];
 
-  const handlePressItem = () => {
+  const handlePressItem = (vocabulary: Vocabulary) => {
     navigation.navigate(SCREEN_NAMES.recordNavigator, {
       screen: SCREEN_NAMES.wordsRecord,
+      params: {
+        vocabularyId: vocabulary._id,
+      },
     });
   };
   const handleSelectedFilter = (value: string) => {
@@ -168,7 +172,7 @@ const Record = ({}: Props) => {
           return (
             <>
               <WordItem
-                onPress={isRecorded ? undefined : handlePressItem}
+                onPress={isRecorded ? undefined : () => handlePressItem(item)}
                 key={index}
                 word={item.text.en}
                 status={isRecorded ? 'disabled' : 'active'}
