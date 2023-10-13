@@ -130,6 +130,7 @@ const theme = extendTheme({
           bg: 'highlight',
         },
       },
+      bg: 'darkerBackground',
     },
   },
 });

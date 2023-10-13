@@ -11,10 +11,21 @@ type FilterItems = {
 type Props = {
   filterItems: FilterItems[];
   onSelected: (value: FilterItems) => void;
+  selectedValue?: FilterItems;
 };
 
 export const Filter = (props: Props) => {
   const [isShow, setIsShow] = React.useState(false);
+  const [selectedValue, setSelectedValue] = React.useState<FilterItems>();
+  const handleSelected = (value: FilterItems) => {
+    setSelectedValue(prev => {
+      if (prev && prev.value === value.value) {
+        return undefined;
+      }
+      return value;
+    });
+    props.onSelected(value);
+  };
   return (
     <Menu
       onOpen={() => setIsShow(true)}
@@ -31,16 +42,29 @@ export const Filter = (props: Props) => {
           <TouchableOpacity {...triggerProps}>
             <HStack space={2} alignItems="center">
               <FilterIcon
-                color={isShow ? COLORS.highlight : COLORS.textPrimary}
+                opacity={isShow ? 1 : 0.6}
+                color={isShow ? COLORS.highlight : COLORS.text}
               />
-              <Text color={isShow ? COLORS.highlight : 'black'}>Filter</Text>
+              <Text
+                opacity={isShow ? 1 : 0.6}
+                color={isShow ? COLORS.highlight : COLORS.text}>
+                Filter
+                {selectedValue ? `: ${selectedValue.label}` : ''}
+              </Text>
             </HStack>
           </TouchableOpacity>
         );
       }}>
       {props.filterItems.map((item, index) => (
         <Menu.Item
-          onPress={() => props.onSelected(item)}
+          bg={
+            selectedValue && selectedValue.value === item.value
+              ? '#D1D1D1'
+              : 'transparent'
+          }
+          onPress={() => {
+            handleSelected(item);
+          }}
           borderBottomWidth={1}
           borderBottomColor={'white'}
           key={index}
