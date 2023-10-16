@@ -1,14 +1,13 @@
-import React, {useEffect} from 'react';
 import {HStack, Pressable, View} from 'native-base';
+import React, {useEffect} from 'react';
 import {Animated} from 'react-native';
 import {PauseIcon, PlayIcon, TrashIcon} from '../../../components/icons';
+import {SoundWave} from '../../../components/sound-wave';
 import {COLORS} from '../../../constants/design-system';
 import {useAudioRecord} from '../../../hooks/use-audio-record';
-import {SoundWave} from '../../../components/sound-wave';
 
 type Props = {
   children?: React.ReactNode;
-  isRecorded?: boolean;
   onHasRecord?: (uri: string) => void;
   onNoRecord?: () => void;
 };
@@ -126,6 +125,8 @@ export const RecordCard = ({children, onHasRecord, onNoRecord}: Props) => {
                 height: 64,
                 transform: [{scale: zoom}],
                 backgroundColor: backgroundColor,
+                justifyContent: 'center',
+                alignItems: 'center',
               }}>
               {isRecording && <SoundWave value={metering * -1} />}
             </Animated.View>

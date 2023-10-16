@@ -30,8 +30,18 @@ export const SentenceContentCard = ({vocabulary}: Props) => {
         />
       </HStack>
       <HStack mt={3} alignItems="center" space={2}>
-        <Image w={6} h={6} alt="Korean flag" source={flagMap[nativeLanguage]} />
-        <Text opacity={0.6} fontSize="md" color={COLORS.text}>
+        <Image
+          w={6}
+          h={6}
+          alt={flagMap[nativeLanguage]!.alt}
+          source={flagMap[nativeLanguage]!.src}
+        />
+        <Text
+          flexWrap="wrap"
+          flex={1}
+          opacity={0.6}
+          fontSize="md"
+          color={COLORS.text}>
           {vocabulary.example[nativeLanguage]}
         </Text>
       </HStack>
@@ -44,5 +54,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.text,
     fontSize: 16,
+    flexWrap: 'wrap',
   },
 });
