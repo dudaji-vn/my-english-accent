@@ -25,4 +25,5 @@ export type GetRecordsParams = {
   pageSize?: number;
   type?: string;
   category?: string;
+  q?: string;
 };

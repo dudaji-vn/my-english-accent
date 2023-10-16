@@ -1,4 +1,5 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import {useQuery} from '@tanstack/react-query';
 import {
   FlatList,
   HStack,
@@ -10,18 +11,20 @@ import {
 } from 'native-base';
 import React from 'react';
 import {Send} from 'react-native-feather';
+import {EmptyData} from '../../../components/empty-data';
 import {Filter} from '../../../components/filter';
 import {Input} from '../../../components/form';
+import {Modal} from '../../../components/modal';
+import {ShareModal} from '../../../components/share-modal';
 import {Topic, TopicCard} from '../../../components/topic-card';
 import {WordItem} from '../../../components/word-item';
 import {COLORS} from '../../../constants/design-system';
 import {SCREEN_NAMES} from '../../../constants/screen';
+import {useModal} from '../../../hooks/use-modal';
 import {useRootSelector} from '../../../redux/reducers';
-import {GetRecordsParams} from '../../../types/record';
-import {Vocabulary} from '../../../types/vocabulary';
-import {useGetMyRecords} from '../hooks/use-get-my-records';
-import {useQuery} from '@tanstack/react-query';
 import {recordService} from '../../../services/record.service';
+import {GetRecordsParams, Record} from '../../../types/record';
+import {useGetMyRecords} from '../hooks/use-get-my-records';
 const designerImg = require('../../../assets/images/Designer.png');
 
 const generalImg = require('../../../assets/images/Chat.png');
@@ -74,26 +77,29 @@ const topics: Topic[] = [
 const MyRecordList = ({}: Props) => {
   const role = useRootSelector(state => state.user.profile?.role);
   const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = React.useState<string>('');
+  const {close, open, isShowing} = useModal();
   const [filter, setFilter] = React.useState<GetRecordsParams>({
     category: topics[0]._id,
     pageSize: 0,
+    q: searchQuery,
   });
-  const {data, refetch, isFetching} = useGetMyRecords(filter);
+  const {data, isFetching} = useGetMyRecords({
+    ...filter,
+    q: searchQuery,
+  });
 
   const vocabularies = data?.items || [];
   const {data: progress} = useQuery({
     queryKey: ['progress'],
     queryFn: recordService.getRecordProgress,
   });
-  console.log('progress', progress);
 
-  const handlePressItem = (vocabulary: Vocabulary) => {
+  const handlePressItem = (record: Record) => {
     navigation.navigate(SCREEN_NAMES.recordNavigator, {
-      screen: SCREEN_NAMES.wordsRecord,
+      screen: SCREEN_NAMES.myRecordListen,
       params: {
-        vocabularyId: vocabulary._id,
-        category: vocabulary.category,
-        filter,
+        record,
       },
     });
   };
@@ -125,15 +131,19 @@ const MyRecordList = ({}: Props) => {
 
   const renderSeparator = () => <View h={5} />;
 
-  useFocusEffect(
-    React.useCallback(() => {
-      refetch();
-    }, [refetch]),
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     refetch();
+  //   }, [refetch]),
+  // );
 
   return (
     <VStack flex={1} pt={5}>
-      <Input typeInput="search" />
+      <Input
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        typeInput="search"
+      />
       <HStack space={4} mt={5} justifyContent="space-between">
         {topicsShow.map((topic, index) => (
           <TopicCard
@@ -150,53 +160,70 @@ const MyRecordList = ({}: Props) => {
           onSelected={value => handleSelectedFilter(value.value)}
           filterItems={filterItems}
         />
-        <SendAllButton />
+        <SendAllButton
+          onPress={() => {
+            open();
+          }}
+        />
       </HStack>
       {isFetching ? (
         <View flex={1} alignItems="center" justifyContent="center">
           <Spinner size="lg" color={COLORS.highlight} />
         </View>
       ) : (
-        <FlatList
-          mt={5}
-          ItemSeparatorComponent={renderSeparator}
-          data={vocabularies}
-          numColumns={1}
-          renderItem={({item, index}) => {
-            return (
-              <>
-                <WordItem
-                  onPress={() => handlePressItem(item.vocabulary)}
-                  key={index}
-                  word={item.vocabulary.text.en}
-                  status="default"
-                  leftElement={
-                    <Send
-                      opacity={0.6}
-                      width={24}
-                      height={24}
-                      color={COLORS.text}
+        <>
+          {vocabularies.length > 0 ? (
+            <FlatList
+              mt={5}
+              ItemSeparatorComponent={renderSeparator}
+              data={vocabularies}
+              numColumns={1}
+              renderItem={({item, index}) => {
+                return (
+                  <>
+                    <WordItem
+                      onPress={() => handlePressItem(item)}
+                      key={index}
+                      word={item.vocabulary.text.en}
+                      status="default"
+                      leftElement={
+                        <Send
+                          opacity={0.6}
+                          width={24}
+                          height={24}
+                          color={COLORS.text}
+                        />
+                      }
                     />
-                  }
-                />
-                {index === vocabularies.length - 1 && <View h={31} />}
-              </>
-            );
-          }}
-          keyExtractor={item => item._id}
-        />
+                    {index === vocabularies.length - 1 && <View h={31} />}
+                  </>
+                );
+              }}
+              keyExtractor={item => item._id}
+            />
+          ) : (
+            <>
+              <EmptyData>Record your words to see them here</EmptyData>
+              <View h={31} />
+            </>
+          )}
+        </>
       )}
+      <Modal onClose={close} isOpen={isShowing}>
+        <ShareModal />
+      </Modal>
     </VStack>
   );
 };
 
 export default MyRecordList;
 
-const SendAllButton = () => {
+const SendAllButton = ({onPress}: {onPress?: () => void}) => {
   const [color, setColor] = React.useState(COLORS.text);
   const [opacity, setOpacity] = React.useState(0.6);
   return (
     <Pressable
+      onPress={onPress}
       opacity={opacity}
       onPressIn={() => {
         setColor(COLORS.highlight);

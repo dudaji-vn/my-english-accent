@@ -46,6 +46,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 22,
     color: COLORS.highlight,
+    flexWrap: 'wrap',
+    flex: 1,
   },
   pronunciation: {
     fontSize: 16,

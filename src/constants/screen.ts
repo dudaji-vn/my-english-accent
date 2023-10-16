@@ -10,6 +10,7 @@ export const SCREEN_NAMES = {
   settingsProfile: 'settings-profile',
   recordNavigator: 'record-navigator',
   wordsRecord: 'words-record',
+  myRecordListen: 'my-record-listen',
   listeningsNavigator: 'listeningsNavigator',
   searchListen: 'searchListen',
   individual: 'individual',

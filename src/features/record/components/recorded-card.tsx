@@ -55,39 +55,40 @@ export const RecordedCard = ({children, recordUri}: Props) => {
           mt={4}
           w={68}
           alignSelf="center"
-          justifyContent="space-between"
+          justifyContent={recordUri ? 'space-between' : 'center'}
           alignItems="center">
           <Pressable p={4} onPress={handlePressPlayOrPause}>
             <MicFilledIcon opacity={0.6} />
           </Pressable>
-          <Pressable
-            onPressIn={() => setIsPressing(true)}
-            onPressOut={() => setIsPressing(false)}
-            onPress={startPlayer}
-            borderWidth={1}
-            borderColor={COLORS.stroke}
-            alignSelf="center"
-            rounded="full"
-            p={2}>
-            <Animated.View
-              // eslint-disable-next-line react-native/no-inline-styles
-              style={{
-                borderRadius: 999,
-                padding: 8,
-                width: 64,
-                height: 64,
-                transform: [{scale: zoom}],
-                backgroundColor: COLORS.stroke,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Volume2 width={40} height={40} color="white" />
-            </Animated.View>
-          </Pressable>
+          {recordUri && (
+            <Pressable
+              onPressIn={() => setIsPressing(true)}
+              onPressOut={() => setIsPressing(false)}
+              onPress={startPlayer}
+              alignSelf="center"
+              rounded="full">
+              <Animated.View
+                // eslint-disable-next-line react-native/no-inline-styles
+                style={{
+                  borderRadius: 999,
+                  padding: 8,
+                  width: 64,
+                  height: 64,
+                  transform: [{scale: zoom}],
+                  backgroundColor: COLORS.stroke,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Volume2 width={40} height={40} color="white" />
+              </Animated.View>
+            </Pressable>
+          )}
 
-          <Pressable p={4} onPress={handlePressDelete}>
-            <TrashIcon color={isDeleting ? COLORS.error : COLORS.text} />
-          </Pressable>
+          {recordUri && (
+            <Pressable p={4} onPress={handlePressDelete}>
+              <TrashIcon color={isDeleting ? COLORS.error : COLORS.text} />
+            </Pressable>
+          )}
         </HStack>
       </View>
     </View>
