@@ -1,8 +1,9 @@
 import {NavigationProp} from '@react-navigation/native';
 import React from 'react';
 
-import {Text, View} from 'native-base';
+import {View} from 'native-base';
 import {TabData, Tabs} from '../../../components/tabs';
+import MyRecordList from '../components/my-record-list';
 import Record from '../components/record';
 
 type Props = {
@@ -17,7 +18,7 @@ const tabs: TabData[] = [
   {
     key: 'My record list',
     title: 'My record list',
-    content: () => <Text>This is Tab 2</Text>,
+    content: MyRecordList,
   },
 ];
 

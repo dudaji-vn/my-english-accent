@@ -71,6 +71,7 @@ export const Tabs = ({tabs}: Props) => {
 
   return (
     <TabView
+      lazy
       swipeEnabled={false}
       navigationState={{
         index,

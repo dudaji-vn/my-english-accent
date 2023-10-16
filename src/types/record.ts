@@ -19,3 +19,10 @@ export type CreateRecordDTO = {
   };
   vocabularyId: string;
 };
+
+export type GetRecordsParams = {
+  page?: number;
+  pageSize?: number;
+  type?: string;
+  category?: string;
+};

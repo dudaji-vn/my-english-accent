@@ -45,7 +45,7 @@ export const Input = ({
         }}
         value={value}
         InputLeftElement={
-          typeInput == 'search' && !isFocused && !value ? (
+          typeInput === 'search' ? (
             <View marginLeft={4}>
               <SearchIcon />
             </View>

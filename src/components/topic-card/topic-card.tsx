@@ -16,6 +16,7 @@ type Props = {
   isActive?: boolean;
   minimalOnInActive?: boolean;
   onPress?: () => void;
+  hideProgress?: boolean;
 };
 
 export const TopicCard = (props: Props) => {
@@ -60,13 +61,15 @@ export const TopicCard = (props: Props) => {
             </VStack>
           )}
         </HStack>
-        <Progress
-          _filledTrack={{
-            bg: COLORS.highlight,
-          }}
-          mt={4}
-          value={(props.topic.numOfAchieved / props.topic.totalWords) * 100}
-        />
+        {!props.hideProgress && (
+          <Progress
+            _filledTrack={{
+              bg: COLORS.highlight,
+            }}
+            mt={4}
+            value={(props.topic.numOfAchieved / props.topic.totalWords) * 100}
+          />
+        )}
       </View>
     </TouchableOpacity>
   );

@@ -102,9 +102,7 @@ export default class RecordService {
       {
         $skip: (page - 1) * pageSize
       },
-      {
-        $limit: pageSize
-      },
+      ...(pageSize !== 0 ? [{ $limit: pageSize }] : []),
       {
         $project: {
           _id: 1,
