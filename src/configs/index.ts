@@ -26,8 +26,21 @@ export const recordEndpoint = {
   base: 'api/record',
 };
 
-export const flagMap: Record<Language, ImageSourcePropType | undefined> = {
+export const flagMap: Record<
+  Language,
+  | {
+      alt: string;
+      src: ImageSourcePropType;
+    }
+  | undefined
+> = {
   en: undefined,
-  ko: KRFlag,
-  vi: VNFlag,
+  ko: {
+    alt: 'Korean Flag',
+    src: KRFlag,
+  },
+  vi: {
+    alt: 'Vietnamese Flag',
+    src: VNFlag,
+  },
 };
