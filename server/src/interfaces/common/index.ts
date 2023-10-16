@@ -25,3 +25,17 @@ export interface ICursorResponse<T> {
   endCursor: string
   hasNextPage: boolean
 }
+
+export interface IPaginationParams {
+  page?: number
+  pageSize?: number
+  q?: string
+}
+
+export interface IPaginationResponse<T> {
+  items: T[]
+  currentPage: number
+  totalPage: number
+  totalItems: number
+  hasNextPage: boolean
+}
