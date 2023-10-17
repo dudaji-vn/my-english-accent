@@ -18,13 +18,13 @@ import {useDispatch} from 'react-redux';
 import {Input} from '../../../components/form';
 import {Modal} from '../../../components/modal';
 import {ModalCard} from '../../../components/modal-card';
-import Toast from '../../../components/toast/toast';
 import {COLORS} from '../../../constants/design-system';
 import {useModal} from '../../../hooks/use-modal';
 import {useRootSelector} from '../../../redux/reducers';
 import {updateProfile} from '../../../redux/reducers/user.reducer';
 import {userService} from '../../../services/user.service';
 import {RadioCard} from '../components/radio-card';
+import {Toast} from '../../../components/toast';
 
 const FULL_NAME_MAX_LENGTH = 60;
 const DISPLAY_NAME_MAX_LENGTH = 16;
