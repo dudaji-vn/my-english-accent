@@ -5,6 +5,8 @@ import userRouter from './user.router'
 import fileRouter from './file.router'
 import vocabularyRouter from './vocabulary.router'
 import recordRouter from './record.router'
+import listenRouter from './listen.router'
+import groupRouter from './group.router'
 
 const apiRouterV1 = express.Router()
 
@@ -28,6 +30,14 @@ const listApi = [
   {
     path: PATH.record,
     router: recordRouter
+  },
+  {
+    path: PATH.listen,
+    router: listenRouter
+  },
+  {
+    path: PATH.group,
+    router: groupRouter
   }
 ]
 listApi.forEach((item) => {
