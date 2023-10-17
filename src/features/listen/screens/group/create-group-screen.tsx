@@ -1,5 +1,14 @@
 import {useNavigation} from '@react-navigation/native';
-import {Button, HStack, Pressable, ScrollView, Text, View} from 'native-base';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {
+  Avatar,
+  Button,
+  HStack,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from 'native-base';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -13,12 +22,61 @@ import {Modal} from '../../../../components/modal';
 import {ModalCard} from '../../../../components/modal-card';
 import {COLORS} from '../../../../constants/design-system';
 import {useModal} from '../../../../hooks/use-modal';
+import {IFormAddGroup, IUserInvite} from '../../../../interfaces/api/Group';
+import {groupService} from '../../../../services/group.service';
+import {listenService} from '../../../../services/listen.service';
 import {uploadImage} from '../../../../utils/upload-image';
 import RowUserAvatar from '../../components/RowUserAvatar';
+
 const CreateGroupScreen = () => {
   const {close, isShowing, open} = useModal();
+  const queryClient = useQueryClient();
   const [allowGoBack, setAllowGoBack] = useState(false);
+  const {data: users} = useQuery({
+    queryKey: ['listen-user-progress'],
+    queryFn: listenService.getUserProgress,
+  });
+  const {mutate} = useMutation({
+    mutationFn: groupService.createGroup,
+    onSuccess: data => {
+      setAllowGoBack(true);
+      setTimeout(() => {
+        navigation.goBack();
+      }, 100);
+    },
+    onSettled: () => {
+      // Invalidate the query to refetch the data
+      queryClient.invalidateQueries({queryKey: ['myGroups']});
+    },
+    onError: (error, variables) => {
+      console.log('create group error', error, variables);
+    },
+  });
   const navigation = useNavigation<any>();
+  const [isFocus, setIsFocus] = useState(false);
+  const [usersInvite, setUsersInvite] = useState<IUserInvite[]>([]);
+  const [formGroup, setFormGroup] = useState<IFormAddGroup>({
+    avatar: '',
+    name: '',
+    members: [],
+  });
+
+  useEffect(() => {
+    if (!users) {
+      return;
+    }
+    const userInvites: IUserInvite[] = users.map(user => {
+      return {
+        _id: user._id,
+        avatar: user.avatar,
+        displayName: user.displayName,
+        nativeLanguage: user.nativeLanguage,
+        role: user.role,
+        isInvite: false,
+      };
+    });
+    setUsersInvite(userInvites);
+  }, [users]);
   useEffect(
     () =>
       navigation.addListener('beforeRemove', e => {
@@ -48,41 +106,99 @@ const CreateGroupScreen = () => {
       name: image.filename || 'avatar',
       type: image.mime,
     });
+
+    setFormGroup((prev: any) => {
+      return {
+        ...prev,
+        avatar: url,
+      };
+    });
+  };
+
+  const handleChangeInput = (name: string) => {
+    setIsFocus(true);
+    setFormGroup((prev: any) => {
+      return {
+        ...prev,
+        name: name,
+      };
+    });
+  };
+
+  const handleToggleInviteUser = (index: number) => {
+    const newUserInvites = [...usersInvite];
+    newUserInvites[index].isInvite = !newUserInvites[index].isInvite;
+    setUsersInvite(newUserInvites);
+  };
+
+  useEffect(() => {
+    const members = usersInvite
+      .filter(item => item.isInvite)
+      .map(item => item._id);
+    setFormGroup(prev => {
+      return {
+        ...prev,
+        members: members,
+      };
+    });
+  }, [usersInvite]);
+
+  const handleSubmit = () => {
+    mutate(formGroup);
   };
   return (
     <ScrollViewLayout>
       <BreadCrumb parentTitle="Listen" mainTitle="Create new group" />
       <View style={styles.groupContainer} bg={COLORS.white}>
         <Pressable onPress={handleCropAvatar} mb={8} alignItems={'center'}>
-          <AvatarIcon />
+          {formGroup.avatar ? (
+            <Avatar width={100} height={100} source={{uri: formGroup.avatar}} />
+          ) : (
+            <AvatarIcon />
+          )}
         </Pressable>
         <Text mb={2}>What's your group name?</Text>
-        <Input placeholder="Enter group name" />
+        <Input
+          value={formGroup.name}
+          onChangeText={handleChangeInput}
+          error={isFocus && !formGroup.name && 'This field is required'}
+          placeholder="Enter group name"
+        />
       </View>
       <View style={styles.memberContainer} bg={COLORS.white}>
         <HStack mb={2} justifyContent={'space-between'}>
           <Text>Add member</Text>
-          <Text>(0)</Text>
+          <Text>({formGroup.members.length})</Text>
         </HStack>
-        <Input mb={5} typeInput="search" placeholder="Search" />
+        <View mb={5}>
+          <Input typeInput="search" placeholder="Search" />
+        </View>
+
         <ScrollView nestedScrollEnabled style={{maxHeight: 330}}>
-          {[1, 2, 3, 4].map((item, index) => {
-            return (
-              <HStack
-                marginBottom={5}
-                alignItems={'center'}
-                justifyContent={'space-between'}
-                key={index}>
-                <RowUserAvatar />
-                <Pressable>
-                  {index % 2 == 0 ? <AddMemberIcon /> : <RemoveMemberIcon />}
-                </Pressable>
-              </HStack>
-            );
-          })}
+          {usersInvite &&
+            usersInvite.map((item, index) => {
+              return (
+                <HStack
+                  marginBottom={5}
+                  alignItems={'center'}
+                  justifyContent={'space-between'}
+                  key={index}>
+                  <RowUserAvatar isHighLightName={item.isInvite} user={item} />
+                  <Pressable
+                    paddingLeft={4}
+                    onPress={() => handleToggleInviteUser(index)}>
+                    {!item.isInvite ? <AddMemberIcon /> : <RemoveMemberIcon />}
+                  </Pressable>
+                </HStack>
+              );
+            })}
         </ScrollView>
       </View>
-      <Button h={14.5} bg={COLORS.highlight} rounded="lg">
+      <Button
+        onPress={handleSubmit}
+        h={14.5}
+        bg={COLORS.highlight}
+        rounded="lg">
         <Text color="white">Save your changes</Text>
       </Button>
       <Modal isOpen={isShowing} onClose={close}>
@@ -124,7 +240,6 @@ const styles = StyleSheet.create({
   pencilIcon: {
     borderRadius: 99,
     backgroundColor: '#7F7F7F',
-
     alignItems: 'center',
     justifyContent: 'center',
     padding: 8,
