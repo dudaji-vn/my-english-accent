@@ -1,11 +1,13 @@
-import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
 import {useQuery} from '@tanstack/react-query';
-import {FlatList, HStack, Spinner, VStack, View} from 'native-base';
+import {FlatList, HStack, Spinner, VStack, View, useToast} from 'native-base';
 import React from 'react';
+import {RefreshControl} from 'react-native';
 import {Mic} from 'react-native-feather';
 import {AppProgress} from '../../../components/app-progress';
 import {Filter} from '../../../components/filter';
 import {MicCheckIcon, MicFilledIcon} from '../../../components/icons';
+import {Toast} from '../../../components/toast';
 import {Topic, TopicCard} from '../../../components/topic-card';
 import {WordItem} from '../../../components/word-item';
 import {COLORS} from '../../../constants/design-system';
@@ -43,7 +45,11 @@ const filterItems = [
   },
 ];
 
-type Props = {};
+type Props = {
+  navigation: NavigationProp<any>;
+  route: RouteProp<any>;
+  jumpTo: (key: string) => void;
+};
 const topics: Topic[] = [
   {
     _id: 'general',
@@ -71,9 +77,12 @@ const topics: Topic[] = [
   },
 ];
 
-const Record = ({}: Props) => {
+const Record = ({navigation, route, jumpTo}: Props) => {
   const role = useRootSelector(state => state.user.profile?.role);
-  const navigation = useNavigation();
+  const needRefresh = route.params?.needRefresh;
+  const hasNewRecord = route.params?.hasNewRecord;
+  const savedNumber = route.params?.savedNumber;
+  const toast = useToast();
   const [filter, setFilter] = React.useState<GetVocabulariesParams>({
     category: topics[0]._id,
     recordStatus: 'all',
@@ -138,20 +147,45 @@ const Record = ({}: Props) => {
 
   const renderSeparator = () => <View h={5} />;
 
-  useFocusEffect(
-    React.useCallback(() => {
+  React.useEffect(() => {
+    if (needRefresh) {
       refetch();
       refetchProgress();
-    }, [refetch, refetchProgress]),
-  );
+      navigation.setParams({needRefresh: false});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needRefresh, refetch, refetchProgress]);
+
+  React.useEffect(() => {
+    if (hasNewRecord && savedNumber > 0) {
+      const unit = savedNumber > 1 ? 'records' : 'record';
+      toast.show({
+        render(props) {
+          return (
+            <Toast
+              leftElementOnPress={() => {
+                jumpTo('My record list');
+              }}
+              leftElement={<>Show me</>}
+              {...props}
+              status="success">
+              You have {savedNumber} new {unit}!
+            </Toast>
+          );
+        },
+      });
+      navigation.setParams({hasNewRecord: false});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasNewRecord, savedNumber]);
 
   return (
-    <VStack flex={1} pt={5}>
+    <VStack flex={1} pt={5} px={5}>
       <AppProgress
         progress={progressValue || 0}
         startIcon={<Mic color="white" width={20} height={20} />}
       />
-      <HStack space={4} mt={8} justifyContent="space-between">
+      <HStack space={4} mt={8}>
         {topicsShow.map((topic, index) => (
           <TopicCard
             onPress={() => handleSelectedFilter(`category=${topic._id}`)}
@@ -167,12 +201,20 @@ const Record = ({}: Props) => {
           filterItems={filterItems}
         />
       </View>
-      {isFetching ? (
-        <View flex={1} alignItems="center" justifyContent="center">
-          <Spinner size="lg" color={COLORS.highlight} />
-        </View>
+      {isFetching && vocabularies.length === 0 ? (
+        <Spinner mt={12} size="lg" color={COLORS.highlight} />
       ) : (
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isFetching}
+              onRefresh={() => {
+                refetch();
+                refetchProgress();
+              }}
+              colors={[COLORS.highlight]}
+            />
+          }
           mt={5}
           ItemSeparatorComponent={renderSeparator}
           data={vocabularies}

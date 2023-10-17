@@ -2,23 +2,24 @@ import {HStack, Pressable, View} from 'native-base';
 import React from 'react';
 import {Animated} from 'react-native';
 import {Volume2} from 'react-native-feather';
-import {
-  MicFilledIcon,
-  PauseIcon,
-  PlayIcon,
-  TrashIcon,
-} from '../../../components/icons';
+import {MicFilledIcon, TrashIcon} from '../../../components/icons';
 import {COLORS} from '../../../constants/design-system';
 import {useAudioRecord} from '../../../hooks/use-audio-record';
 
 type Props = {
   children?: React.ReactNode;
   recordUri?: string;
+  onDelete?: () => void;
+  onReRecord?: () => void;
 };
 
-export const RecordedCard = ({children, recordUri}: Props) => {
-  const {startPlayer, stopPlayer, deleteRecord, isPlaying} =
-    useAudioRecord(recordUri);
+export const RecordedCard = ({
+  children,
+  recordUri,
+  onDelete,
+  onReRecord,
+}: Props) => {
+  const {startPlayer, stopPlayer, isPlaying} = useAudioRecord(recordUri);
   const [isDeleting, setIsDeleting] = React.useState(false);
 
   const [isPressing, setIsPressing] = React.useState(false);
@@ -39,11 +40,6 @@ export const RecordedCard = ({children, recordUri}: Props) => {
       await stopPlayer();
     }
   };
-  const handlePressDelete = async () => {
-    setIsDeleting(true);
-    await deleteRecord();
-    setIsDeleting(false);
-  };
 
   return (
     <View rounded="lg" bg="white" shadow="e3" p={4}>
@@ -53,18 +49,18 @@ export const RecordedCard = ({children, recordUri}: Props) => {
       <View alignItems="center" w="full">
         <HStack
           mt={4}
-          w={68}
+          w={60}
           alignSelf="center"
           justifyContent={recordUri ? 'space-between' : 'center'}
           alignItems="center">
-          <Pressable p={4} onPress={handlePressPlayOrPause}>
+          <Pressable p={4} onPress={onReRecord}>
             <MicFilledIcon opacity={0.6} />
           </Pressable>
           {recordUri && (
             <Pressable
               onPressIn={() => setIsPressing(true)}
               onPressOut={() => setIsPressing(false)}
-              onPress={startPlayer}
+              onPress={handlePressPlayOrPause}
               alignSelf="center"
               rounded="full">
               <Animated.View
@@ -85,7 +81,11 @@ export const RecordedCard = ({children, recordUri}: Props) => {
           )}
 
           {recordUri && (
-            <Pressable p={4} onPress={handlePressDelete}>
+            <Pressable
+              onPressIn={() => setIsDeleting(true)}
+              onPressOut={() => setIsDeleting(false)}
+              p={4}
+              onPress={onDelete}>
               <TrashIcon color={isDeleting ? COLORS.error : COLORS.text} />
             </Pressable>
           )}

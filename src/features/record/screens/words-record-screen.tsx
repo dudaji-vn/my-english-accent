@@ -8,6 +8,7 @@ import {
   Text,
   VStack,
   View,
+  useToast,
 } from 'native-base';
 import React from 'react';
 import {AlertCircle, ChevronLeft, ChevronRight, X} from 'react-native-feather';
@@ -28,6 +29,8 @@ import {useGetVocabularies} from '../hooks/use-get-vocabularies';
 import {useWindowDimensions} from 'react-native';
 import {GetVocabulariesParams} from '../../../types/vocabulary';
 import {RecordedCard} from '../components/recorded-card';
+import {Toast} from '../../../components/toast';
+import {SCREEN_NAMES} from '../../../constants/screen';
 
 const PAGE_SIZE = 0;
 
@@ -43,8 +46,10 @@ type TempRecord = {
 };
 
 const WordsRecordScreen = ({navigation, route}: Props) => {
+  const toast = useToast();
   const screenWith = useWindowDimensions().width;
   const filter = route.params?.filter as GetVocabulariesParams;
+  const [isSaving, setIsSaving] = React.useState(false);
   const [recordedWord, setRecordedWord] = React.useState<TempRecord | null>(
     null,
   );
@@ -55,11 +60,17 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
   const [recordedSentence, setRecordedSentence] =
     React.useState<TempRecord | null>(null);
   const swiperRef = React.useRef<SwiperFlatList>(null);
-  const {data} = useGetVocabularies({
-    ...filter,
-    recordStatus: 'not-recorded',
-    pageSize: PAGE_SIZE,
-  });
+  const {data} = useGetVocabularies(
+    {
+      ...filter,
+      recordStatus: 'not-recorded',
+      pageSize: PAGE_SIZE,
+    },
+    {
+      keepPreviousData: false,
+      initialData: undefined,
+    },
+  );
 
   React.useEffect(() => {
     request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {});
@@ -74,47 +85,77 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     }
   }, [recordedWord, recordedSentence]);
 
-  const {mutate, isLoading} = useMutation({
-    mutationFn: async () => {
-      const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
-      const currentVocabulary = data?.items[currentIdx]!;
-      let wordRecordUri = null;
-      let sentenceRecordUri = null;
-      if (recordedWord) {
-        wordRecordUri = await uploadAudio({
-          uri: recordedWord.uri,
-          name: recordedWord._id,
-          type: 'audio/m4a',
-        });
-        setRecordedWord(prev => ({...prev!, isSaved: true}));
-      }
-
-      if (recordedSentence) {
-        sentenceRecordUri = await uploadAudio({
-          uri: recordedSentence.uri,
-          name: recordedSentence._id,
-          type: 'audio/m4a',
-        });
-        setRecordedSentence(prev => ({...prev!, isSaved: true}));
-      }
-      return recordService.createRecord({
-        vocabularyId: currentVocabulary._id,
-        recordUrl: {
-          word: wordRecordUri,
-          sentence: sentenceRecordUri,
-        },
-      });
-    },
+  const {mutateAsync} = useMutation({
+    mutationFn: recordService.createRecord,
     onSuccess: recorded => {
       setRecordedWord(null);
       setRecordedSentence(null);
       const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
       const vocabularyId = data?.items[currentIdx]._id.toString();
       setSavedList(prev => ({...prev, [vocabularyId]: recorded}));
+      // setTimeout(() => {
+      toast.show({
+        render(props) {
+          return (
+            <Toast {...props} status="success">
+              File has been saved!
+            </Toast>
+          );
+        },
+        placement: 'bottom',
+      });
       goToNext();
+      // }, 100);
     },
   });
+  const handleSaveRecord = async () => {
+    setIsSaving(true);
+    const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
+    const currentVocabulary = data?.items[currentIdx];
 
+    if (!currentVocabulary) {
+      // Handle the case where currentVocabulary is not available.
+      return null;
+    }
+
+    const promises = [];
+
+    if (recordedWord?.uri) {
+      promises.push(
+        uploadAudio({
+          uri: recordedWord.uri,
+          name: recordedWord._id,
+          type: 'audio/m4a',
+        }).then(wordRecordUri => {
+          setRecordedWord(prev => ({...prev!, isSaved: true}));
+          return wordRecordUri;
+        }),
+      );
+    }
+
+    if (recordedSentence?.uri) {
+      promises.push(
+        uploadAudio({
+          uri: recordedSentence.uri,
+          name: recordedSentence._id,
+          type: 'audio/m4a',
+        }).then(sentenceRecordUri => {
+          setRecordedSentence(prev => ({...prev!, isSaved: true}));
+          return sentenceRecordUri;
+        }),
+      );
+    }
+
+    const [wordRecordUri, sentenceRecordUri] = await Promise.all(promises);
+    await mutateAsync({
+      vocabularyId: currentVocabulary._id,
+      recordUrl: {
+        word: wordRecordUri,
+        sentence: sentenceRecordUri,
+      },
+    });
+    setIsSaving(false);
+  };
   const goToNext = () => {
     const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
     swiperRef.current?.scrollToIndex({index: currentIdx + 1});
@@ -123,10 +164,12 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
   return (
     <View bg="white" h="full">
       <Header
+        hasSaved={Object.keys(savedList).length > 0}
         navigation={navigation}
         isUnsaved={isUnsaved}
         completed={Object.keys(savedList).length}
         total={data?.totalItems || 0}
+        savedNumber={Object.keys(savedList).length}
       />
       <ScrollView flex={1}>
         {data && (
@@ -191,11 +234,11 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
           Skip
         </Button>
         <Button
-          isLoading={isLoading}
+          isLoading={isSaving}
           disabled={!recordedWord && !recordedSentence}
           opacity={!recordedWord && !recordedSentence ? 0.3 : 1}
           flex={1}
-          onPress={() => mutate()}
+          onPress={handleSaveRecord}
           variant="outline">
           Save
         </Button>
@@ -211,18 +254,37 @@ const Header = ({
   isUnsaved,
   completed,
   total,
+  hasSaved,
+  savedNumber = 0,
 }: {
   navigation: NavigationProp<any>;
   isUnsaved: boolean;
   completed: number;
   total: number;
+  hasSaved: boolean;
+  savedNumber: number;
 }) => {
   const {close, isShowing, open} = useModal();
   const {onAllowGoBack} = useUnsavedChange(isUnsaved, navigation, open);
+  const goBack = () => {
+    if (hasSaved) {
+      navigation.navigate({
+        name: SCREEN_NAMES.record,
+        params: {
+          needRefresh: true,
+          hasNewRecord: true,
+          savedNumber: savedNumber,
+        },
+      });
+      return;
+    }
+    navigation.goBack();
+  };
+
   return (
     <>
       <HStack h={14} alignItems="center" justifyContent="space-between">
-        <Pressable p={5} onPress={navigation.goBack}>
+        <Pressable p={5} onPress={goBack}>
           <X width={24} height={24} color={COLORS.text} />
         </Pressable>
         <HStack space={5}>
@@ -246,7 +308,14 @@ const Header = ({
               Cancel
             </Button>
           }
-          confirmButton={<Button onPress={onAllowGoBack}>Go back</Button>}
+          confirmButton={
+            <Button
+              onPress={() => {
+                onAllowGoBack(goBack);
+              }}>
+              Go back
+            </Button>
+          }
         />
       </Modal>
     </>

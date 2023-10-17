@@ -1,4 +1,4 @@
-import {NavigationProp} from '@react-navigation/native';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
 import React from 'react';
 
 import {View} from 'native-base';
@@ -8,23 +8,31 @@ import Record from '../components/record';
 
 type Props = {
   navigation: NavigationProp<any>;
+  route: RouteProp<any, any>;
 };
-const tabs: TabData[] = [
-  {
-    key: 'Record',
-    title: 'Record',
-    content: Record,
-  },
-  {
-    key: 'My record list',
-    title: 'My record list',
-    content: MyRecordList,
-  },
-];
 
-const MainRecordScreen = ({}: Props) => {
+const MainRecordScreen = ({navigation, route}: Props) => {
+  const tabs: TabData[] = React.useMemo(
+    () => [
+      {
+        key: 'Record',
+        title: 'Record',
+        content: ({jumpTo}) => (
+          <Record navigation={navigation} route={route} jumpTo={jumpTo} />
+        ),
+      },
+      {
+        key: 'My record list',
+        title: 'My record list',
+        content: ({jumpTo}) => (
+          <MyRecordList navigation={navigation} route={route} jumpTo={jumpTo} />
+        ),
+      },
+    ],
+    [navigation, route],
+  );
   return (
-    <View flex={1} bg="white" px={4}>
+    <View flex={1} bg="white">
       <Tabs tabs={tabs} />
     </View>
   );

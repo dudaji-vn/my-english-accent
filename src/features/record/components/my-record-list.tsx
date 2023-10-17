@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
 import {useQuery} from '@tanstack/react-query';
 import {
   FlatList,
@@ -10,6 +10,7 @@ import {
   View,
 } from 'native-base';
 import React from 'react';
+import {RefreshControl} from 'react-native';
 import {Send} from 'react-native-feather';
 import {EmptyData} from '../../../components/empty-data';
 import {Filter} from '../../../components/filter';
@@ -46,7 +47,11 @@ const filterItems = [
   },
 ];
 
-type Props = {};
+type Props = {
+  navigation: NavigationProp<any>;
+  route: RouteProp<any>;
+  jumpTo: (screen: string) => void;
+};
 const topics: Topic[] = [
   {
     _id: 'general',
@@ -74,9 +79,9 @@ const topics: Topic[] = [
   },
 ];
 
-const MyRecordList = ({}: Props) => {
+const MyRecordList = ({navigation, route}: Props) => {
   const role = useRootSelector(state => state.user.profile?.role);
-  const navigation = useNavigation();
+  const needRefresh = route.params?.needRefresh;
   const [searchQuery, setSearchQuery] = React.useState<string>('');
   const {close, open, isShowing} = useModal();
   const [filter, setFilter] = React.useState<GetRecordsParams>({
@@ -84,13 +89,13 @@ const MyRecordList = ({}: Props) => {
     pageSize: 0,
     q: searchQuery,
   });
-  const {data, isFetching} = useGetMyRecords({
+  const {data, isFetching, refetch} = useGetMyRecords({
     ...filter,
     q: searchQuery,
   });
 
   const vocabularies = data?.items || [];
-  const {data: progress} = useQuery({
+  const {data: progress, refetch: refetchProgress} = useQuery({
     queryKey: ['progress'],
     queryFn: recordService.getRecordProgress,
   });
@@ -104,6 +109,10 @@ const MyRecordList = ({}: Props) => {
     });
   };
   const handleSelectedFilter = (value: string) => {
+    if (!value) {
+      setFilter({category: topics[0]._id});
+      return;
+    }
     const key = value.split('=')[0];
     const val = value.split('=')[1];
     setFilter(prev => ({...prev, [key]: val}));
@@ -131,14 +140,16 @@ const MyRecordList = ({}: Props) => {
 
   const renderSeparator = () => <View h={5} />;
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     refetch();
-  //   }, [refetch]),
-  // );
+  React.useEffect(() => {
+    if (needRefresh) {
+      refetch();
+      refetchProgress();
+      navigation.setParams({needRefresh: false});
+    }
+  }, [navigation, needRefresh, refetch, refetchProgress]);
 
   return (
-    <VStack flex={1} pt={5}>
+    <VStack flex={1} pt={5} px={5}>
       <Input
         value={searchQuery}
         onChangeText={setSearchQuery}
@@ -166,14 +177,23 @@ const MyRecordList = ({}: Props) => {
           }}
         />
       </HStack>
-      {isFetching ? (
-        <View flex={1} alignItems="center" justifyContent="center">
-          <Spinner size="lg" color={COLORS.highlight} />
-        </View>
+
+      {isFetching && vocabularies.length === 0 ? (
+        <Spinner mt={12} size="lg" color={COLORS.highlight} />
       ) : (
         <>
           {vocabularies.length > 0 ? (
             <FlatList
+              refreshControl={
+                <RefreshControl
+                  refreshing={isFetching}
+                  onRefresh={() => {
+                    refetch();
+                    refetchProgress();
+                  }}
+                  colors={[COLORS.highlight]}
+                />
+              }
               mt={5}
               ItemSeparatorComponent={renderSeparator}
               data={vocabularies}
@@ -209,6 +229,7 @@ const MyRecordList = ({}: Props) => {
           )}
         </>
       )}
+
       <Modal onClose={close} isOpen={isShowing}>
         <ShareModal />
       </Modal>
