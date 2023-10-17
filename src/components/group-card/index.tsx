@@ -4,79 +4,48 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {COLORS} from '../../constants/design-system';
 import {SCREEN_NAMES} from '../../constants/screen';
+import {IGroupMember, IGroups} from '../../interfaces/api/Group';
+import {IUser} from '../../interfaces/api/User';
 
-const GroupCard = () => {
+const GroupCard = ({group}: {group: IGroups}) => {
   const navigation = useNavigation<any>();
+
+  const [users, setUsers] = useState<IGroupMember[]>([]);
+  useEffect(() => {
+    if (!group) {
+      return;
+    }
+    const numberUsers = group.members.length;
+    const remainingCount = numberUsers > 4 ? numberUsers - 4 : 0;
+    if (remainingCount > 0) {
+      let newUsers = group.members.slice(0, 3);
+      const remain: any = {
+        _id: 'none',
+        remainingCount: `+${remainingCount}`,
+      };
+      newUsers = [...newUsers, remain];
+      setUsers(newUsers);
+    } else {
+      setUsers(group.members);
+    }
+  }, [group?.members.length]);
   const handleClick = () => {
     navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
       screen: SCREEN_NAMES.listenDetailScreen,
       params: {typeScreen: 'group'},
     });
   };
-  const listUsers: any = [
-    {
-      _id: '111',
-      name: 'Linh',
-      avatar:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
-      nativeLanguage: 'ko',
-    },
-    {
-      _id: '222',
-      name: 'Linh',
-      avatar:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
-      nativeLanguage: 'ko',
-    },
-    {
-      _id: '333',
-      name: 'Linh',
-      avatar:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
-      nativeLanguage: 'ko',
-    },
-    {
-      _id: '444',
-      name: 'Linh',
-      avatar:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
-      nativeLanguage: 'ko',
-    },
-    {
-      _id: '555',
-      name: 'Linh',
-      avatar:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
-      nativeLanguage: 'ko',
-    },
-  ];
-  const [users, setUsers] = useState([]);
-  useEffect(() => {
-    const numberUsers = listUsers.length;
-    const remainingCount = numberUsers > 4 ? numberUsers - 4 : 0;
-    if (remainingCount > 0) {
-      let newUsers = listUsers.slice(0, 3);
-      newUsers = [
-        ...newUsers,
-        {_id: 'none', remainingCount: `+${remainingCount}`},
-      ];
-      setUsers(newUsers);
-    }
-  }, [users.length]);
-
-  const renderMember = ({item, index}: {item: any; index: number}) => {
+  const renderMember = ({item, index}: {item: IGroupMember; index: number}) => {
     return (
       <View style={styles.avatar}>
         <Avatar
           backgroundColor={item?.remainingCount && COLORS.highlight}
           size={'sm'}
           source={{
-            uri:
-              item.name &&
-              'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+            uri: item.avatar,
           }}>
           <Text style={{fontSize: 14, color: '#fff'}}>
-            {item.name ? item.name : item?.remainingCount}
+            {item.displayName ? item.displayName : item?.remainingCount}
           </Text>
         </Avatar>
       </View>
@@ -85,16 +54,16 @@ const GroupCard = () => {
   return (
     <Pressable onPress={handleClick} style={styles.container}>
       <FlatList
-        initialNumToRender={4}
+        initialNumToRender={2}
         data={users}
         keyExtractor={(item, index) => item._id.toString()}
         numColumns={2}
         renderItem={renderMember}
       />
 
-      <Text style={styles.textName}>Group name</Text>
-      <Text style={styles.textRole}>5 members</Text>
-      <Text style={styles.textSentences}>12 sentences</Text>
+      <Text style={styles.textName}>{group?.name}</Text>
+      <Text style={styles.textRole}>{group?.members.length} members</Text>
+      <Text style={styles.textSentences}>0 sentences</Text>
     </Pressable>
   );
 };

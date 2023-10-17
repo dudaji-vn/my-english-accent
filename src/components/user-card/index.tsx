@@ -6,8 +6,16 @@ import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../../constants/screen';
 import HeadPhoneListenIcon from '../icons/headphone-listen-icon';
 
-const UserCard = () => {
+import {flagMap} from '../../configs';
+import {IUserProgress} from '../../interfaces/api/User';
+
+interface IUserCardProps {
+  userProgress: IUserProgress;
+}
+const UserCard = (props: IUserCardProps) => {
+  const {userProgress} = props;
   const navigation = useNavigation<any>();
+
   const handleClick = () => {
     navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
       screen: SCREEN_NAMES.listenDetailScreen,
@@ -21,21 +29,23 @@ const UserCard = () => {
           width={15}
           height={15}
           source={{
-            uri: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+            uri: userProgress?.avatar,
           }}>
-          AJ
+          {userProgress?.displayName}
         </Avatar>
         <Avatar
           width={6}
           height={6}
           style={styles.flag}
-          source={require('../../assets/images/KoreanFlagIcon.png')}
+          source={flagMap[userProgress.nativeLanguage]}
         />
       </View>
 
-      <Text style={styles.textName}>Display name</Text>
-      <Text style={styles.textRole}>Position</Text>
-      <Text style={styles.textSentences}>12 sentences1</Text>
+      <Text style={styles.textName}>{userProgress?.displayName}</Text>
+      <Text style={styles.textRole}>{userProgress?.role}</Text>
+      <Text style={styles.textSentences}>
+        {userProgress?.totalRecord} sentences
+      </Text>
       <HStack space={2} width={'100%'} alignItems={'center'}>
         <HeadPhoneListenIcon />
         <Progress
@@ -43,7 +53,7 @@ const UserCard = () => {
           _filledTrack={{
             bg: COLORS.highlight,
           }}
-          value={40}
+          value={(userProgress?.totalListen * 100) / userProgress?.totalRecord}
         />
       </HStack>
     </Pressable>
