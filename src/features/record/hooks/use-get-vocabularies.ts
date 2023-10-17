@@ -1,9 +1,12 @@
 import React from 'react';
 import {GetVocabulariesParams} from '../../../types/vocabulary';
 import {vocabularyService} from '../../../services/vocabulary.service';
-import {useQuery, useQueryClient} from '@tanstack/react-query';
+import {UseQueryOptions, useQuery, useQueryClient} from '@tanstack/react-query';
 
-export const useGetVocabularies = (params: GetVocabulariesParams) => {
+export const useGetVocabularies = (
+  params: GetVocabulariesParams,
+  options?: UseQueryOptions,
+) => {
   const queryClient = useQueryClient();
   const [page, setPage] = React.useState(1);
   const {status, data, error, isFetching, isPreviousData, refetch} = useQuery({
@@ -21,6 +24,7 @@ export const useGetVocabularies = (params: GetVocabulariesParams) => {
       }),
     keepPreviousData: true,
     staleTime: 5000,
+    ...options,
   });
 
   React.useEffect(() => {

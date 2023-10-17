@@ -11,6 +11,12 @@ export const useAudioRecord = (path?: string) => {
   const [isRecording, setIsRecording] = React.useState(false);
   const [metering, setMetering] = React.useState(-36);
 
+  React.useEffect(() => {
+    if (path) {
+      setCacheFilePath(path);
+    }
+  }, [path]);
+
   async function startRecording() {
     const id = uuid.v4();
     const dirs = RNFetchBlob.fs.dirs;
