@@ -37,7 +37,7 @@ export const Tabs = ({tabs}: Props) => {
     },
   ) => {
     return (
-      <Box flexDirection="row">
+      <Box flexDirection="row" px={5}>
         {props.navigationState.routes.map((route, i) => {
           const color = index === i ? COLORS.text : COLORS.stroke;
           const borderColor = index === i ? COLORS.highlight : COLORS.stroke;
