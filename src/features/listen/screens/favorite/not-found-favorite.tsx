@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {Text, View} from 'native-base';
-import React from 'react';
+import React, {memo} from 'react';
 import HomeIcon from '../../../../components/icons/home-icon';
 import {COLORS} from '../../../../constants/design-system';
 import {SCREEN_NAMES} from '../../../../constants/screen';
@@ -32,4 +32,4 @@ const FavoriteNotFound = () => {
   );
 };
 
-export default FavoriteNotFound;
+export default memo(FavoriteNotFound);

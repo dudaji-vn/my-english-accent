@@ -1,19 +1,24 @@
-import {HStack, Text, View} from 'native-base';
-import {FilterIcon} from '../../../../components/icons/filter-icon';
-import ListUser from '../../components/ListUser';
-import Section from '../../../../components/section';
-import {Filter} from '../../../../components/filter';
+import {useQuery} from '@tanstack/react-query';
+import {HStack, View} from 'native-base';
+import {memo} from 'react';
+import {listenService} from '../../../../services/listen.service';
 import FilterListen from '../../components/FilterListen';
+import ListUser from '../../components/ListUser';
 
 const IndividualTab = () => {
+  const {data: userProgress, error} = useQuery({
+    queryKey: ['listen-user-progress'],
+    queryFn: listenService.getUserProgress,
+  });
+
   return (
     <View marginX={5} marginTop={5}>
       <HStack space={2} marginBottom={5}>
         <FilterListen />
       </HStack>
-      <ListUser />
+      {userProgress && <ListUser users={userProgress} />}
     </View>
   );
 };
 
-export default IndividualTab;
+export default memo(IndividualTab);

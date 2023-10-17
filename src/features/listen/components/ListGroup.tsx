@@ -1,8 +1,8 @@
-import {ScrollView, View} from 'native-base';
+import {View} from 'native-base';
 import React from 'react';
-import {FlatList, Text, StyleSheet} from 'react-native';
-import UserCard from '../../../components/user-card';
+import {FlatList, StyleSheet} from 'react-native';
 import GroupCard from '../../../components/group-card';
+import {IGroups} from '../../../interfaces/api/Group';
 
 const data = [
   {id: '1', text: 'Item 1'},
@@ -13,31 +13,18 @@ const data = [
   {id: '6', text: 'Item 2'},
 ];
 
-const ListGroup = () => {
+const ListGroup = ({groups}: {groups: IGroups[]}) => {
   return (
     <View style={{marginHorizontal: -10, maxHeight: 900}}>
       <FlatList
         horizontal={false}
-        nestedScrollEnabled={true}
-        data={data}
+        data={groups}
         numColumns={2}
-        renderItem={({item}) => <GroupCard />}
-        keyExtractor={item => item.id}
+        renderItem={({item}) => <GroupCard group={item} />}
+        keyExtractor={item => item._id}
       />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  item: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 100,
-    borderWidth: 1,
-    borderColor: 'gray',
-    margin: 5,
-  },
-});
 
 export default ListGroup;
