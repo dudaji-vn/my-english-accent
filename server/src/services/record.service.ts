@@ -138,7 +138,8 @@ export default class RecordService {
     return record
   }
   async updateRecord(
-    { recordId, recordUrl }: IUpdateRecordDTO,
+    { recordUrl }: IUpdateRecordDTO,
+    recordId: String,
     userId: String
   ): Promise<any> {
     if (!recordUrl?.word && !recordUrl?.sentence) {
@@ -151,7 +152,7 @@ export default class RecordService {
         recordUrl
       },
       { new: true }
-    )
+    ).populate('vocabulary')
     return record
   }
 

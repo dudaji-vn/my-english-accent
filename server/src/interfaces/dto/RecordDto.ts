@@ -13,7 +13,6 @@ export interface IUpdateRecordDTO {
     word?: string
     sentence?: string
   }
-  recordId: string
 }
 
 export interface IGetRecordsPaginationDTO extends IPaginationParams {

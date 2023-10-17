@@ -28,7 +28,7 @@ recordRouter.get(
 )
 
 recordRouter.patch(
-  '/',
+  '/:recordId',
   auth,
   catchAsync(recordController.updateRecord.bind(recordController))
 )

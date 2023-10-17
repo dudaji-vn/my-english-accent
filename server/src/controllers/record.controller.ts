@@ -40,6 +40,7 @@ export default class RecordController {
     const data = req.body
     const record = await this.recordService.updateRecord(
       data,
+      req.params.recordId,
       req.user._id
     )
     return res.success(record)

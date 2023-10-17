@@ -1,7 +1,12 @@
 import queryString from 'query-string';
 import {recordEndpoint} from '../configs';
 import {IApiResponse, IPaginationResponse} from '../interfaces/api/Http';
-import {CreateRecordDTO, GetRecordsParams, Record} from '../types/record';
+import {
+  CreateRecordDTO,
+  GetRecordsParams,
+  Record,
+  UpdateRecordDTO,
+} from '../types/record';
 
 import httpService from './http.service';
 
@@ -13,11 +18,18 @@ class RecordService {
     );
     return res.data.data;
   }
+
+  async updateRecord({_id, ...data}: UpdateRecordDTO): Promise<Record> {
+    const res = await httpService.patch<IApiResponse<Record>>(
+      recordEndpoint.base + '/' + _id,
+      data,
+    );
+    return res.data.data;
+  }
   async getMyRecords(
     params: GetRecordsParams,
   ): Promise<IPaginationResponse<Record>> {
     const searchParams = queryString.stringify(params);
-    console.log(recordEndpoint.base + '/me' + '?' + searchParams);
     const res = await httpService.get<
       IApiResponse<IPaginationResponse<Record>>
     >(recordEndpoint.base + '/me' + '?' + searchParams);

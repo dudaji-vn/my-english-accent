@@ -20,6 +20,14 @@ export type CreateRecordDTO = {
   vocabularyId: string;
 };
 
+export type UpdateRecordDTO = {
+  recordUrl: {
+    word?: string | null;
+    sentence?: string | null;
+  };
+  _id: string;
+};
+
 export type GetRecordsParams = {
   page?: number;
   pageSize?: number;
