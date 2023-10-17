@@ -1,6 +1,9 @@
 import { NextFunction } from 'express'
 import { IRequest, IResponse } from '../interfaces/common'
-import { UnAuthorizeError } from '../interfaces/dto/Error'
+import {
+  BadRequestError,
+  UnAuthorizeError
+} from '../interfaces/dto/Error'
 type AsyncFunction = (
   req: IRequest,
   res: IResponse,
@@ -11,8 +14,15 @@ export const catchAsync = (fn: AsyncFunction) => {
   return (req: IRequest, res: IResponse, next: NextFunction) => {
     try {
       fn(req, res, next).catch((err: Error) => {
+        console.log({
+          messsage: err.message,
+          stack: err.stack
+        })
         if (err instanceof UnAuthorizeError) {
           return res.error(401, err.message, err.stack)
+        }
+        if (err instanceof BadRequestError) {
+          return res.error(400, err.message, err.stack)
         }
         return res.error(500, err.message, err.stack)
       })
