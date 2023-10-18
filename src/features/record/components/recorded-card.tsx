@@ -1,10 +1,11 @@
 import {HStack, Pressable, View} from 'native-base';
 import React from 'react';
-import {Animated} from 'react-native';
+import {Animated, StyleSheet} from 'react-native';
 import {Volume2} from 'react-native-feather';
 import {MicFilledIcon, TrashIcon} from '../../../components/icons';
 import {COLORS} from '../../../constants/design-system';
 import {useAudioRecord} from '../../../hooks/use-audio-record';
+import LottieView from 'lottie-react-native';
 
 type Props = {
   children?: React.ReactNode;
@@ -75,7 +76,16 @@ export const RecordedCard = ({
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <Volume2 width={40} height={40} color="white" />
+                {isPlaying ? (
+                  <LottieView
+                    style={styles.speaker}
+                    source={require('../../../assets/jsons/speaker-animation.json')}
+                    autoPlay
+                    loop
+                  />
+                ) : (
+                  <Volume2 width={40} height={40} color="white" />
+                )}
               </Animated.View>
             </Pressable>
           )}
@@ -94,3 +104,9 @@ export const RecordedCard = ({
     </View>
   );
 };
+const styles = StyleSheet.create({
+  speaker: {
+    width: 40,
+    height: 40,
+  },
+});
