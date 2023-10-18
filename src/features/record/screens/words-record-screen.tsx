@@ -1,8 +1,9 @@
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {useMutation} from '@tanstack/react-query';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {
   Button,
   HStack,
+  Image,
   Pressable,
   ScrollView,
   Text,
@@ -11,26 +12,31 @@ import {
   useToast,
 } from 'native-base';
 import React from 'react';
-import {AlertCircle, ChevronLeft, ChevronRight, X} from 'react-native-feather';
+import {StyleSheet, Text as TextDf, useWindowDimensions} from 'react-native';
+import {ChevronLeft, ChevronRight, X} from 'react-native-feather';
 import {PERMISSIONS, request} from 'react-native-permissions';
 import {SwiperFlatList} from 'react-native-swiper-flatlist';
+import {MicCheckIcon} from '../../../components/icons';
 import {Modal} from '../../../components/modal';
 import {ModalCard} from '../../../components/modal-card';
+import {LoadingScreen} from '../../../components/screens';
+import {TabBar, TabDataItem} from '../../../components/tab-bar';
+import {Toast} from '../../../components/toast';
 import {COLORS} from '../../../constants/design-system';
+import {SCREEN_NAMES} from '../../../constants/screen';
 import {useModal} from '../../../hooks/use-modal';
 import {useUnsavedChange} from '../../../hooks/use-unsaved-change';
 import {recordService} from '../../../services/record.service';
 import {Record} from '../../../types/record';
+import {GetVocabulariesParams} from '../../../types/vocabulary';
 import {uploadAudio} from '../../../utils/upload-audio';
 import {RecordCard} from '../components/record-card';
+import {RecordedCard} from '../components/recorded-card';
 import {SentenceContentCard} from '../components/sentence-content-card';
 import {WordContentCard} from '../components/word-content-card';
 import {useGetVocabularies} from '../hooks/use-get-vocabularies';
-import {useWindowDimensions} from 'react-native';
-import {GetVocabulariesParams} from '../../../types/vocabulary';
-import {RecordedCard} from '../components/recorded-card';
-import {Toast} from '../../../components/toast';
-import {SCREEN_NAMES} from '../../../constants/screen';
+import {useDispatch} from 'react-redux';
+import {addCompletedId} from '../../../redux/reducers/record.reducer';
 
 const PAGE_SIZE = 0;
 
@@ -45,10 +51,32 @@ type TempRecord = {
   isSaved: boolean;
 };
 
+const tabItems: TabDataItem[] = [
+  {
+    title: 'Word',
+    value: 'word',
+  },
+  {
+    title: 'Sentence',
+    value: 'sentence',
+  },
+  {
+    title: 'Both',
+    value: 'both',
+  },
+];
+
 const WordsRecordScreen = ({navigation, route}: Props) => {
   const toast = useToast();
-  const screenWith = useWindowDimensions().width;
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const filter = route.params?.filter as GetVocabulariesParams;
+  const refreshKey = route.params?.refreshKey;
+  const [footerHeight] = React.useState(144);
+  const [headerHeight] = React.useState(121.81818389892578);
+  const screenWith = useWindowDimensions().width;
+  const screenHeight = useWindowDimensions().height;
+  const [currentIdx, setCurrentIdx] = React.useState(0);
   const [isSaving, setIsSaving] = React.useState(false);
   const [recordedWord, setRecordedWord] = React.useState<TempRecord | null>(
     null,
@@ -57,19 +85,20 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     [key: string]: Record;
   }>({});
 
+  const [typeRecord, setTypeRecord] = React.useState<
+    'word' | 'sentence' | 'both'
+  >('word');
+
   const [recordedSentence, setRecordedSentence] =
     React.useState<TempRecord | null>(null);
   const swiperRef = React.useRef<SwiperFlatList>(null);
-  const {data} = useGetVocabularies(
+  const {data, isFetching} = useGetVocabularies(
     {
       ...filter,
       recordStatus: 'not-recorded',
       pageSize: PAGE_SIZE,
     },
-    {
-      keepPreviousData: false,
-      initialData: undefined,
-    },
+    'record',
   );
 
   React.useEffect(() => {
@@ -93,6 +122,9 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
       const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
       const vocabularyId = data?.items[currentIdx]._id.toString();
       setSavedList(prev => ({...prev, [vocabularyId]: recorded}));
+      dispatch(addCompletedId(recorded._id));
+      queryClient.invalidateQueries(refreshKey);
+      queryClient.invalidateQueries(['progress']);
       // setTimeout(() => {
       toast.show({
         render(props) {
@@ -161,67 +193,148 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     swiperRef.current?.scrollToIndex({index: currentIdx + 1});
   };
 
+  if (isFetching) {
+    return <LoadingScreen />;
+  }
+
+  const forward = () => {
+    const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
+    swiperRef.current?.scrollToIndex({index: currentIdx + 1});
+  };
+  const backward = () => {
+    const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
+    swiperRef.current?.scrollToIndex({index: currentIdx - 1});
+  };
+
+  const showWord = typeRecord === 'word' || typeRecord === 'both';
+  const showSentence = typeRecord === 'sentence' || typeRecord === 'both';
+
   return (
     <View bg="white" h="full">
-      <Header
-        hasSaved={Object.keys(savedList).length > 0}
-        navigation={navigation}
-        isUnsaved={isUnsaved}
-        completed={Object.keys(savedList).length}
-        total={data?.totalItems || 0}
-        savedNumber={Object.keys(savedList).length}
+      <Image
+        position="absolute"
+        bottom={0}
+        w="full"
+        height="full"
+        source={require('../../../assets/images/wave-background.png')}
       />
-      <ScrollView flex={1}>
-        {data && (
-          <SwiperFlatList
-            disableGesture
-            ref={swiperRef}
-            data={data?.items}
-            renderItem={({item}) => (
-              <VStack style={{width: screenWith}} px={5} py={2} space={5}>
-                {savedList[item._id]?.recordUrl?.word ? (
-                  <RecordedCard
-                    recordUri={savedList[item._id]?.recordUrl?.word}>
-                    <WordContentCard vocabulary={item} />
-                  </RecordedCard>
-                ) : (
-                  <RecordCard
-                    onHasRecord={uri => {
-                      setRecordedWord({_id: item._id, uri, isSaved: false});
-                    }}
-                    onNoRecord={() => {
-                      setRecordedWord(null);
-                    }}>
-                    <WordContentCard vocabulary={item} />
-                  </RecordCard>
+
+      <View
+      // onLayout={event => {
+      //   // const {height} = event.nativeEvent.layout;
+      //   // console.log('height h', height);
+      //   // if (height && height !== 0) setHeaderHeight(height);
+      // }}
+      >
+        <Header
+          forward={forward}
+          backward={backward}
+          currentIdx={currentIdx}
+          hasSaved={Object.keys(savedList).length > 0}
+          navigation={navigation}
+          isUnsaved={isUnsaved}
+          completed={Object.keys(savedList).length}
+          total={data?.totalItems || 0}
+        />
+        <View mb={6} justifyContent="center" alignItems="center">
+          <TabBar
+            onValueChange={value => {
+              setTypeRecord(value as 'word' | 'sentence' | 'both');
+            }}
+            tabItems={tabItems}
+            value={typeRecord}
+          />
+        </View>
+      </View>
+
+      {data && (
+        <SwiperFlatList
+          onChangeIndex={({index}) => {
+            setCurrentIdx(index);
+          }}
+          disableGesture
+          ref={swiperRef}
+          data={data?.items}
+          renderItem={({item}) => (
+            <ScrollView
+              contentContainerStyle={[
+                // eslint-disable-next-line react-native/no-inline-styles
+                {
+                  justifyContent: 'center',
+                  paddingBottom: 20,
+                },
+                !(showWord && showSentence) && {
+                  height: screenHeight - footerHeight - headerHeight,
+                },
+              ]}
+              style={{
+                width: screenWith,
+                height: screenHeight - footerHeight - headerHeight,
+              }}>
+              <VStack mb={4} justifyContent="center" px={5} py={2} space={5}>
+                {showWord && (
+                  <>
+                    {savedList[item._id]?.recordUrl?.word ? (
+                      <RecordedCard
+                        recordUri={savedList[item._id]?.recordUrl?.word}>
+                        <WordContentCard vocabulary={item} />
+                      </RecordedCard>
+                    ) : (
+                      <RecordCard
+                        onHasRecord={uri => {
+                          setRecordedWord({
+                            _id: item._id,
+                            uri,
+                            isSaved: false,
+                          });
+                        }}
+                        onNoRecord={() => {
+                          setRecordedWord(null);
+                        }}>
+                        <WordContentCard vocabulary={item} />
+                      </RecordCard>
+                    )}
+                  </>
                 )}
-                {savedList[item._id]?.recordUrl?.sentence ? (
-                  <RecordedCard
-                    recordUri={savedList[item._id]?.recordUrl?.sentence}>
-                    <SentenceContentCard vocabulary={item} />
-                  </RecordedCard>
-                ) : (
-                  <RecordCard
-                    onHasRecord={uri => {
-                      setRecordedSentence({
-                        _id: item._id,
-                        uri,
-                        isSaved: false,
-                      });
-                    }}
-                    onNoRecord={() => {
-                      setRecordedSentence(null);
-                    }}>
-                    <SentenceContentCard vocabulary={item} />
-                  </RecordCard>
+
+                {showSentence && (
+                  <>
+                    {savedList[item._id]?.recordUrl?.sentence ? (
+                      <RecordedCard
+                        recordUri={savedList[item._id]?.recordUrl?.sentence}>
+                        <SentenceContentCard vocabulary={item} />
+                      </RecordedCard>
+                    ) : (
+                      <RecordCard
+                        onHasRecord={uri => {
+                          setRecordedSentence({
+                            _id: item._id,
+                            uri,
+                            isSaved: false,
+                          });
+                        }}
+                        onNoRecord={() => {
+                          setRecordedSentence(null);
+                        }}>
+                        <SentenceContentCard vocabulary={item} />
+                      </RecordCard>
+                    )}
+                  </>
                 )}
               </VStack>
-            )}
-          />
-        )}
-      </ScrollView>
+            </ScrollView>
+          )}
+        />
+      )}
+
       <HStack
-        py={3}
+        flexShrink={0}
+        // onLayout={event => {
+        //   const {height} = event.nativeEvent.layout;
+        //   console.log('height f', height);
+        //   if (height && height !== 0) setFooterHeight(height);
+        // }}
+        py={8}
         bg="white"
         zIndex={1}
         position="absolute"
@@ -238,9 +351,8 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
           disabled={!recordedWord && !recordedSentence}
           opacity={!recordedWord && !recordedSentence ? 0.3 : 1}
           flex={1}
-          onPress={handleSaveRecord}
-          variant="outline">
-          Save
+          onPress={handleSaveRecord}>
+          <Text color="white">Save</Text>
         </Button>
       </HStack>
     </View>
@@ -250,19 +362,23 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
 export default WordsRecordScreen;
 
 const Header = ({
+  currentIdx = 0,
   navigation,
   isUnsaved,
   completed,
   total,
   hasSaved,
-  savedNumber = 0,
+  forward,
+  backward,
 }: {
+  currentIdx?: number;
   navigation: NavigationProp<any>;
   isUnsaved: boolean;
   completed: number;
   total: number;
   hasSaved: boolean;
-  savedNumber: number;
+  forward: () => void;
+  backward: () => void;
 }) => {
   const {close, isShowing, open} = useModal();
   const {onAllowGoBack} = useUnsavedChange(isUnsaved, navigation, open);
@@ -271,9 +387,8 @@ const Header = ({
       navigation.navigate({
         name: SCREEN_NAMES.record,
         params: {
-          needRefresh: true,
           hasNewRecord: true,
-          savedNumber: savedNumber,
+          savedNumber: completed,
         },
       });
       return;
@@ -288,16 +403,38 @@ const Header = ({
           <X width={24} height={24} color={COLORS.text} />
         </Pressable>
         <HStack space={5}>
-          <ChevronLeft width={24} height={24} color={COLORS.text} />
-          <Text>
-            <Text color={COLORS.highlight}>{completed}</Text>/
-            <Text opacity={0.3}>{total}</Text>
-          </Text>
-          <ChevronRight width={24} height={24} color={COLORS.text} />
+          <Pressable onPress={backward}>
+            <ChevronLeft
+              opacity={currentIdx === 0 ? 0.3 : 0.6}
+              width={24}
+              height={24}
+              color={COLORS.text}
+            />
+          </Pressable>
+          <HStack>
+            <Text fontWeight="medium" opacity={0.6} color={COLORS.text}>
+              {currentIdx + 1}
+            </Text>
+            <Text fontWeight="medium" opacity={0.3}>
+              /{total}
+            </Text>
+          </HStack>
+          <Pressable onPress={forward}>
+            <ChevronRight
+              opacity={currentIdx === total - 1 ? 0.3 : 0.6}
+              width={24}
+              height={24}
+              color={COLORS.text}
+            />
+          </Pressable>
         </HStack>
-        <Pressable p={5} onPress={() => navigation.navigate('Home')}>
-          <AlertCircle width={24} height={24} color={COLORS.text} />
-        </Pressable>
+
+        <HStack space={1} mr={5} alignItems="center">
+          <TextDf style={styles.text}>{completed}</TextDf>
+          <Text>
+            <MicCheckIcon />
+          </Text>
+        </HStack>
       </HStack>
       <Modal isOpen={isShowing} onClose={close}>
         <ModalCard
@@ -321,3 +458,11 @@ const Header = ({
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  text: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.highlight,
+  },
+});

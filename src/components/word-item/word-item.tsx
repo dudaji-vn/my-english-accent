@@ -6,8 +6,10 @@ import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 type Props = {
   word: string;
   status: 'default' | 'active' | 'disabled';
-  leftElement: React.ReactNode;
+  leftElement?: React.ReactNode;
+  rightElement?: React.ReactNode;
   onPress?: () => void;
+  justifyContent?: 'space-between' | 'flex-start' | 'flex-end';
 };
 
 export const WordItem = (props: Props) => {
@@ -17,7 +19,7 @@ export const WordItem = (props: Props) => {
       disabled={props.onPress === undefined ? true : false}>
       <HStack
         alignItems="center"
-        justifyContent="space-between"
+        // justifyContent={props.justifyContent || 'space-between'}
         w="full"
         rounded="lg"
         bg={
@@ -27,13 +29,14 @@ export const WordItem = (props: Props) => {
         }
         px={4}
         py={5}>
+        {props.leftElement}
         <Text
           style={[
             styles.text,
             {
               color:
                 props.status === 'active'
-                  ? COLORS.highlight
+                  ? COLORS.text
                   : props.status === 'disabled'
                   ? COLORS.stroke
                   : COLORS.text,
@@ -41,7 +44,7 @@ export const WordItem = (props: Props) => {
           ]}>
           {props.word}
         </Text>
-        {props.leftElement}
+        {props.rightElement}
       </HStack>
     </TouchableOpacity>
   );
@@ -49,6 +52,7 @@ export const WordItem = (props: Props) => {
 
 const styles = StyleSheet.create({
   text: {
+    flex: 1,
     fontSize: 16,
     fontWeight: '400',
   },

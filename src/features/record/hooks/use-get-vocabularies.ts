@@ -1,22 +1,23 @@
+import {useQuery, useQueryClient} from '@tanstack/react-query';
 import React from 'react';
-import {GetVocabulariesParams} from '../../../types/vocabulary';
 import {vocabularyService} from '../../../services/vocabulary.service';
-import {UseQueryOptions, useQuery, useQueryClient} from '@tanstack/react-query';
+import {GetVocabulariesParams} from '../../../types/vocabulary';
 
 export const useGetVocabularies = (
   params: GetVocabulariesParams,
-  options?: UseQueryOptions,
+  key?: string,
 ) => {
   const queryClient = useQueryClient();
   const [page, setPage] = React.useState(1);
+  const queryKey = [
+    `vocabularies ${key}`,
+    {
+      ...params,
+      page,
+    },
+  ];
   const {status, data, error, isFetching, isPreviousData, refetch} = useQuery({
-    queryKey: [
-      'vocabularies',
-      {
-        ...params,
-        page,
-      },
-    ],
+    queryKey: queryKey,
     queryFn: () =>
       vocabularyService.getVocabularies({
         ...params,
@@ -24,7 +25,6 @@ export const useGetVocabularies = (
       }),
     keepPreviousData: true,
     staleTime: 5000,
-    ...options,
   });
 
   React.useEffect(() => {
@@ -62,5 +62,6 @@ export const useGetVocabularies = (
     setPage,
     fetchNextPage,
     refetch,
+    queryKey,
   };
 };

@@ -1,31 +1,55 @@
 import {HStack, Image, Pressable, VStack} from 'native-base';
 import React from 'react';
+import {StyleSheet, Text} from 'react-native';
+import Tts from 'react-native-tts';
 import {SpeakerIcon} from '../../../components/icons';
+import {flagMap} from '../../../configs';
 import {COLORS} from '../../../constants/design-system';
 import {useRootSelector} from '../../../redux/reducers';
 import {Vocabulary} from '../../../types/vocabulary';
-import {flagMap} from '../../../configs';
-import {StyleSheet, Text} from 'react-native';
-import Tts from 'react-native-tts';
+import LottieView from 'lottie-react-native';
 
 type Props = {
   vocabulary: Vocabulary;
 };
 
 export const WordContentCard = ({vocabulary}: Props) => {
+  const [isSpeaking, setIsSpeaking] = React.useState(false);
   const nativeLanguage = useRootSelector(
     state => state.user.profile.nativeLanguage,
   )!;
+  const handleSpeak = async () => {
+    //en-us-x-iom-local male
+    // en-us-x-iob-local" female
+    Tts.addEventListener('tts-finish', event => setIsSpeaking(false));
+    Tts.addEventListener('tts-start', event => {
+      setIsSpeaking(true);
+    });
+    Tts.speak(vocabulary.text.en);
+  };
+
   return (
     <VStack space={1}>
       <HStack alignItems="center" space={4}>
         <Text style={styles.font}>{vocabulary.text.en}</Text>
-        <Pressable
-          onPress={() => {
-            Tts.speak(vocabulary.text.en);
-          }}>
-          <SpeakerIcon />
-        </Pressable>
+        {!isSpeaking ? (
+          <Pressable onPress={handleSpeak}>
+            <SpeakerIcon />
+          </Pressable>
+        ) : (
+          <Pressable
+            onPress={() => {
+              Tts.stop();
+              setIsSpeaking(false);
+            }}>
+            <LottieView
+              style={styles.speaker}
+              source={require('../../../assets/jsons/speaker-animation.json')}
+              autoPlay
+              loop
+            />
+          </Pressable>
+        )}
       </HStack>
       <Text style={styles.pronunciation}>/{vocabulary.pronunciation}/</Text>
       <HStack mt={3} alignItems="center" space={2}>
@@ -59,5 +83,9 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     opacity: 0.6,
     flexWrap: 'wrap',
+  },
+  speaker: {
+    width: 28,
+    height: 28,
   },
 });

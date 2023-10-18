@@ -79,7 +79,6 @@ const topics: Topic[] = [
 
 const Record = ({navigation, route, jumpTo}: Props) => {
   const role = useRootSelector(state => state.user.profile?.role);
-  const needRefresh = route.params?.needRefresh;
   const hasNewRecord = route.params?.hasNewRecord;
   const savedNumber = route.params?.savedNumber;
   const toast = useToast();
@@ -88,7 +87,7 @@ const Record = ({navigation, route, jumpTo}: Props) => {
     recordStatus: 'all',
     pageSize: 0,
   });
-  const {data, refetch, isFetching} = useGetVocabularies(filter);
+  const {data, refetch, isFetching, queryKey} = useGetVocabularies(filter);
   const {data: progress, refetch: refetchProgress} = useQuery({
     queryKey: ['progress'],
     queryFn: recordService.getRecordProgress,
@@ -103,6 +102,7 @@ const Record = ({navigation, route, jumpTo}: Props) => {
         vocabularyId: vocabulary._id,
         category: vocabulary.category,
         filter,
+        refreshKey: queryKey,
       },
     });
   };
@@ -146,15 +146,6 @@ const Record = ({navigation, route, jumpTo}: Props) => {
   }, [topicsShow]);
 
   const renderSeparator = () => <View h={5} />;
-
-  React.useEffect(() => {
-    if (needRefresh) {
-      refetch();
-      refetchProgress();
-      navigation.setParams({needRefresh: false});
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [needRefresh, refetch, refetchProgress]);
 
   React.useEffect(() => {
     if (hasNewRecord && savedNumber > 0) {
@@ -228,7 +219,7 @@ const Record = ({navigation, route, jumpTo}: Props) => {
                   key={index}
                   word={item.text.en}
                   status={isRecorded ? 'disabled' : 'active'}
-                  leftElement={
+                  rightElement={
                     isRecorded ? (
                       <MicCheckIcon />
                     ) : (

@@ -81,7 +81,8 @@ const topics: Topic[] = [
 
 const MyRecordList = ({navigation, route}: Props) => {
   const role = useRootSelector(state => state.user.profile?.role);
-  const needRefresh = route.params?.needRefresh;
+  const completedIds =
+    useRootSelector(state => state.record)?.completedIds || [];
   const [searchQuery, setSearchQuery] = React.useState<string>('');
   const {close, open, isShowing} = useModal();
   const [filter, setFilter] = React.useState<GetRecordsParams>({
@@ -89,7 +90,7 @@ const MyRecordList = ({navigation, route}: Props) => {
     pageSize: 0,
     q: searchQuery,
   });
-  const {data, isFetching, refetch} = useGetMyRecords({
+  const {data, isFetching, refetch, queryKey} = useGetMyRecords({
     ...filter,
     q: searchQuery,
   });
@@ -105,6 +106,7 @@ const MyRecordList = ({navigation, route}: Props) => {
       screen: SCREEN_NAMES.myRecordListen,
       params: {
         record,
+        refreshKey: queryKey,
       },
     });
   };
@@ -141,12 +143,9 @@ const MyRecordList = ({navigation, route}: Props) => {
   const renderSeparator = () => <View h={5} />;
 
   React.useEffect(() => {
-    if (needRefresh) {
-      refetch();
-      refetchProgress();
-      navigation.setParams({needRefresh: false});
-    }
-  }, [navigation, needRefresh, refetch, refetchProgress]);
+    refetch();
+    refetchProgress();
+  }, [completedIds, refetch, refetchProgress]);
 
   return (
     <VStack flex={1} pt={5} px={5}>
@@ -202,17 +201,30 @@ const MyRecordList = ({navigation, route}: Props) => {
                 return (
                   <>
                     <WordItem
+                      leftElement={
+                        completedIds.includes(item._id) ? (
+                          <View
+                            mr={2}
+                            w={3}
+                            h={3}
+                            rounded="full"
+                            bg={COLORS.highlight}
+                          />
+                        ) : undefined
+                      }
                       onPress={() => handlePressItem(item)}
                       key={index}
                       word={item.vocabulary.text.en}
                       status="default"
-                      leftElement={
-                        <Send
-                          opacity={0.6}
-                          width={24}
-                          height={24}
-                          color={COLORS.text}
-                        />
+                      rightElement={
+                        <Pressable alignSelf="flex-end">
+                          <Send
+                            opacity={0.6}
+                            width={24}
+                            height={24}
+                            color={COLORS.text}
+                          />
+                        </Pressable>
                       }
                     />
                     {index === vocabularies.length - 1 && <View h={31} />}

@@ -14,7 +14,6 @@ import {Modal} from '../../../components/modal';
 import {ModalCard} from '../../../components/modal-card';
 import {Toast} from '../../../components/toast';
 import {COLORS} from '../../../constants/design-system';
-import {SCREEN_NAMES} from '../../../constants/screen';
 import {useModal} from '../../../hooks/use-modal';
 import {Record} from '../../../types/record';
 import {uploadAudio} from '../../../utils/upload-audio';
@@ -23,6 +22,7 @@ import {RecordedCard} from '../components/recorded-card';
 import {SentenceContentCard} from '../components/sentence-content-card';
 import {WordContentCard} from '../components/word-content-card';
 import {useUpdateRecord} from '../hooks/use-update-record';
+import {useQueryClient} from '@tanstack/react-query';
 
 type Props = {
   navigation: NavigationProp<any>;
@@ -30,24 +30,13 @@ type Props = {
 };
 
 export const MyRecordListenScreen = ({navigation, route}: Props) => {
+  const refreshKey = route.params?.refreshKey;
+  const queryClient = useQueryClient();
   const [record, setRecord] = React.useState<Record>(route.params?.record);
   const [currentItem, setCurrentItem] = React.useState<'word' | 'sentence'>();
   const [newRecordUri, setNewRecordUri] = React.useState<string | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
   const toast = useToast();
-  const [isChanged, setIsChanged] = React.useState(false);
-  const goBack = () => {
-    if (!isChanged) {
-      navigation.goBack();
-      return;
-    }
-    navigation.navigate({
-      name: SCREEN_NAMES.record,
-      params: {
-        needRefresh: true,
-      },
-    });
-  };
 
   const {
     close: closeRecord,
@@ -71,14 +60,10 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
   } = useModal();
   const {updateRecord, isLoading, mutateAsync} = useUpdateRecord({
     onSuccess: data => {
-      setIsChanged(true);
+      queryClient.invalidateQueries(refreshKey);
+      queryClient.invalidateQueries(['progress']);
       if (!data) {
-        navigation.navigate({
-          name: SCREEN_NAMES.record,
-          params: {
-            needRefresh: true,
-          },
-        });
+        navigation.goBack();
         return;
       }
       setRecord(data as Record);
@@ -148,7 +133,11 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
   return (
     <View bg="white" h="full">
       <HStack h={14} alignItems="center" justifyContent="space-between">
-        <Pressable p={5} onPress={goBack}>
+        <Pressable
+          p={5}
+          onPress={() => {
+            navigation.goBack();
+          }}>
           <X width={24} height={24} color={COLORS.text} />
         </Pressable>
       </HStack>
