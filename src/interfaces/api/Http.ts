@@ -8,3 +8,12 @@ export interface ICursorPaginationResponse<T> {
   endCursor: string;
   hasNextPage: boolean;
 }
+
+export interface IPaginationResponse<T> {
+  items: T[];
+  limit: number;
+  totalItems: number;
+  currentPage: number;
+  totalPage: number;
+  hasNextPage: boolean;
+}

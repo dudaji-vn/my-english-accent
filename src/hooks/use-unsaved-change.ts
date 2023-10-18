@@ -22,10 +22,10 @@ export const useUnsavedChange = (
     [navigation, isUnsaved, allowGoBack],
   );
 
-  const onAllowGoBack = () => {
+  const onAllowGoBack = (callBack?: () => void) => {
     setAllowGoBack(true);
     setTimeout(() => {
-      navigation.goBack();
+      callBack ? callBack() : navigation.goBack();
     }, 100);
   };
 

@@ -1,38 +1,35 @@
-import {FlatList, HStack, VStack, View} from 'native-base';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
+import {useQuery} from '@tanstack/react-query';
+import {FlatList, HStack, Spinner, VStack, View, useToast} from 'native-base';
 import React from 'react';
+import {RefreshControl} from 'react-native';
 import {Mic} from 'react-native-feather';
 import {AppProgress} from '../../../components/app-progress';
 import {Filter} from '../../../components/filter';
 import {MicCheckIcon, MicFilledIcon} from '../../../components/icons';
+import {Toast} from '../../../components/toast';
 import {Topic, TopicCard} from '../../../components/topic-card';
 import {WordItem} from '../../../components/word-item';
 import {COLORS} from '../../../constants/design-system';
-import {useNavigation} from '@react-navigation/native';
 import {SCREEN_NAMES} from '../../../constants/screen';
-import {useQuery} from '@tanstack/react-query';
-import {
-  GetVocabulariesParams,
-  vocabularyService,
-} from '../../../services/vocabulary.service';
-import {recordService} from '../../../services/record.service';
 import {useRootSelector} from '../../../redux/reducers';
-import {Vocabulary} from '../../../types/vocabulary';
+import {recordService} from '../../../services/record.service';
+import {GetVocabulariesParams, Vocabulary} from '../../../types/vocabulary';
+import {useGetVocabularies} from '../hooks/use-get-vocabularies';
 const designerImg = require('../../../assets/images/Designer.png');
 
 const generalImg = require('../../../assets/images/Chat.png');
 
 const developerImg = require('../../../assets/images/Dev.png');
 
-const recordedIds = ['6528c17b0187283073293cac'];
-
 const filterItems = [
   {
     label: 'Incomplete',
-    value: 'isRecorded=false',
+    value: 'recordStatus=not-recorded',
   },
   {
     label: 'Completed recently',
-    value: 'isRecorded=true',
+    value: 'recordStatus=recorded',
   },
   {
     label: 'Type (verb)',
@@ -48,7 +45,11 @@ const filterItems = [
   },
 ];
 
-type Props = {};
+type Props = {
+  navigation: NavigationProp<any>;
+  route: RouteProp<any>;
+  jumpTo: (key: string) => void;
+};
 const topics: Topic[] = [
   {
     _id: 'general',
@@ -76,17 +77,19 @@ const topics: Topic[] = [
   },
 ];
 
-const Record = ({}: Props) => {
+const Record = ({navigation, route, jumpTo}: Props) => {
   const role = useRootSelector(state => state.user.profile?.role);
-  const navigation = useNavigation();
+  const needRefresh = route.params?.needRefresh;
+  const hasNewRecord = route.params?.hasNewRecord;
+  const savedNumber = route.params?.savedNumber;
+  const toast = useToast();
   const [filter, setFilter] = React.useState<GetVocabulariesParams>({
     category: topics[0]._id,
+    recordStatus: 'all',
+    pageSize: 0,
   });
-  const {data} = useQuery({
-    queryKey: ['vocabulary', filter],
-    queryFn: () => vocabularyService.getVocabularies(filter),
-  });
-  const {data: progress} = useQuery({
+  const {data, refetch, isFetching} = useGetVocabularies(filter);
+  const {data: progress, refetch: refetchProgress} = useQuery({
     queryKey: ['progress'],
     queryFn: recordService.getRecordProgress,
   });
@@ -98,6 +101,8 @@ const Record = ({}: Props) => {
       screen: SCREEN_NAMES.wordsRecord,
       params: {
         vocabularyId: vocabulary._id,
+        category: vocabulary.category,
+        filter,
       },
     });
   };
@@ -140,13 +145,47 @@ const Record = ({}: Props) => {
     return Math.round((achieved / total) * 100);
   }, [topicsShow]);
 
+  const renderSeparator = () => <View h={5} />;
+
+  React.useEffect(() => {
+    if (needRefresh) {
+      refetch();
+      refetchProgress();
+      navigation.setParams({needRefresh: false});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needRefresh, refetch, refetchProgress]);
+
+  React.useEffect(() => {
+    if (hasNewRecord && savedNumber > 0) {
+      const unit = savedNumber > 1 ? 'records' : 'record';
+      toast.show({
+        render(props) {
+          return (
+            <Toast
+              leftElementOnPress={() => {
+                jumpTo('My record list');
+              }}
+              leftElement={<>Show me</>}
+              {...props}
+              status="success">
+              You have {savedNumber} new {unit}!
+            </Toast>
+          );
+        },
+      });
+      navigation.setParams({hasNewRecord: false});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasNewRecord, savedNumber]);
+
   return (
-    <VStack flex={1} pt={5}>
+    <VStack flex={1} pt={5} px={5}>
       <AppProgress
-        progress={progressValue}
+        progress={progressValue || 0}
         startIcon={<Mic color="white" width={20} height={20} />}
       />
-      <HStack space={4} mt={8} justifyContent="space-between">
+      <HStack space={4} mt={8}>
         {topicsShow.map((topic, index) => (
           <TopicCard
             onPress={() => handleSelectedFilter(`category=${topic._id}`)}
@@ -162,34 +201,48 @@ const Record = ({}: Props) => {
           filterItems={filterItems}
         />
       </View>
-      <FlatList
-        mt={5}
-        ItemSeparatorComponent={() => <View h={5} />}
-        data={vocabularies}
-        numColumns={1}
-        renderItem={({item, index}) => {
-          const isRecorded = recordedIds.includes(item._id);
-          return (
-            <>
-              <WordItem
-                onPress={isRecorded ? undefined : () => handlePressItem(item)}
-                key={index}
-                word={item.text.en}
-                status={isRecorded ? 'disabled' : 'active'}
-                leftElement={
-                  isRecorded ? (
-                    <MicCheckIcon />
-                  ) : (
-                    <MicFilledIcon opacity={0.1} color={COLORS.text} />
-                  )
-                }
-              />
-              {index === vocabularies.length - 1 && <View h={31} />}
-            </>
-          );
-        }}
-        keyExtractor={item => item._id}
-      />
+      {isFetching && vocabularies.length === 0 ? (
+        <Spinner mt={12} size="lg" color={COLORS.highlight} />
+      ) : (
+        <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={isFetching}
+              onRefresh={() => {
+                refetch();
+                refetchProgress();
+              }}
+              colors={[COLORS.highlight]}
+            />
+          }
+          mt={5}
+          ItemSeparatorComponent={renderSeparator}
+          data={vocabularies}
+          numColumns={1}
+          renderItem={({item, index}) => {
+            const isRecorded = item.isRecorded;
+            return (
+              <>
+                <WordItem
+                  onPress={isRecorded ? undefined : () => handlePressItem(item)}
+                  key={index}
+                  word={item.text.en}
+                  status={isRecorded ? 'disabled' : 'active'}
+                  leftElement={
+                    isRecorded ? (
+                      <MicCheckIcon />
+                    ) : (
+                      <MicFilledIcon opacity={0.1} color={COLORS.text} />
+                    )
+                  }
+                />
+                {index === vocabularies.length - 1 && <View h={31} />}
+              </>
+            );
+          }}
+          keyExtractor={item => item._id}
+        />
+      )}
     </VStack>
   );
 };

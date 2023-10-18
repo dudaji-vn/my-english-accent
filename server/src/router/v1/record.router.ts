@@ -15,11 +15,28 @@ recordRouter.post(
   catchAsync(recordController.createRecord.bind(recordController))
 )
 recordRouter.get(
+  '/me',
+  auth,
+  catchAsync(recordController.getMyRecords.bind(recordController))
+)
+recordRouter.get(
   '/progress',
   auth,
   catchAsync(
     recordController.getRecordProgress.bind(recordController)
   )
+)
+
+recordRouter.patch(
+  '/:recordId',
+  auth,
+  catchAsync(recordController.updateRecord.bind(recordController))
+)
+
+recordRouter.delete(
+  '/:recordId',
+  auth,
+  catchAsync(recordController.deleteRecord.bind(recordController))
 )
 
 export default recordRouter

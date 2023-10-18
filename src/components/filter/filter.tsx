@@ -38,11 +38,12 @@ export const Filter = (props: Props) => {
   const handleSelected = (value: FilterItems) => {
     setSelectedValue(prev => {
       if (prev && prev.value === value.value) {
+        props.onSelected({label: '', value: ''});
         return undefined;
       }
+      props.onSelected(value);
       return value;
     });
-    props.onSelected(value);
   };
   const {icon} = props;
 
