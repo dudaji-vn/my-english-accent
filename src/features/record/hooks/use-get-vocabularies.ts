@@ -2,10 +2,12 @@ import React from 'react';
 import {GetVocabulariesParams} from '../../../types/vocabulary';
 import {vocabularyService} from '../../../services/vocabulary.service';
 import {UseQueryOptions, useQuery, useQueryClient} from '@tanstack/react-query';
+import {IGetRecordsPaginationDTO} from '../../../../server/src/interfaces/dto/RecordDto';
+import {Record} from '../../../types/record';
 
 export const useGetVocabularies = (
   params: GetVocabulariesParams,
-  options?: UseQueryOptions,
+  options?: UseQueryOptions<IGetRecordsPaginationDTO<Record>, any, any>,
 ) => {
   const queryClient = useQueryClient();
   const [page, setPage] = React.useState(1);
