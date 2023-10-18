@@ -1,5 +1,5 @@
 import {Text, View, Button, HStack, AddIcon} from 'native-base';
-import React from 'react';
+import React, {memo} from 'react';
 
 import {useNavigation} from '@react-navigation/native';
 import HomeIcon from '../../../components/icons/home-icon';
@@ -35,4 +35,4 @@ const NotInternet = () => {
   );
 };
 
-export default NotInternet;
+export default memo(NotInternet);

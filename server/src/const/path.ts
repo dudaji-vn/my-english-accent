@@ -3,5 +3,7 @@ export const PATH = {
   file: '/file',
   user: '/user',
   vocabulary: '/vocabulary',
-  record: '/record'
+  record: '/record',
+  listen: '/listen',
+  group: '/group'
 }

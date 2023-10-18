@@ -7,6 +7,7 @@ const PlayAllIcon = (props: SvgProps) => (
     width={24}
     height={24}
     fill="none"
+    opacity={0.6}
     {...props}>
     <Path
       fill="#333"

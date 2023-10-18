@@ -14,7 +14,7 @@ import SearchIcon from '../icons/search-icon';
 
 type Props = {
   label?: string;
-  error?: string;
+  error?: string | boolean;
   typeInput?: 'text' | 'search';
 } & IInputProps;
 

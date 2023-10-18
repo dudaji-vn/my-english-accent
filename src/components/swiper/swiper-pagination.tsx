@@ -24,7 +24,7 @@ const Dot = ({
   const color = React.useMemo(() => {
     switch (status) {
       case 'active':
-        return COLORS.stroke;
+        return COLORS.text;
       case 'visited':
         return COLORS.highlight;
       default:
@@ -34,7 +34,7 @@ const Dot = ({
   return (
     <View
       onTouchEnd={onPress}
-      opacity={status === 'inactive' ? 0.3 : 1}
+      opacity={status !== 'visited' ? 0.3 : 1}
       w={2.5}
       h={2.5}
       rounded="full"
@@ -77,7 +77,7 @@ export const SwiperPagination = ({
         <HStack space={1}>
           {Array.from({length: total}).map((_, i) => {
             let status: DotStatus = 'inactive';
-            if (visitedIndexes.includes(i)) {
+            if (i < index) {
               status = 'visited';
             }
             if (i === index) {

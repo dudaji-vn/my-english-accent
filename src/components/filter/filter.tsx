@@ -1,17 +1,35 @@
-import {HStack, Menu, Text} from 'native-base';
+import {HStack, Menu, Text, View} from 'native-base';
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
-import {FilterIcon} from '../icons';
 import {COLORS} from '../../constants/design-system';
+import {FilterIcon} from '../icons';
 type FilterItems = {
   label: string;
   value: string;
+  icon?: JSX.Element;
 };
 
 type Props = {
   filterItems: FilterItems[];
   onSelected: (value: FilterItems) => void;
   selectedValue?: FilterItems;
+  icon?: JSX.Element;
+  placement?:
+    | 'top'
+    | 'bottom'
+    | 'left'
+    | 'right'
+    | 'top left'
+    | 'top right'
+    | 'bottom left'
+    | 'bottom right'
+    | 'right top'
+    | 'right bottom'
+    | 'left top'
+    | 'left bottom';
+  marginTop?: number;
+  marginLeft?: number;
+  maxHeight?: number;
 };
 
 export const Filter = (props: Props) => {
@@ -27,6 +45,8 @@ export const Filter = (props: Props) => {
       return value;
     });
   };
+  const {icon} = props;
+
   return (
     <Menu
       onOpen={() => setIsShow(true)}
@@ -41,21 +61,26 @@ export const Filter = (props: Props) => {
       trigger={triggerProps => {
         return (
           <TouchableOpacity {...triggerProps}>
-            <HStack space={2} alignItems="center">
-              <FilterIcon
-                opacity={isShow ? 1 : 0.6}
-                color={isShow ? COLORS.highlight : COLORS.text}
-              />
-              <Text
-                opacity={isShow ? 1 : 0.6}
-                color={isShow ? COLORS.highlight : COLORS.text}>
-                Filter
-                {selectedValue ? `: ${selectedValue.label}` : ''}
-              </Text>
-            </HStack>
+            {icon ? (
+              icon
+            ) : (
+              <HStack space={2} alignItems="center">
+                <FilterIcon
+                  opacity={isShow ? 1 : 0.6}
+                  color={isShow ? COLORS.highlight : COLORS.text}
+                />
+                <Text
+                  opacity={isShow ? 1 : 0.6}
+                  color={isShow ? COLORS.highlight : COLORS.text}>
+                  Filter
+                  {selectedValue ? `: ${selectedValue.label}` : ''}
+                </Text>
+              </HStack>
+            )}
           </TouchableOpacity>
         );
-      }}>
+      }}
+      {...props}>
       {props.filterItems.map((item, index) => (
         <Menu.Item
           bg={
@@ -73,7 +98,14 @@ export const Filter = (props: Props) => {
           px={3}
           py={4}
           fontSize="md">
-          <Text>{item.label}</Text>
+          {item.icon ? (
+            <HStack space={2}>
+              {item?.icon}
+              <Text>{item.label}</Text>
+            </HStack>
+          ) : (
+            <Text>{item.label}</Text>
+          )}
         </Menu.Item>
       ))}
     </Menu>

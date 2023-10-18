@@ -1,0 +1,12 @@
+POST http://localhost:5000/api/listen/listenRecord
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTIzNjUyYmE3NTkxN2E4NWRmZWFjNWIiLCJlbWFpbCI6ImhvcXVhbmdsaW5oMjcxMEBnbWFpbC5jb20iLCJpYXQiOjE2OTY5OTU5OTIsImV4cCI6MTY5OTU4Nzk5Mn0.aCIl7ILy4Qx-dvqertuU-OiOfKQqBwQ_Rl5g1DZQTsI
+Content-Type: application/json
+
+{
+  "recordId":"652ca5cc51858b83d25c3339"
+}
+
+
+###
+GET http://10.0.100.81:5000/api/listen/getUserProgress
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTIzNjUyYmE3NTkxN2E4NWRmZWFjNWIiLCJlbWFpbCI6ImhvcXVhbmdsaW5oMjcxMEBnbWFpbC5jb20iLCJpYXQiOjE2OTY5OTU5OTIsImV4cCI6MTY5OTU4Nzk5Mn0.aCIl7ILy4Qx-dvqertuU-OiOfKQqBwQ_Rl5g1DZQTsI

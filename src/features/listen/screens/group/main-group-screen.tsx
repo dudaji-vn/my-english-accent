@@ -6,17 +6,24 @@ import AddIcon from '../../../../components/icons/add-icon';
 import {SCREEN_NAMES} from '../../../../constants/screen';
 import {useNavigation} from '@react-navigation/native';
 import GroupNotFound from './group-notfound';
+import {memo} from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {groupService} from '../../../../services/group.service';
 
 const fullWidth = Dimensions.get('window').width;
 const MainGroupScreen = () => {
   const navigation = useNavigation<any>();
+  const {data: myGroups} = useQuery({
+    queryKey: ['myGroups'],
+    queryFn: groupService.getMyGroup,
+  });
   const handleClick = () => {
     navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
       screen: SCREEN_NAMES.createGroup,
     });
   };
 
-  return true ? (
+  return !myGroups ? (
     <GroupNotFound />
   ) : (
     <View marginX={5} marginTop={5}>
@@ -35,10 +42,10 @@ const MainGroupScreen = () => {
         </HStack>
       </Button>
       <View>
-        <ListGroup />
+        <ListGroup groups={myGroups} />
       </View>
     </View>
   );
 };
 
-export default MainGroupScreen;
+export default memo(MainGroupScreen);

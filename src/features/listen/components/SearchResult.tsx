@@ -25,7 +25,7 @@ const SearchResult = () => {
           <Text color={COLORS.highlight} marginY={5}>
             {item.text}
           </Text>
-          {item.type === 'user' ? <ListUser /> : <ListGroup />}
+          {item.type === 'user' ? <ListUser users={[]} /> : <ListGroup />}
         </View>
       )}
     />
@@ -34,7 +34,7 @@ const SearchResult = () => {
   const SecondRoute = () => <View style={{flex: 1}} />;
 
   const renderScene = SceneMap({
-    allScreen: SearchNotFound || FirstRoute,
+    allScreen: FirstRoute || SearchNotFound,
     individualScreen: SecondRoute,
     groupScreen: FirstRoute,
   });

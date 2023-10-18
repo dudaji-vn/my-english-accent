@@ -1,18 +1,32 @@
-import {HStack, View, Text} from 'native-base';
+import {HStack, Text, View} from 'native-base';
 import React from 'react';
 
-import UserAvatar from '../../../components/user-avatar';
 import {StyleSheet} from 'react-native';
+import UserAvatar from '../../../components/user-avatar';
 import {COLORS} from '../../../constants/design-system';
 
-const RowUserAvatar = () => {
+import {IUser} from '../../../interfaces/api/User';
+import {capitalizeFirstLetter} from '../../../utils/string';
+
+interface IRowUserAvatarProps {
+  user: IUser;
+  isHighLightName?: boolean;
+}
+const RowUserAvatar = (props: IRowUserAvatarProps) => {
+  const {user, isHighLightName} = props;
   return (
     <HStack space={4} alignItems={'center'}>
-      <UserAvatar nation="ko" />
+      <UserAvatar imageUrl={user.avatar} nativeLanguage={user.nativeLanguage} />
       <View>
-        <Text style={styles.textName}>Display name</Text>
+        <Text
+          style={[
+            styles.textName,
+            isHighLightName && {color: COLORS.highlight},
+          ]}>
+          {user.displayName}
+        </Text>
         <Text opacity={0.4} fontWeight={'400'} style={styles.textRole}>
-          Position
+          {capitalizeFirstLetter(user.role)}
         </Text>
       </View>
     </HStack>

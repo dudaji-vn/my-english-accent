@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import {Route, SceneRendererProps, TabView} from 'react-native-tab-view';
 import SearchIcon from '../../../components/icons/search-icon';
@@ -18,41 +19,46 @@ import {colors} from '../../../consts';
 import CustomTabBarListen from '../components/CustomTabBarListen';
 import IndividualTab from './individual/individual-tab';
 
-import MainGroupScreen from './group/main-group-screen';
-import FavoriteNotFound from './favorite/not-found-favorite';
-import DownloadTab from './download/download-tab';
 import NotInternet from '../components/NotInternet';
+import DownloadTab from './download/download-tab';
+import FavoriteNotFound from './favorite/not-found-favorite';
+import MainGroupScreen from './group/main-group-screen';
 
 var fullWidth = Dimensions.get('window').width;
 
 const ListenScreen: FC = () => {
   const [index, setIndex] = useState(0);
   const navigation = useNavigation<any>();
+  const layout = useWindowDimensions();
 
-  const routes = [
-    {key: 'first', title: 'Individual'},
-    {key: 'second', title: 'Group'},
-    {key: 'third', title: 'Favorite'},
-    {key: 'four', title: 'Download'},
+  const routes: Route[] = [
+    {key: 'individual', title: 'Individual'},
+    {key: 'group', title: 'Group'},
+    {key: 'favorite', title: 'Favorite'},
+    {key: 'download', title: 'Download'},
   ];
 
   const handleIndexChange = (selectedIndex: number) => {
-    setIndex(selectedIndex);
+    setIndex(prev => selectedIndex);
   };
 
-  const renderScene = <T extends Route>(
-    props: SceneRendererProps & {route: T},
-  ) => {
-    const {route, jumpTo} = props;
+  const renderScene = (props: SceneRendererProps & {route: Route}) => {
+    const {route} = props;
+
+    if (route && index !== routes.indexOf(route)) {
+      return <View />;
+    }
     switch (route.key) {
-      case 'first':
-        return <NotInternet /> || <IndividualTab />;
-      case 'second':
+      case 'individual':
+        return <IndividualTab /> || <NotInternet />;
+      case 'group':
         return <MainGroupScreen />;
-      case 'third':
+      case 'favorite':
         return true ? <FavoriteNotFound /> : <IndividualTab />;
-      case 'four':
+      case 'download':
         return <DownloadTab />;
+      default:
+        return null;
     }
   };
   return (
@@ -74,6 +80,7 @@ const ListenScreen: FC = () => {
         navigationState={{index, routes}}
         renderScene={renderScene}
         onIndexChange={handleIndexChange}
+        initialLayout={{width: layout.width, height: 0}}
       />
     </View>
   );

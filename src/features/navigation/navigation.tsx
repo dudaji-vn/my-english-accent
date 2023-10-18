@@ -20,7 +20,6 @@ export function Navigation() {
     const fetchAccessToken = async () => {
       try {
         const token = await AsyncStorage.getItem(keyStorage.accessToken);
-        console.log('token', token);
 
         if (token) {
           setTimeout(() => {

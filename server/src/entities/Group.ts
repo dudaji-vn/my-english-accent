@@ -1,5 +1,4 @@
-const mongoose = require('mongoose')
-
+import mongoose from 'mongoose'
 const groupSchema = new mongoose.Schema(
   {
     creator: {
@@ -7,16 +6,13 @@ const groupSchema = new mongoose.Schema(
       ref: 'user',
       required: true
     },
-    members: [
-      { type: mongoose.Types.ObjectId, ref: 'user', required: true }
-    ],
+    members: [{ type: mongoose.Types.ObjectId, ref: 'user' }],
     name: {
       type: String,
       required: true
     },
     avatar: {
-      type: String,
-      required: true
+      type: String
     }
   },
   {
@@ -24,4 +20,5 @@ const groupSchema = new mongoose.Schema(
   }
 )
 
-module.exports = mongoose.model('group', groupSchema)
+const GroupModel = mongoose.model('group', groupSchema)
+export default GroupModel
