@@ -7,14 +7,15 @@ import {GetRecordsParams} from '../../../types/record';
 export const useGetMyRecords = (params: GetRecordsParams) => {
   const queryClient = useQueryClient();
   const [page, setPage] = React.useState(1);
+  const queryKey = [
+    'records',
+    {
+      ...params,
+      page,
+    },
+  ];
   const {status, data, error, isFetching, isPreviousData, refetch} = useQuery({
-    queryKey: [
-      'records',
-      {
-        ...params,
-        page,
-      },
-    ],
+    queryKey: queryKey,
     queryFn: () =>
       recordService.getMyRecords({
         ...params,
@@ -59,5 +60,6 @@ export const useGetMyRecords = (params: GetRecordsParams) => {
     setPage,
     fetchNextPage,
     refetch,
+    queryKey,
   };
 };

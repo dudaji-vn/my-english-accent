@@ -1,5 +1,5 @@
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {useMutation} from '@tanstack/react-query';
+import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {
   Button,
   HStack,
@@ -35,6 +35,8 @@ import {RecordedCard} from '../components/recorded-card';
 import {SentenceContentCard} from '../components/sentence-content-card';
 import {WordContentCard} from '../components/word-content-card';
 import {useGetVocabularies} from '../hooks/use-get-vocabularies';
+import {useDispatch} from 'react-redux';
+import {addCompletedId} from '../../../redux/reducers/record.reducer';
 
 const PAGE_SIZE = 0;
 
@@ -66,12 +68,15 @@ const tabItems: TabDataItem[] = [
 
 const WordsRecordScreen = ({navigation, route}: Props) => {
   const toast = useToast();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const filter = route.params?.filter as GetVocabulariesParams;
+  const refreshKey = route.params?.refreshKey;
   const [footerHeight] = React.useState(144);
   const [headerHeight] = React.useState(121.81818389892578);
   const screenWith = useWindowDimensions().width;
   const screenHeight = useWindowDimensions().height;
   const [currentIdx, setCurrentIdx] = React.useState(0);
-  const filter = route.params?.filter as GetVocabulariesParams;
   const [isSaving, setIsSaving] = React.useState(false);
   const [recordedWord, setRecordedWord] = React.useState<TempRecord | null>(
     null,
@@ -87,11 +92,14 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
   const [recordedSentence, setRecordedSentence] =
     React.useState<TempRecord | null>(null);
   const swiperRef = React.useRef<SwiperFlatList>(null);
-  const {data, isFetching} = useGetVocabularies({
-    ...filter,
-    recordStatus: 'not-recorded',
-    pageSize: PAGE_SIZE,
-  });
+  const {data, isFetching} = useGetVocabularies(
+    {
+      ...filter,
+      recordStatus: 'not-recorded',
+      pageSize: PAGE_SIZE,
+    },
+    'record',
+  );
 
   React.useEffect(() => {
     request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {});
@@ -114,6 +122,9 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
       const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
       const vocabularyId = data?.items[currentIdx]._id.toString();
       setSavedList(prev => ({...prev, [vocabularyId]: recorded}));
+      dispatch(addCompletedId(recorded._id));
+      queryClient.invalidateQueries(refreshKey);
+      queryClient.invalidateQueries(['progress']);
       // setTimeout(() => {
       toast.show({
         render(props) {
@@ -376,7 +387,6 @@ const Header = ({
       navigation.navigate({
         name: SCREEN_NAMES.record,
         params: {
-          needRefresh: true,
           hasNewRecord: true,
           savedNumber: completed,
         },
