@@ -33,7 +33,7 @@ export const WordItem = (props: Props) => {
             {
               color:
                 props.status === 'active'
-                  ? COLORS.highlight
+                  ? COLORS.text
                   : props.status === 'disabled'
                   ? COLORS.stroke
                   : COLORS.text,
