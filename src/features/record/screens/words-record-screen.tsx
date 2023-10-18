@@ -31,6 +31,7 @@ import {GetVocabulariesParams} from '../../../types/vocabulary';
 import {RecordedCard} from '../components/recorded-card';
 import {Toast} from '../../../components/toast';
 import {SCREEN_NAMES} from '../../../constants/screen';
+import {LoadingScreen} from '../../../components/screens';
 
 const PAGE_SIZE = 0;
 
@@ -60,17 +61,11 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
   const [recordedSentence, setRecordedSentence] =
     React.useState<TempRecord | null>(null);
   const swiperRef = React.useRef<SwiperFlatList>(null);
-  const {data} = useGetVocabularies(
-    {
-      ...filter,
-      recordStatus: 'not-recorded',
-      pageSize: PAGE_SIZE,
-    },
-    {
-      keepPreviousData: false,
-      initialData: undefined,
-    },
-  );
+  const {data, isFetching} = useGetVocabularies({
+    ...filter,
+    recordStatus: 'not-recorded',
+    pageSize: PAGE_SIZE,
+  });
 
   React.useEffect(() => {
     request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {});
@@ -160,6 +155,10 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     const currentIdx = swiperRef.current?.getCurrentIndex() || 0;
     swiperRef.current?.scrollToIndex({index: currentIdx + 1});
   };
+
+  if (isFetching) {
+    return <LoadingScreen />;
+  }
 
   return (
     <View bg="white" h="full">
