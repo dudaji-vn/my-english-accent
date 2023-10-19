@@ -1,8 +1,11 @@
-export const uploadAudio = async (file: {
-  uri: string;
-  type: string;
-  name: string;
-}) => {
+import uuid from 'react-native-uuid';
+export const uploadAudio = async (uri: string) => {
+  const id = uuid.v4();
+  const file = {
+    uri,
+    name: `${id}.mp3`,
+    type: 'audio/m4a',
+  };
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', 'kctmadgr');

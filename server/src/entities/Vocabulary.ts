@@ -49,7 +49,5 @@ const vocabularySchema = new mongoose.Schema(
 )
 
 const VocabularyModel = mongoose.model('vocabulary', vocabularySchema)
-VocabularyModel.collection.createIndex({ 'text.en': 'text' })
-// index for text field
 
 export default VocabularyModel

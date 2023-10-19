@@ -1,4 +1,4 @@
-import {HStack, Menu, Text, View} from 'native-base';
+import {HStack, Menu, Text} from 'native-base';
 import React from 'react';
 import {TouchableOpacity} from 'react-native';
 import {COLORS} from '../../constants/design-system';
