@@ -94,11 +94,7 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const uri = await uploadAudio({
-      uri: newRecordUri!,
-      name: record._id,
-      type: 'audio/m4a',
-    });
+    const uri = await uploadAudio(recordedSentence.uri);
     if (currentItem === 'word') {
       await mutateAsync({
         _id: record._id,
