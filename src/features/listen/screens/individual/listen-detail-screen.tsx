@@ -4,9 +4,10 @@ import {
   useNavigation,
 } from '@react-navigation/native';
 import {HStack} from 'native-base';
-import React from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
-import {FlatList, View} from 'react-native';
+import {useQuery} from '@tanstack/react-query';
+import {FlatList, RefreshControl, View} from 'react-native';
 import {Headphones} from 'react-native-feather';
 import {AppProgress} from '../../../../components/app-progress';
 import BreadCrumb from '../../../../components/bread-crumb/bread-crumb';
@@ -18,50 +19,23 @@ import PlayAllIcon from '../../../../components/icons/play-all-icon';
 import ScreenWrapper from '../../../../components/layout/screen-wrapper';
 import {Topic, TopicCard} from '../../../../components/topic-card';
 import {WordItem} from '../../../../components/word-item';
+import {initTopics} from '../../../../configs';
 import {SCREEN_NAMES} from '../../../../constants/screen';
+import {IParamListenDetail} from '../../../../interfaces/api/Listen';
+import {IUserProgress} from '../../../../interfaces/api/User';
+import {listenService} from '../../../../services/listen.service';
 import RowGroup from '../../components/RowGroup';
 import RowUserAvatar from '../../components/RowUserAvatar';
+import {COLORS} from '../../../../constants/design-system';
 
-const designerImg = require('../../../../assets/images/Designer.png');
-
-const generalImg = require('../../../../assets/images/Chat.png');
-
+type RootStackParamList = {
+  ListenDetail: {user?: IUserProgress; typeScreen: string};
+};
 type Props = {
-  route: RouteProp<any>;
+  route: RouteProp<RootStackParamList, 'ListenDetail'>;
   navigation: NavigationProp<any>;
 };
 
-const data: Topic[] = [
-  {
-    _id: '1',
-    name: 'General',
-    image: generalImg,
-    description: 'General description',
-    totalWords: 100,
-    numOfAchieved: 10,
-  },
-  {
-    _id: '2',
-    name: 'Developer',
-    image: designerImg,
-    description: 'General description',
-    totalWords: 1,
-    numOfAchieved: 0,
-  },
-];
-const words = [
-  'Keyword1',
-  'Keyword2',
-  'Keyword3',
-  'Keyword4',
-  'Keyword5',
-  'Keyword6',
-  'Keyword7',
-  'Keyword8',
-  'Keyword9',
-  'Keyword10',
-  'Keyword11',
-];
 const filterItems = [
   {
     label: 'Latest files first',
@@ -89,8 +63,46 @@ const filterItems = [
   },
 ];
 const ListenDetailScreen = ({route}: Props) => {
-  const typeScreen = route.params?.typeScreen;
+  const {typeScreen, user} = route.params!;
+  const [topicShow, setTopicShow] = useState<Topic[]>([]);
+
   const navigation = useNavigation<any>();
+  const [indexTopicActive, setIndexTopicActive] = useState(0);
+  const [params, setParams] = useState<IParamListenDetail>({
+    userId: user?._id,
+    category: 'general',
+  });
+
+  const {data: listenDetail, isFetching} = useQuery(
+    ['listenDetail', user?._id],
+    () => listenService.getListenDetail(params),
+  );
+  useEffect(() => {
+    if (listenDetail) {
+      const topics = listenDetail
+        .map(item => {
+          const topic = initTopics[item.category];
+          (topic.totalWords = item.totalRecord),
+            (topic.numOfAchieved = item.records.filter(
+              item => item.isListen,
+            ).length);
+          return topic;
+        })
+        .sort((a, b) => parseInt(a._id) - parseInt(b._id));
+      setTopicShow(topics);
+    }
+  }, [listenDetail?.length]);
+  const records = useMemo(() => {
+    if (!listenDetail) {
+      return [];
+    }
+    if (!params.category) {
+      return;
+    }
+    return listenDetail.find(
+      item => item.category.toUpperCase() === params?.category?.toUpperCase(),
+    )?.records;
+  }, [params.category, listenDetail?.length]);
 
   return (
     <ScreenWrapper>
@@ -104,19 +116,35 @@ const ListenDetailScreen = ({route}: Props) => {
         justifyContent={'space-between'}
         alignItems={'center'}>
         <HStack space={2} alignItems={'center'}>
-          {typeScreen === 'group' ? <RowGroup /> : <RowUserAvatar />}
+          {typeScreen === 'group' ? (
+            <RowGroup />
+          ) : (
+            user && <RowUserAvatar user={user} />
+          )}
           <InfoIcon />
         </HStack>
         <DownLoadIcon />
       </HStack>
-      <AppProgress
-        progress={40}
-        startIcon={<Headphones color="white" width={20} height={20} />}
-      />
+      {user && (
+        <AppProgress
+          progress={Math.round((user?.totalListen * 100) / user?.totalRecord)}
+          startIcon={<Headphones color="white" width={20} height={20} />}
+        />
+      )}
+
       <HStack my={6} space={4} justifyContent="space-between">
-        {data.map((topic, index) => (
-          <TopicCard isActive={index === 0} key={index} topic={topic} />
-        ))}
+        {topicShow &&
+          topicShow.map((topic, index) => (
+            <TopicCard
+              onPress={() => {
+                setParams({...params, category: topic.name});
+                setIndexTopicActive(index);
+              }}
+              isActive={index === indexTopicActive}
+              key={topic._id}
+              topic={topic}
+            />
+          ))}
       </HStack>
       <HStack justifyContent={'space-between'} mb={5}>
         <Filter
@@ -128,25 +156,33 @@ const ListenDetailScreen = ({route}: Props) => {
         <PlayAllIcon />
       </HStack>
       <FlatList
+        refreshControl={
+          <RefreshControl refreshing={isFetching} colors={[COLORS.highlight]} />
+        }
         numColumns={1}
+        maxToRenderPerBatch={4}
+        initialNumToRender={4}
         horizontal={false}
-        data={words}
-        renderItem={({item}) => (
-          <View style={{marginBottom: 10}}>
-            <WordItem
-              onPress={() => {
-                navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
-                  screen: SCREEN_NAMES.listAudioListenScreen,
-                  params: {typeScreen: 'group'},
-                });
-              }}
-              word={item}
-              status={'disabled'}
-              leftElement={<FillIcon isFill />}
-            />
-          </View>
-        )}
-        keyExtractor={item => item}
+        data={records}
+        renderItem={({item}) =>
+          item &&
+          item.vocabulary && (
+            <View style={{marginBottom: 10}}>
+              <WordItem
+                onPress={() => {
+                  navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
+                    screen: SCREEN_NAMES.listAudioListenScreen,
+                    params: {typeScreen: 'user', recordId: item._id},
+                  });
+                }}
+                word={item.vocabulary.text.en}
+                status={item.isListen ? 'disabled' : 'active'}
+                rightElement={<FillIcon isFill={item.isListen} />}
+              />
+            </View>
+          )
+        }
+        keyExtractor={item => item._id.toString()}
       />
     </ScreenWrapper>
   );
