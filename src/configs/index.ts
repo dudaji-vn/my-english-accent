@@ -1,7 +1,12 @@
 import {ImageSourcePropType} from 'react-native';
-import {Language} from '../types/user';
+import {Category, Language} from '../types/user';
+import {Topic} from '../components/topic-card';
 export const VNFlag = require('../assets/images/VietNamFlagIcon.png');
 export const KRFlag = require('../assets/images/KoreanFlagIcon.png');
+const designerImg = require('../assets/images/Designer.png');
+const developerImg = require('../assets/images/Dev.png');
+const generalImg = require('../assets/images/Chat.png');
+const otherImg = require('../assets/images/Other.png');
 
 // import {API_URL} from '@env';
 export const baseApiUrl = 'http://10.0.100.14:5000/';
@@ -28,6 +33,8 @@ export const recordEndpoint = {
 
 export const listenEndpoint = {
   getUserProgress: 'api/listen/getUserProgress',
+  getListenDetail: 'api/listen/listenDetail',
+  getAudioList: 'api/listen/audioList',
 };
 
 export const groupEndpoint = {
@@ -51,5 +58,46 @@ export const flagMap: Record<
   vi: {
     alt: 'Vietnamese Flag',
     src: VNFlag,
+  },
+};
+
+export const category = {
+  general: 'general',
+  designer: 'designer',
+  developer: 'developer',
+};
+
+export const initTopics: Record<Category, Topic> = {
+  general: {
+    _id: '0',
+    name: 'General',
+    image: generalImg,
+    description: 'General description',
+    totalWords: 1,
+    numOfAchieved: 0,
+  },
+  developer: {
+    _id: '1',
+    name: 'Developer',
+    image: developerImg,
+    description: 'General description',
+    totalWords: 1,
+    numOfAchieved: 0,
+  },
+  designer: {
+    _id: '2',
+    name: 'Designer',
+    image: designerImg,
+    description: 'General description',
+    totalWords: 1,
+    numOfAchieved: 0,
+  },
+  others: {
+    _id: '2',
+    name: 'Designer',
+    image: otherImg,
+    description: 'General description',
+    totalWords: 1,
+    numOfAchieved: 0,
   },
 };
