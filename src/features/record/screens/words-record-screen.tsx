@@ -19,7 +19,7 @@ import {useDispatch} from 'react-redux';
 import {MicCheckIcon} from '../../../components/icons';
 import {Modal} from '../../../components/modal';
 import {ModalCard} from '../../../components/modal-card';
-import {LoadingScreen} from '../../../components/screens';
+import {LoadingScreen, PermissionScreen} from '../../../components/screens';
 import {TabBar, TabDataItem} from '../../../components/tab-bar';
 import {Toast} from '../../../components/toast';
 import {COLORS} from '../../../constants/design-system';
@@ -29,7 +29,7 @@ import {useUnsavedChange} from '../../../hooks/use-unsaved-change';
 import {addCompletedId} from '../../../redux/reducers/record.reducer';
 import {recordService} from '../../../services/record.service';
 import {Record} from '../../../types/record';
-import {GetVocabulariesParams} from '../../../types/vocabulary';
+import {GetVocabulariesParams, Vocabulary} from '../../../types/vocabulary';
 import {uploadAudio} from '../../../utils/upload-audio';
 import {RecordCard} from '../components/record-card';
 import {RecordedCard} from '../components/recorded-card';
@@ -38,6 +38,7 @@ import {WordContentCard} from '../components/word-content-card';
 import {useGetVocabularies} from '../hooks/use-get-vocabularies';
 import Swiper from 'react-native-swiper';
 import SwiperDeck from 'react-native-deck-swiper';
+import {Text600} from '../../../components/text-600';
 
 const PAGE_SIZE = 0;
 
@@ -74,13 +75,15 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
   const filter = route.params?.filter as GetVocabulariesParams;
   const refreshKey = route.params?.refreshKey;
   const swiperRef = React.useRef<Swiper>(null);
-  const swiperDeckRef = React.useRef<SwiperDeck>(null);
+  const swiperDeckRef = React.useRef<SwiperDeck<Vocabulary>>(null);
   const [footerHeight] = React.useState(144);
   const [headerHeight] = React.useState(121.81818389892578);
   const screenWith = useWindowDimensions().width;
   const screenHeight = useWindowDimensions().height;
   const [currentIdx, setCurrentIdx] = React.useState(0);
   const [isSaving, setIsSaving] = React.useState(false);
+  const [isMicPermissionGranted, setIsMicPermissionGranted] =
+    React.useState(true);
 
   const [recordedWord, setRecordedWord] = React.useState<TempRecord | null>(
     null,
@@ -89,9 +92,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     [key: string]: Record;
   }>({});
 
-  const [typeRecord, setTypeRecord] = React.useState<
-    'word' | 'sentence' | 'both'
-  >('word');
+  const [tabIndex, setTabIndex] = React.useState(0);
 
   const [recordedSentence, setRecordedSentence] =
     React.useState<TempRecord | null>(null);
@@ -105,9 +106,6 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     'record',
   );
 
-  React.useEffect(() => {
-    request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {});
-  }, []);
   const isUnsaved = React.useMemo(() => {
     if (!recordedWord && !recordedSentence) {
       return false;
@@ -123,8 +121,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     onSuccess: recorded => {
       setRecordedWord(null);
       setRecordedSentence(null);
-      const currentIdx = swiperRef.current?.state.index || 0;
-      const vocabularyId = data?.items[currentIdx]._id.toString();
+      const vocabularyId: string = data?.items[currentIdx]._id as string;
       setSavedList(prev => ({...prev, [vocabularyId]: recorded}));
       dispatch(addCompletedId(recorded._id));
       queryClient.invalidateQueries(refreshKey);
@@ -144,9 +141,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
   });
   const handleSaveRecord = async () => {
     setIsSaving(true);
-    const currentIdx = swiperRef.current?.state.index || 0;
     const currentVocabulary = data?.items[currentIdx];
-
     if (!currentVocabulary) {
       // Handle the case where currentVocabulary is not available.
       return null;
@@ -182,13 +177,55 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     });
     setIsSaving(false);
   };
+  React.useEffect(() => {
+    request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {
+      if (result === 'granted') {
+        setIsMicPermissionGranted(true);
+        return;
+      }
+      setIsMicPermissionGranted(false);
+    });
+  }, []);
+
+  if (!isMicPermissionGranted) {
+    return (
+      <PermissionScreen
+        imageSource={require('../../../assets/images/permission-bot.png')}
+        title="Mic & Audio permission"
+        subTitle={
+          <Text>
+            To access this feature, you have to allow “<Text600>Record</Text600>
+            ” and “<Text600>Audio</Text600>” permission
+          </Text>
+        }
+        subTitle2="After allowed permission, you can return and use app normally">
+        <View my={10} opacity={0.6}>
+          <Text600 style={styles.textStep}>
+            1. Click “Go to setting” to open system’s setting app
+          </Text600>
+          <Text600 style={styles.textStep}>2. Choose “Permission”</Text600>
+          <Text600 style={styles.textStep}>
+            3. Allow “Mic” & “Audio” permission
+          </Text600>
+        </View>
+      </PermissionScreen>
+    );
+  }
 
   if (isFetching) {
     return <LoadingScreen />;
   }
 
   const forward = () => {
-    if (currentIdx === data?.items.length - 1) {
+    if (data?.items?.length && currentIdx === data.items.length - 1) {
+      const firstUnsavedIdx = data.items.findIndex(
+        item => !savedList[item._id],
+      );
+      if (firstUnsavedIdx === -1) {
+        return;
+      }
+      swiperDeckRef.current?.jumpToCardIndex(firstUnsavedIdx);
+      setCurrentIdx(firstUnsavedIdx);
       return;
     }
     swiperDeckRef.current?.swipeLeft();
@@ -226,43 +263,56 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         <View mb={6} justifyContent="center" alignItems="center">
           <TabBar
             onValueChange={value => {
-              setTypeRecord(value as 'word' | 'sentence' | 'both');
+              const activeIndex = tabItems.findIndex(
+                item => item.value === value,
+              );
+              setTabIndex(activeIndex);
+              swiperRef.current?.scrollTo(activeIndex);
             }}
             tabItems={tabItems}
-            value={typeRecord}
+            value={tabItems[tabIndex].value}
           />
         </View>
       </View>
 
       <View>
         <SwiperDeck
-          containerStyle={{
-            backgroundColor: 'transparent',
-            paddingHorizontal: 0,
-            paddingVertical: 0,
-            position: 'absolute',
-            width: screenWith,
-            height: mainHeight,
-          }}
-          cardStyle={{
-            top: 0,
-            left: 0,
-            width: screenWith,
-            height: mainHeight,
-          }}
+          containerStyle={[
+            styles.swiperDeckContainer,
+            {
+              width: screenWith,
+              height: mainHeight,
+            },
+          ]}
+          cardStyle={[
+            styles.swiperDeckCard,
+            {
+              width: screenWith,
+              height: mainHeight,
+            },
+          ]}
           ref={swiperDeckRef}
           cards={data?.items || []}
           renderCard={item => {
             return (
-              <Swiper showsButtons={false} showsPagination={false} loop={false}>
+              <Swiper
+                index={tabIndex}
+                ref={swiperRef}
+                onIndexChanged={index => {
+                  setTabIndex(index);
+                }}
+                showsButtons={false}
+                showsPagination={false}
+                loop={false}>
                 <Pressable
+                  pb={5}
                   px={5}
                   width={screenWith}
                   height={mainHeight}
                   justifyContent="center">
-                  {savedList[item._id]?.recordUrl?.word ? (
+                  {savedList[item?._id]?.recordUrl?.word ? (
                     <RecordedCard
-                      recordUri={savedList[item._id]?.recordUrl?.word}>
+                      recordUri={savedList[item?._id]?.recordUrl?.word}>
                       <WordContentCard vocabulary={item} />
                     </RecordedCard>
                   ) : (
@@ -283,12 +333,13 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                 </Pressable>
                 <Pressable
                   px={5}
+                  pb={5}
                   width={screenWith}
                   height={mainHeight}
                   justifyContent="center">
-                  {savedList[item._id]?.recordUrl?.sentence ? (
+                  {savedList[item?._id]?.recordUrl?.sentence ? (
                     <RecordedCard
-                      recordUri={savedList[item._id]?.recordUrl?.sentence}>
+                      recordUri={savedList[item?._id]?.recordUrl?.sentence}>
                       <SentenceContentCard vocabulary={item} />
                     </RecordedCard>
                   ) : (
@@ -321,12 +372,12 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                       width: screenWith,
                       height: screenHeight - footerHeight - headerHeight,
                     }}>
-                    <Pressable>
+                    <Pressable pb={5}>
                       <VStack mb={4} px={5} py={2} space={5}>
                         <>
-                          {savedList[item._id]?.recordUrl?.word ? (
+                          {savedList[item?._id]?.recordUrl?.word ? (
                             <RecordedCard
-                              recordUri={savedList[item._id]?.recordUrl?.word}>
+                              recordUri={savedList[item?._id]?.recordUrl?.word}>
                               <WordContentCard vocabulary={item} />
                             </RecordedCard>
                           ) : (
@@ -347,10 +398,10 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                         </>
 
                         <>
-                          {savedList[item._id]?.recordUrl?.sentence ? (
+                          {savedList[item?._id]?.recordUrl?.sentence ? (
                             <RecordedCard
                               recordUri={
-                                savedList[item._id]?.recordUrl?.sentence
+                                savedList[item?._id]?.recordUrl?.sentence
                               }>
                               <SentenceContentCard vocabulary={item} />
                             </RecordedCard>
@@ -378,10 +429,15 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
             );
           }}
           onSwipedLeft={cardIndex => {
-            setCurrentIdx(prev => ++prev);
+            setCurrentIdx(
+              cardIndex === data?.items.length - 1 ? cardIndex : cardIndex + 1,
+            );
           }}
           onSwipedRight={cardIndex => {
-            setCurrentIdx(prev => --prev);
+            if (cardIndex > data?.items.length - 1) {
+              return;
+            }
+            setCurrentIdx(cardIndex === 0 ? cardIndex : cardIndex - 1);
           }}
           goBackToPreviousCardOnSwipeRight={true}
           showSecondCard={false}
@@ -401,12 +457,14 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         w="full"
         px={5}
         space={1}>
-        <Button
-          disabled={currentIdx === data?.items.length - 1}
-          onPress={forward}
-          variant="ghost">
-          Skip
-        </Button>
+        {data?.items.length > 0 && data?.items.length - 1 !== currentIdx && (
+          <Button
+            disabled={currentIdx === data?.items.length - 1}
+            onPress={forward}
+            variant="ghost">
+            Skip
+          </Button>
+        )}
         <Button
           isLoading={isSaving}
           disabled={!recordedWord && !recordedSentence}
@@ -528,5 +586,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.highlight,
+  },
+  swiperDeckContainer: {
+    backgroundColor: 'transparent',
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    position: 'absolute',
+  },
+  swiperDeckCard: {
+    top: 0,
+    left: 0,
+  },
+  textStep: {
+    fontSize: 14,
+    fontWeight: '300',
+    color: COLORS.text,
   },
 });

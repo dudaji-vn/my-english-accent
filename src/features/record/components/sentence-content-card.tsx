@@ -16,7 +16,9 @@ export const SentenceContentCard = ({vocabulary}: Props) => {
   const nativeLanguage = useRootSelector(
     state => state.user.profile.nativeLanguage,
   )!;
-  const searchWords = vocabulary.text.en.replace(/[^\w\s]/gi, '').split(' ');
+  const searchWords = vocabulary?.text?.en
+    ? vocabulary?.text?.en.replace(/[^\w\s]/gi, '').split(' ')
+    : [];
 
   return (
     <VStack space={1}>
@@ -27,7 +29,7 @@ export const SentenceContentCard = ({vocabulary}: Props) => {
             color: COLORS.highlight,
           }}
           searchWords={searchWords}
-          textToHighlight={vocabulary.example.en}
+          textToHighlight={vocabulary?.example?.en}
         />
       </HStack>
       <HStack mt={3} space={2}>
@@ -43,7 +45,7 @@ export const SentenceContentCard = ({vocabulary}: Props) => {
           opacity={0.6}
           fontSize="md"
           color={COLORS.text}>
-          {vocabulary.example[nativeLanguage]}
+          {vocabulary?.example[nativeLanguage]}
         </Text>
       </HStack>
     </VStack>
