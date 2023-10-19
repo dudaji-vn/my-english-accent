@@ -19,3 +19,5 @@ export type User = {
   appSetting?: AppSetting;
   autoDownload?: boolean;
 } & BaseEntity;
+
+export type Category = 'general' | 'developer' | 'designer' | 'others';
