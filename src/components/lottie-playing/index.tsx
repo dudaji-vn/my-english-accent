@@ -1,0 +1,28 @@
+import {View} from 'native-base';
+import React from 'react';
+import {COLORS} from '../../constants/design-system';
+import LottieView from 'lottie-react-native';
+
+const LottiePlaying = () => {
+  return (
+    <View
+      alignItems={'center'}
+      justifyContent={'center'}
+      borderRadius={40}
+      w={20}
+      h={20}
+      bg={COLORS.stroke}>
+      <LottieView
+        style={{
+          width: 40,
+          height: 40,
+        }}
+        source={require('../../assets/jsons/speaker-animation.json')}
+        autoPlay
+        loop
+      />
+    </View>
+  );
+};
+
+export default LottiePlaying;

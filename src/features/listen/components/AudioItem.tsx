@@ -1,14 +1,16 @@
 import {HStack, Image, Pressable, Text, View} from 'native-base';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Dimensions} from 'react-native';
-import SpeakerIconRound from '../../../components/icons/speaker-icon-round';
-import UserAvatar from '../../../components/user-avatar';
-import {VNFlag, flagMap} from '../../../configs';
-import {COLORS, OPACITY} from '../../../constants/design-system';
-import {Record} from '../../../types/record';
-import {useRootSelector} from '../../../redux/reducers';
-import Player from 'react-native-audio-recorder-player';
+import {Dimensions, StyleSheet} from 'react-native';
 import {getPlayerInstance} from '../../../../server/src/services/player.service';
+import SpeakerIconRound from '../../../components/icons/speaker-icon-round';
+import LottiePlaying from '../../../components/lottie-playing';
+import UserAvatar from '../../../components/user-avatar';
+import {flagMap} from '../../../configs';
+import {COLORS, OPACITY} from '../../../constants/design-system';
+import {useRootSelector} from '../../../redux/reducers';
+import {Record} from '../../../types/record';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {listenService} from '../../../services/listen.service';
 const player = getPlayerInstance();
 const fullWidth = Dimensions.get('window').width;
 type RecordType = 'word' | 'sentence';
@@ -19,13 +21,28 @@ interface IAudioItemProps {
 const AudioItem = (props: IAudioItemProps) => {
   const {record, handleNext} = props;
   const isPlayAll = useRootSelector(item => item.slider.isPlayAll);
-
+  const [isListened, setIsListened] = useState<boolean>(false);
+  const queryClient = useQueryClient();
+  const {mutate} = useMutation({
+    mutationFn: listenService.listenRecord,
+    onSuccess: data => {
+      console.log('call api success');
+      queryClient.invalidateQueries({queryKey: ['listen-user-progress']});
+    },
+    onError: (error, variables) => {
+      console.log('create group error', error, variables);
+    },
+  });
   useEffect(() => {
-    console.log(isPlayAll);
+    if (record && record._id && isListened) {
+      mutate(record._id);
+    }
+  }, [isListened]);
+  useEffect(() => {
     if (!isPlayAll) {
       return;
     }
-    console.log(record);
+
     const playAudio = async () => {
       console.log('useEffect');
       if (!record) {
@@ -34,17 +51,24 @@ const AudioItem = (props: IAudioItemProps) => {
       if (record.recordUrl.word) {
         try {
           console.log('word');
+          setIsPlayingWord(true);
           await player.startPlayer(record.recordUrl.word);
+
           player.addPlayBackListener(async e => {
             if (e.currentPosition === e.duration) {
+              setIsListened(true);
               await player.stopPlayer();
+              setIsPlayingWord(false);
               await player.removePlayBackListener();
               if (!record.recordUrl.sentence) {
                 handleNext && handleNext();
               } else {
+                setIsPlayingSentence(true);
                 await player.startPlayer(record.recordUrl.sentence);
                 player.addPlayBackListener(async e => {
                   if (e.currentPosition === e.duration) {
+                    setIsListened(true);
+                    setIsPlayingSentence(false);
                     handleNext && handleNext();
                   }
                 });
@@ -53,6 +77,20 @@ const AudioItem = (props: IAudioItemProps) => {
           });
         } catch (error) {
           console.error('Error playing audio:', error);
+        }
+      } else {
+        if (!record.recordUrl.sentence) {
+          handleNext && handleNext();
+        } else {
+          setIsPlayingSentence(true);
+          await player.startPlayer(record.recordUrl.sentence);
+          player.addPlayBackListener(async e => {
+            if (e.currentPosition === e.duration) {
+              setIsListened(true);
+              setIsPlayingSentence(false);
+              handleNext && handleNext();
+            }
+          });
         }
       }
     };
@@ -71,25 +109,30 @@ const AudioItem = (props: IAudioItemProps) => {
   const myNativeLanguage = useRootSelector(
     state => state.user.profile?.nativeLanguage,
   );
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isPlayingWord, setIsPlayingWord] = useState<boolean>(false);
+  const [isPlayingSentence, setIsPlayingSentence] = useState<boolean>(false);
   const togglePlayback = async (recordType: RecordType) => {
     console.log('toggle playback call');
-    if (isPlaying) {
+    if (isPlayingWord || isPlayingSentence) {
       console.log('is playing');
       await stopPlayer();
     } else {
       if (recordType === 'word') {
         console.log('word');
+        setIsPlayingWord(!isPlayingWord);
         console.log(record.recordUrl.word);
         await player.startPlayer(record.recordUrl.word);
       } else {
+        setIsPlayingSentence(!isPlayingSentence);
         console.log('sentence');
         console.log(record.recordUrl.sentence);
         await player.startPlayer(record.recordUrl.sentence);
       }
       player.addPlayBackListener(e => {
         if (e.currentPosition === e.duration) {
+          setIsListened(true);
           console.log('stop player call');
+
           stopPlayer();
         }
       });
@@ -98,7 +141,8 @@ const AudioItem = (props: IAudioItemProps) => {
   async function stopPlayer() {
     await player.stopPlayer();
     player.removePlayBackListener();
-    setIsPlaying(false);
+    setIsPlayingWord(false);
+    setIsPlayingSentence(false);
   }
   const WordAudio = () => {
     return (
@@ -139,7 +183,7 @@ const AudioItem = (props: IAudioItemProps) => {
           </HStack>
           {record.recordUrl.word && (
             <Pressable onPress={() => togglePlayback('word')}>
-              <SpeakerIconRound />
+              {isPlayingWord ? <LottiePlaying /> : <SpeakerIconRound />}
             </Pressable>
           )}
         </HStack>
@@ -181,7 +225,7 @@ const AudioItem = (props: IAudioItemProps) => {
           </HStack>
           {record.recordUrl.sentence && (
             <Pressable onPress={() => togglePlayback('sentence')}>
-              <SpeakerIconRound />
+              {isPlayingSentence ? <LottiePlaying /> : <SpeakerIconRound />}
             </Pressable>
           )}
         </HStack>

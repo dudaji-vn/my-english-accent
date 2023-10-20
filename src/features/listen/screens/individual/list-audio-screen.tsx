@@ -25,9 +25,11 @@ type Props = {
 import {useDispatch} from 'react-redux';
 import {togglePlayAll} from '../../../../redux/reducers/slider.reducer';
 import {useRootSelector} from '../../../../redux/reducers';
+import HeaderSwiper from '../../components/HeaderSwiper';
 
 const ListAudioListenScreen = (props: Props) => {
   const swiperRef = useRef<SwiperDeck>(null);
+  const [currentIdx, setCurrentIdx] = useState(0);
   const dispatch = useDispatch();
   const playAll = useRootSelector(item => item.slider.isPlayAll);
   const navigation = useNavigation();
@@ -65,8 +67,9 @@ const ListAudioListenScreen = (props: Props) => {
   if (!recordId) {
     return null;
   }
-  const {data: audioList} = useQuery(['getAudioDetail', recordId], () =>
-    listenService.getAudioList(recordId),
+  const {data: audioList, isSuccess} = useQuery(
+    ['getAudioDetail', recordId],
+    () => listenService.getAudioList(recordId),
   );
   const dataRecord = useMemo(() => {
     let mergeArray = [];
@@ -86,6 +89,15 @@ const ListAudioListenScreen = (props: Props) => {
   const handleNext = () => {
     swiperRef.current?.swipeLeft();
   };
+  const forward = () => {
+    swiperRef.current?.swipeLeft();
+  };
+  const backward = () => {
+    if (currentIdx === 0) {
+      return;
+    }
+    swiperRef.current?.swipeRight();
+  };
   return (
     <ScreenWrapper>
       <HStack justifyContent={'space-between'} mb={6}>
@@ -95,7 +107,24 @@ const ListAudioListenScreen = (props: Props) => {
           }}>
           <CloseIcon />
         </Pressable>
+        {dataRecord && dataRecord?.length > 0 && (
+          <HeaderSwiper
+            currentIdx={currentIdx}
+            navigation={navigation}
+            total={dataRecord?.length || 0}
+            forward={forward}
+            backward={backward}
+          />
+        )}
 
+        <Pressable
+          onPress={() => {
+            dispatch(togglePlayAll());
+          }}>
+          <PlayAllIcon isHighLight={playAll} />
+        </Pressable>
+      </HStack>
+      <HStack>
         {typeScreen === 'group' && (
           <Filter
             maxHeight={220}
@@ -114,19 +143,17 @@ const ListAudioListenScreen = (props: Props) => {
             filterItems={filterItems}
           />
         )}
-        <Pressable
-          onPress={() => {
-            dispatch(togglePlayAll());
-          }}>
-          <PlayAllIcon isHighLight={playAll} />
-        </Pressable>
       </HStack>
-
       <View h={700}>
         {dataRecord && dataRecord.length > 0 && (
           <SwiperDeck
+            onSwipedLeft={cardIndex => {
+              setCurrentIdx(prev => ++prev);
+            }}
+            onSwipedRight={cardIndex => {
+              setCurrentIdx(prev => --prev);
+            }}
             ref={swiperRef}
-            horizontalSwipe={false}
             verticalSwipe={false}
             infinite={true}
             swipeAnimationDuration={450}

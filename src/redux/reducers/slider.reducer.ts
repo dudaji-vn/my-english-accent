@@ -19,8 +19,14 @@ const sliderSlice: any = createSlice({
         isPlayAll: !state.isPlayAll,
       };
     },
+    turnOffPlayAll: (state, action) => {
+      return {
+        ...state,
+        isPlayAll: false,
+      };
+    },
   },
 });
 
-export const {togglePlayAll} = sliderSlice.actions;
+export const {togglePlayAll, turnOffPlayAll} = sliderSlice.actions;
 export default sliderSlice.reducer;
