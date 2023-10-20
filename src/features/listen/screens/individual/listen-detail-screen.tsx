@@ -3,7 +3,7 @@ import {
   RouteProp,
   useNavigation,
 } from '@react-navigation/native';
-import {HStack} from 'native-base';
+import {HStack, Pressable} from 'native-base';
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {useQuery} from '@tanstack/react-query';
@@ -27,6 +27,8 @@ import {listenService} from '../../../../services/listen.service';
 import RowGroup from '../../components/RowGroup';
 import RowUserAvatar from '../../components/RowUserAvatar';
 import {COLORS} from '../../../../constants/design-system';
+import {useDispatch} from 'react-redux';
+import {togglePlayAll} from '../../../../redux/reducers/slider.reducer';
 
 type RootStackParamList = {
   ListenDetail: {user?: IUserProgress; typeScreen: string};
@@ -65,6 +67,7 @@ const filterItems = [
 const ListenDetailScreen = ({route}: Props) => {
   const {typeScreen, user} = route.params!;
   const [topicShow, setTopicShow] = useState<Topic[]>([]);
+  const dispatch = useDispatch();
 
   const navigation = useNavigation<any>();
   const [indexTopicActive, setIndexTopicActive] = useState(0);
@@ -153,7 +156,21 @@ const ListenDetailScreen = ({route}: Props) => {
             console.log(value);
           }}
         />
-        <PlayAllIcon />
+
+        <Pressable
+          onPress={() => {
+            if (!records) return;
+            dispatch(togglePlayAll());
+            navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
+              screen: SCREEN_NAMES.listAudioListenScreen,
+              params: {
+                typeScreen: 'user',
+                recordId: records[0]?._id,
+              },
+            });
+          }}>
+          <PlayAllIcon />
+        </Pressable>
       </HStack>
       <FlatList
         refreshControl={
