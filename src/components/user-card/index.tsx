@@ -8,6 +8,7 @@ import HeadPhoneListenIcon from '../icons/headphone-listen-icon';
 
 import {flagMap} from '../../configs';
 import {IUserProgress} from '../../interfaces/api/User';
+import {capitalizeFirstLetter} from '../../utils/string';
 
 interface IUserCardProps {
   userProgress: IUserProgress;
@@ -19,7 +20,7 @@ const UserCard = (props: IUserCardProps) => {
   const handleClick = () => {
     navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
       screen: SCREEN_NAMES.listenDetailScreen,
-      params: {typeScreen: 'user'},
+      params: {typeScreen: 'user', user: userProgress},
     });
   };
   return (
@@ -37,12 +38,16 @@ const UserCard = (props: IUserCardProps) => {
           width={6}
           height={6}
           style={styles.flag}
-          source={flagMap[userProgress.nativeLanguage]}
+          source={flagMap[userProgress.nativeLanguage]?.src!}
         />
       </View>
 
-      <Text style={styles.textName}>{userProgress?.displayName}</Text>
-      <Text style={styles.textRole}>{userProgress?.role}</Text>
+      <Text style={styles.textName}>
+        {capitalizeFirstLetter(userProgress?.displayName)}
+      </Text>
+      <Text style={styles.textRole}>
+        {capitalizeFirstLetter(userProgress?.role)}
+      </Text>
       <Text style={styles.textSentences}>
         {userProgress?.totalRecord} sentences
       </Text>
@@ -53,7 +58,9 @@ const UserCard = (props: IUserCardProps) => {
           _filledTrack={{
             bg: COLORS.highlight,
           }}
-          value={(userProgress?.totalListen * 100) / userProgress?.totalRecord}
+          value={Math.round(
+            (userProgress?.totalListen * 100) / userProgress?.totalRecord,
+          )}
         />
       </HStack>
     </Pressable>

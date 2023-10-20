@@ -26,7 +26,7 @@ const UserAvatar = (props: IUserAvatarProps) => {
           width={flagWidth || 6}
           height={flagWidth || 6}
           style={styles.flag}
-          source={flagMap[nativeLanguage]}
+          source={flagMap[nativeLanguage]?.src!}
         />
       )}
     </View>
