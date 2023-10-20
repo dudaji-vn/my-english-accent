@@ -87,6 +87,13 @@ export default class ListenService {
     if (!recordId) {
       throw new BadRequestError('recordId is required')
     }
+    const isExist = await ListenModel.exists({
+      user: me,
+      record: recordId
+    })
+    if (isExist) {
+      throw new BadRequestError('user listened record')
+    }
     const listen = new ListenModel({
       user: me,
       record: recordId
