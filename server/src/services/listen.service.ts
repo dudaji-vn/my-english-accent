@@ -214,7 +214,8 @@ export default class ListenService {
       query.recordId
     ).populate('vocabulary user')
     const nextRecord = await RecordModel.find({
-      _id: { $ne: query.recordId }
+      _id: { $ne: query.recordId },
+      user: currentRecord?.user
     }).populate('vocabulary user')
 
     return {
