@@ -9,6 +9,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {FlatList, RefreshControl, View} from 'react-native';
 import {Headphones} from 'react-native-feather';
+import {useDispatch} from 'react-redux';
 import {AppProgress} from '../../../../components/app-progress';
 import BreadCrumb from '../../../../components/bread-crumb/bread-crumb';
 import {Filter} from '../../../../components/filter';
@@ -20,15 +21,17 @@ import ScreenWrapper from '../../../../components/layout/screen-wrapper';
 import {Topic, TopicCard} from '../../../../components/topic-card';
 import {WordItem} from '../../../../components/word-item';
 import {initTopics} from '../../../../configs';
+import {COLORS} from '../../../../constants/design-system';
 import {SCREEN_NAMES} from '../../../../constants/screen';
 import {IParamListenDetail} from '../../../../interfaces/api/Listen';
 import {IUserProgress} from '../../../../interfaces/api/User';
+import {
+  togglePlayAll,
+  turnOffPlayAll,
+} from '../../../../redux/reducers/slider.reducer';
 import {listenService} from '../../../../services/listen.service';
 import RowGroup from '../../components/RowGroup';
 import RowUserAvatar from '../../components/RowUserAvatar';
-import {COLORS} from '../../../../constants/design-system';
-import {useDispatch} from 'react-redux';
-import {togglePlayAll} from '../../../../redux/reducers/slider.reducer';
 
 type RootStackParamList = {
   ListenDetail: {user?: IUserProgress; typeScreen: string};
@@ -41,11 +44,7 @@ type Props = {
 const filterItems = [
   {
     label: 'Latest files first',
-    value: 'Latest files first',
-  },
-  {
-    label: 'Oldest files first',
-    value: 'Oldest files first',
+    value: 'sortBy=latestFile',
   },
   {
     label: 'Completed recently',
@@ -53,15 +52,15 @@ const filterItems = [
   },
   {
     label: 'Type (Verb)',
-    value: 'Type (Verb)',
+    value: 'type=Verb',
   },
   {
     label: 'Type (Noun)',
-    value: 'Type (Noun)',
+    value: 'type=Noun',
   },
   {
     label: 'Type (Place / Time)',
-    value: 'Type (Place / Time)',
+    value: 'type=Place / Time',
   },
 ];
 const ListenDetailScreen = ({route}: Props) => {
@@ -75,11 +74,29 @@ const ListenDetailScreen = ({route}: Props) => {
     userId: user?._id,
     category: 'general',
   });
-
-  const {data: listenDetail, isFetching} = useQuery(
-    ['listenDetail', user?._id],
-    () => listenService.getListenDetail(params),
+  const currentProgress = useMemo(() => {
+    if (!user) {
+      return;
+    }
+    return Math.round((user?.totalListen * 100) / user?.totalRecord);
+  }, [user]);
+  const {
+    data: listenDetail,
+    isFetching,
+    refetch,
+  } = useQuery(['listenDetail', params], () =>
+    listenService.getListenDetail(params),
   );
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (refetch) {
+        console.log('refetch');
+        refetch();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
   useEffect(() => {
     if (listenDetail) {
       const topics = listenDetail
@@ -94,8 +111,9 @@ const ListenDetailScreen = ({route}: Props) => {
         .sort((a, b) => parseInt(a._id) - parseInt(b._id));
       setTopicShow(topics);
     }
-  }, [listenDetail?.length]);
+  }, [listenDetail]);
   const records = useMemo(() => {
+    console.log('calling');
     if (!listenDetail) {
       return [];
     }
@@ -105,7 +123,7 @@ const ListenDetailScreen = ({route}: Props) => {
     return listenDetail.find(
       item => item.category.toUpperCase() === params?.category?.toUpperCase(),
     )?.records;
-  }, [params.category, listenDetail?.length]);
+  }, [params, listenDetail]);
 
   return (
     <ScreenWrapper>
@@ -130,7 +148,7 @@ const ListenDetailScreen = ({route}: Props) => {
       </HStack>
       {user && (
         <AppProgress
-          progress={Math.round((user?.totalListen * 100) / user?.totalRecord)}
+          progress={currentProgress}
           startIcon={<Headphones color="white" width={20} height={20} />}
         />
       )}
@@ -152,8 +170,15 @@ const ListenDetailScreen = ({route}: Props) => {
       <HStack justifyContent={'space-between'} mb={5}>
         <Filter
           filterItems={filterItems}
-          onSelected={value => {
-            console.log(value);
+          onSelected={item => {
+            const query = item.value.split('=');
+            const [key, value] = query;
+            const newParams = {
+              userId: params.userId,
+              category: params.category,
+              [key]: value,
+            };
+            setParams(newParams);
           }}
         />
 
@@ -172,6 +197,7 @@ const ListenDetailScreen = ({route}: Props) => {
           <PlayAllIcon />
         </Pressable>
       </HStack>
+
       <FlatList
         refreshControl={
           <RefreshControl refreshing={isFetching} colors={[COLORS.highlight]} />
@@ -187,6 +213,7 @@ const ListenDetailScreen = ({route}: Props) => {
             <View style={{marginBottom: 10}}>
               <WordItem
                 onPress={() => {
+                  dispatch(turnOffPlayAll());
                   navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
                     screen: SCREEN_NAMES.listAudioListenScreen,
                     params: {typeScreen: 'user', recordId: item._id},
