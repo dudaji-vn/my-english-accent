@@ -26,6 +26,13 @@ class RecordService {
     );
     return res.data.data;
   }
+
+  async deleteRecord(_id: string): Promise<Record> {
+    const res = await httpService.delete<IApiResponse<Record>>(
+      recordEndpoint.base + '/' + _id,
+    );
+    return res.data.data;
+  }
   async getMyRecords(
     params: GetRecordsParams,
   ): Promise<IPaginationResponse<Record>> {
@@ -47,6 +54,31 @@ class RecordService {
     }[];
   }> {
     const res = await httpService.get<any>(recordEndpoint.base + '/progress');
+    return res.data.data;
+  }
+  async sendRecordToGroup({
+    recordId,
+    groupId,
+  }: {
+    recordId: string;
+    groupId: string;
+  }): Promise<Record> {
+    const res = await httpService.post<IApiResponse<Record>>(
+      recordEndpoint.base + '/' + recordId + '/' + groupId,
+    );
+    return res.data.data;
+  }
+
+  async unsendRecordFromGroup({
+    recordId,
+    groupId,
+  }: {
+    recordId: string;
+    groupId: string;
+  }): Promise<Record> {
+    const res = await httpService.delete<IApiResponse<Record>>(
+      recordEndpoint.base + '/' + recordId + '/' + groupId,
+    );
     return res.data.data;
   }
 }

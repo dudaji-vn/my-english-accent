@@ -6,6 +6,8 @@ import {
   IUpdateRecordDTO
 } from '../interfaces/dto/RecordDto'
 import VocabularyService from './vocabulary.service'
+import GroupModel from '../entities/Group'
+import GroupRecordModel from '../entities/GroupRecord'
 
 @injectable()
 export default class RecordService {
@@ -203,5 +205,60 @@ export default class RecordService {
       user: userId
     })
     return recorded.map((record) => record.vocabulary)
+  }
+
+  async sendToGroup(
+    recordId: String,
+    groupId: String,
+    userId: string
+  ): Promise<any> {
+    const record = await RecordModel.findOne({
+      _id: recordId,
+      user: userId
+    })
+    if (!record) {
+      throw new Error('Record not found')
+    }
+    const group = await GroupModel.findOne({
+      _id: groupId,
+      $or: [{ members: { $in: [userId] } }, { creator: userId }]
+    })
+    if (!group) {
+      throw new Error('Group not found')
+    }
+    const newGroupRecord = await GroupRecordModel.create({
+      group: groupId,
+      record: recordId
+    })
+    return newGroupRecord
+  }
+
+  async unsendFromGroup(
+    recordId: String,
+    groupId: String,
+    userId: string
+  ) {
+    const record = await RecordModel.findOne({
+      _id: recordId,
+      user: userId
+    })
+    if (!record) {
+      throw new Error('Record not found')
+    }
+    const group = await GroupModel.findOne({
+      _id: groupId,
+      $or: [{ members: { $in: [userId] } }, { creator: userId }]
+    })
+
+    if (!group) {
+      throw new Error('Group not found')
+    }
+
+    const deletedGroupRecord =
+      await GroupRecordModel.findOneAndDelete({
+        group: groupId,
+        record: recordId
+      })
+    return deletedGroupRecord
   }
 }

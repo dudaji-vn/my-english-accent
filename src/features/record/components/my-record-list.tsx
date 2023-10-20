@@ -1,31 +1,25 @@
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {useQuery} from '@tanstack/react-query';
-import {
-  FlatList,
-  HStack,
-  Pressable,
-  Spinner,
-  Text,
-  VStack,
-  View,
-} from 'native-base';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {FlatList, HStack, Spinner, VStack, View} from 'native-base';
 import React from 'react';
 import {RefreshControl} from 'react-native';
-import {Send} from 'react-native-feather';
 import {EmptyData} from '../../../components/empty-data';
 import {Filter} from '../../../components/filter';
 import {Input} from '../../../components/form';
-import {Modal} from '../../../components/modal';
-import {ShareModal} from '../../../components/share-modal';
 import {Topic, TopicCard} from '../../../components/topic-card';
-import {WordItem} from '../../../components/word-item';
 import {COLORS} from '../../../constants/design-system';
 import {SCREEN_NAMES} from '../../../constants/screen';
-import {useModal} from '../../../hooks/use-modal';
 import {useRootSelector} from '../../../redux/reducers';
 import {recordService} from '../../../services/record.service';
 import {GetRecordsParams, Record} from '../../../types/record';
 import {useGetMyRecords} from '../hooks/use-get-my-records';
+import {RecordItem} from './record-item';
+import {SendAllButton} from './send-all';
+import {useModal} from '../../../hooks/use-modal';
+import {IPaginationResponse} from '../../../interfaces/api/Http';
+import {ModalCardDelete} from '../../../components/modal-card';
+import {Modal} from '../../../components/modal';
+import {ShareModal} from '../../../components/share-modal';
 const designerImg = require('../../../assets/images/Designer.png');
 
 const generalImg = require('../../../assets/images/Chat.png');
@@ -79,12 +73,14 @@ const topics: Topic[] = [
   },
 ];
 
-const MyRecordList = ({navigation, route}: Props) => {
+const MyRecordList = ({navigation}: Props) => {
+  const queryClient = useQueryClient();
+  const [currentSelectedItemId, setCurrentSelectedItemId] =
+    React.useState<Record | null>(null);
   const role = useRootSelector(state => state.user.profile?.role);
   const completedIds =
     useRootSelector(state => state.record)?.completedIds || [];
   const [searchQuery, setSearchQuery] = React.useState<string>('');
-  const {close, open, isShowing} = useModal();
   const [filter, setFilter] = React.useState<GetRecordsParams>({
     category: topics[0]._id,
     pageSize: 0,
@@ -146,6 +142,34 @@ const MyRecordList = ({navigation, route}: Props) => {
     refetch();
     refetchProgress();
   }, [completedIds, refetch, refetchProgress]);
+  const {
+    open: openDelete,
+    close: closeDelete,
+    isShowing: isShowingDelete,
+  } = useModal();
+  const {close, open, isShowing} = useModal();
+  const {mutate: deleteRecord, isLoading: isLoadingDelete} = useMutation({
+    mutationFn: recordService.deleteRecord,
+    onSuccess: () => {
+      closeDelete();
+      queryClient.setQueryData<IPaginationResponse<Record> | undefined>(
+        queryKey,
+        old => {
+          if (old) {
+            return {
+              ...old,
+              items: old.items.filter(
+                i => i._id !== currentSelectedItemId?._id,
+              ),
+              totalItems: old.totalItems - 1,
+            };
+          }
+          return old;
+        },
+      );
+      refetchProgress();
+    },
+  });
 
   return (
     <VStack flex={1} pt={5} px={5}>
@@ -170,11 +194,7 @@ const MyRecordList = ({navigation, route}: Props) => {
           onSelected={value => handleSelectedFilter(value.value)}
           filterItems={filterItems}
         />
-        <SendAllButton
-          onPress={() => {
-            open();
-          }}
-        />
+        <SendAllButton />
       </HStack>
 
       {isFetching && vocabularies.length === 0 ? (
@@ -183,6 +203,9 @@ const MyRecordList = ({navigation, route}: Props) => {
         <>
           {vocabularies.length > 0 ? (
             <FlatList
+              removeClippedSubviews={true}
+              initialNumToRender={5}
+              maxToRenderPerBatch={5}
               refreshControl={
                 <RefreshControl
                   refreshing={isFetching}
@@ -196,36 +219,21 @@ const MyRecordList = ({navigation, route}: Props) => {
               mt={5}
               ItemSeparatorComponent={renderSeparator}
               data={vocabularies}
-              numColumns={1}
               renderItem={({item, index}) => {
                 return (
                   <>
-                    <WordItem
-                      leftElement={
-                        completedIds.includes(item._id) ? (
-                          <View
-                            mr={2}
-                            w={3}
-                            h={3}
-                            rounded="full"
-                            bg={COLORS.highlight}
-                          />
-                        ) : undefined
-                      }
-                      onPress={() => handlePressItem(item)}
-                      key={index}
-                      word={item.vocabulary.text.en}
-                      status="default"
-                      rightElement={
-                        <Pressable alignSelf="flex-end">
-                          <Send
-                            opacity={0.6}
-                            width={24}
-                            height={24}
-                            color={COLORS.text}
-                          />
-                        </Pressable>
-                      }
+                    <RecordItem
+                      onDelete={() => {
+                        setCurrentSelectedItemId(item);
+                        openDelete();
+                      }}
+                      onSend={() => {
+                        setCurrentSelectedItemId(item);
+                        open();
+                      }}
+                      onPress={handlePressItem}
+                      item={item}
+                      isNew={completedIds.includes(item._id)}
                     />
                     {index === vocabularies.length - 1 && <View h={31} />}
                   </>
@@ -241,37 +249,22 @@ const MyRecordList = ({navigation, route}: Props) => {
           )}
         </>
       )}
-
+      <Modal isOpen={isShowingDelete} onClose={closeDelete}>
+        <ModalCardDelete
+          title="Delete?"
+          description="Are you sure to delete this file? Recorded word and sentence (if have) will be deleted all!"
+          onCancel={closeDelete}
+          isLoading={isLoadingDelete}
+          onDelete={() => {
+            deleteRecord(currentSelectedItemId?._id!);
+          }}
+        />
+      </Modal>
       <Modal onClose={close} isOpen={isShowing}>
-        <ShareModal />
+        <ShareModal recordId={currentSelectedItemId?._id!} />
       </Modal>
     </VStack>
   );
 };
 
 export default MyRecordList;
-
-const SendAllButton = ({onPress}: {onPress?: () => void}) => {
-  const [color, setColor] = React.useState(COLORS.text);
-  const [opacity, setOpacity] = React.useState(0.6);
-  return (
-    <Pressable
-      onPress={onPress}
-      opacity={opacity}
-      onPressIn={() => {
-        setColor(COLORS.highlight);
-        setOpacity(1);
-      }}
-      onPressOut={() => {
-        setColor(COLORS.text);
-        setOpacity(0.6);
-      }}>
-      <HStack>
-        <Send width={24} height={24} color={color} />
-        <Text ml={2} fontWeight="semibold" color={color}>
-          Send all files
-        </Text>
-      </HStack>
-    </Pressable>
-  );
-};

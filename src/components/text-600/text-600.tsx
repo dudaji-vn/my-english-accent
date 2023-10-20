@@ -1,5 +1,6 @@
 import {Text, StyleSheet} from 'react-native';
 import React from 'react';
+import {COLORS} from '../../constants/design-system';
 
 type Props = {
   children: React.ReactNode;
@@ -17,5 +18,6 @@ export const Text600 = (props: Props) => {
 const styles = StyleSheet.create({
   text: {
     fontWeight: '600',
+    color: COLORS.text,
   },
 });

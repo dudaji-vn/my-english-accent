@@ -1,16 +1,97 @@
+import {useMutation, useQuery} from '@tanstack/react-query';
+import {
+  Button,
+  FlatList,
+  Pressable,
+  Spinner,
+  Text,
+  VStack,
+  View,
+  useToast,
+} from 'native-base';
 import React from 'react';
+import {RefreshControl, useWindowDimensions} from 'react-native';
+import {groupService} from '../../services/group.service';
 import {Input} from '../form';
-import {Button, FlatList, HStack, Text, VStack} from 'native-base';
-import {useWindowDimensions} from 'react-native';
+import {GroupItem} from '../group-item';
+import {COLORS} from '../../constants/design-system';
+import {Send} from 'react-native-feather';
+import {SendFilledIcon} from '../icons';
+import {recordService} from '../../services/record.service';
+import {Toast} from '../toast';
 
-type Props = {};
+type Props = {
+  recordId: string;
+};
 
 export const ShareModal = (props: Props) => {
-  const screenHeight = useWindowDimensions().height;
+  const [sendedGroupIds, setSendedGroupIds] = React.useState<string[]>([]);
+  const [currentSendGroupId, setCurrentSendGroupId] =
+    React.useState<string>('');
+  const toast = useToast();
+  const {mutate: send, isLoading} = useMutation({
+    mutationFn: recordService.sendRecordToGroup,
+    onSuccess: (data, variables) => {
+      toast.show({
+        render(props) {
+          return (
+            <Toast
+              leftElementOnPress={() => {
+                unsend({
+                  groupId: variables.groupId,
+                  recordId: variables.recordId,
+                });
+              }}
+              leftElement={<>Undo</>}
+              {...props}
+              status="success">
+              File has been sent!
+            </Toast>
+          );
+        },
+      });
+      setSendedGroupIds(prev => [...prev, variables.groupId]);
+    },
+  });
+  const {mutate: unsend} = useMutation({
+    mutationFn: recordService.unsendRecordFromGroup,
+    onSuccess: (data, variables) => {
+      toast.show({
+        render(props) {
+          return (
+            <Toast
+              {...props}
+              status="success"
+              leftElement={<></>}
+              leftElementOnPress={() => {}}
+              autoHideDuration={1000}>
+              File has been unsent!
+            </Toast>
+          );
+        },
+      });
+
+      setSendedGroupIds(prev => prev.filter(id => id !== variables.groupId));
+    },
+  });
   const [query, setQuery] = React.useState('');
+  const queryKey = ['groups', query];
+  const {data, isFetching, refetch} = useQuery({
+    queryKey: queryKey,
+    queryFn: () =>
+      groupService.searchMyGroups({
+        page: 1,
+        pageSize: 10,
+        q: query,
+      }),
+    keepPreviousData: true,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+  const screenHeight = useWindowDimensions().height;
+  const renderSeparator = () => <View h={5} />;
   return (
     <VStack maxHeight={(screenHeight * 2) / 3} space={5} p={5}>
-      <Text>Send all files to...</Text>
+      <Text>Send to...</Text>
       <Input
         value={query}
         onChangeText={text => setQuery(text)}
@@ -18,41 +99,58 @@ export const ShareModal = (props: Props) => {
         placeholder="Search"
       />
       <FlatList
-        data={[
-          {_id: '1', name: 'General'},
-          {_id: '2', name: 'Developer'},
-          {_id: '3', name: 'Designer'},
-          {_id: '4', name: 'General'},
-          {_id: '5', name: 'Developer'},
-          {_id: '6', name: 'Designer'},
-          {_id: '7', name: 'General'},
-          {_id: '8', name: 'Developer'},
-          {_id: '9', name: 'Designer'},
-          {_id: '10', name: 'General'},
-          {_id: '10', name: 'General'},
-          {_id: '10', name: 'General'},
-          {_id: '10', name: 'General'},
-          {_id: '10', name: 'General'},
-          {_id: '1', name: 'General'},
-          {_id: '2', name: 'Developer'},
-          {_id: '3', name: 'Designer'},
-          {_id: '4', name: 'General'},
-          {_id: '5', name: 'Developer'},
-          {_id: '6', name: 'Designer'},
-          {_id: '7', name: 'General'},
-          {_id: '8', name: 'Developer'},
-          {_id: '9', name: 'Designer'},
-          {_id: '10', name: 'General'},
-          {_id: '10', name: 'General'},
-          {_id: '10', name: 'General'},
-          {_id: '10', name: 'General'},
-          {_id: '10', name: 'General'},
-        ]}
+        refreshControl={
+          <RefreshControl
+            refreshing={isFetching}
+            onRefresh={() => {
+              refetch();
+            }}
+            colors={[COLORS.highlight]}
+          />
+        }
+        data={data?.items}
+        ItemSeparatorComponent={renderSeparator}
         renderItem={({item}) => {
           return (
-            <HStack>
-              <Text>{item.name}</Text>
-            </HStack>
+            <GroupItem
+              group={item}
+              rightElement={
+                <Pressable
+                  onPress={() => {
+                    if (sendedGroupIds.includes(item._id)) {
+                      return;
+                    }
+                    setCurrentSendGroupId(item._id);
+                    send({
+                      recordId: props.recordId,
+                      groupId: item._id,
+                    });
+                  }}
+                  justifyContent="center"
+                  alignItems="center"
+                  px={3}>
+                  {isLoading && currentSendGroupId === item._id ? (
+                    <Spinner
+                      color={COLORS.highlight}
+                      accessibilityLabel="Sending..."
+                    />
+                  ) : (
+                    <>
+                      {sendedGroupIds.includes(item._id) ? (
+                        <SendFilledIcon />
+                      ) : (
+                        <Send
+                          opacity={0.6}
+                          width={24}
+                          height={24}
+                          color={COLORS.text}
+                        />
+                      )}
+                    </>
+                  )}
+                </Pressable>
+              }
+            />
           );
         }}
         keyExtractor={item => item._id}

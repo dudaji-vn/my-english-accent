@@ -124,6 +124,9 @@ const theme = extendTheme({
           bg: '#000',
           opacity: 0.7,
         },
+        _overlay: {
+          useRNModalOnAndroid: false,
+        },
       },
     },
     Progress: {

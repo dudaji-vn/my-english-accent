@@ -5,14 +5,14 @@ import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 
 type Props = {
   word: string;
-  status: 'default' | 'active' | 'disabled';
+  status?: 'default' | 'active' | 'disabled';
   leftElement?: React.ReactNode;
   rightElement?: React.ReactNode;
   onPress?: () => void;
   justifyContent?: 'space-between' | 'flex-start' | 'flex-end';
 };
 
-export const WordItem = (props: Props) => {
+export const WordItem = ({status = 'default', ...props}: Props) => {
   return (
     <TouchableOpacity
       onPress={props.onPress}
@@ -23,9 +23,7 @@ export const WordItem = (props: Props) => {
         w="full"
         rounded="lg"
         bg={
-          props.status === 'disabled'
-            ? COLORS.lighterBackground
-            : COLORS.background
+          status === 'disabled' ? COLORS.lighterBackground : COLORS.background
         }
         px={4}
         py={5}>
@@ -35,9 +33,9 @@ export const WordItem = (props: Props) => {
             styles.text,
             {
               color:
-                props.status === 'active'
+                status === 'active'
                   ? COLORS.text
-                  : props.status === 'disabled'
+                  : status === 'disabled'
                   ? COLORS.stroke
                   : COLORS.text,
             },
