@@ -7,17 +7,17 @@ type Props = {
   group: Group;
   rightElement?: React.ReactNode;
 };
-
 export const GroupItem = ({group, rightElement}: Props) => {
+  const renderAvatar = () => {
+    if (group.avatar) {
+      return <Avatar source={{uri: group.avatar}} />;
+    }
+    return <Avatar>{group.name[0]}</Avatar>;
+  };
+
   return (
     <HStack space={4}>
-      {group.avatar ? (
-        <Avatar w={15} h={15} source={{uri: group.avatar}} />
-      ) : (
-        <Avatar w={15} h={15}>
-          {group.name[0]}
-        </Avatar>
-      )}
+      {renderAvatar()}
       <VStack alignSelf="center" space={1}>
         <Text600>{group.name}</Text600>
         <Text600

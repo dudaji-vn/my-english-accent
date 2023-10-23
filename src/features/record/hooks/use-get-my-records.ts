@@ -14,16 +14,17 @@ export const useGetMyRecords = (params: GetRecordsParams) => {
       page,
     },
   ];
-  const {status, data, error, isFetching, isPreviousData, refetch} = useQuery({
-    queryKey: queryKey,
-    queryFn: () =>
-      recordService.getMyRecords({
-        ...params,
-        page,
-      }),
-    keepPreviousData: true,
-    staleTime: 5000,
-  });
+  const {status, data, error, isFetching, isPreviousData, refetch, ...rest} =
+    useQuery({
+      queryKey: queryKey,
+      queryFn: () =>
+        recordService.getMyRecords({
+          ...params,
+          page,
+        }),
+      keepPreviousData: true,
+      staleTime: 5000,
+    });
 
   React.useEffect(() => {
     if (!isPreviousData && data?.hasNextPage) {
@@ -61,5 +62,6 @@ export const useGetMyRecords = (params: GetRecordsParams) => {
     fetchNextPage,
     refetch,
     queryKey,
+    ...rest,
   };
 };

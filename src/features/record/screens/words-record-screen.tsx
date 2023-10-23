@@ -121,22 +121,24 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     onSuccess: recorded => {
       setRecordedWord(null);
       setRecordedSentence(null);
-      const vocabularyId: string = data?.items[currentIdx]._id as string;
-      setSavedList(prev => ({...prev, [vocabularyId]: recorded}));
-      dispatch(addCompletedId(recorded._id));
-      queryClient.invalidateQueries(refreshKey);
-      queryClient.invalidateQueries(['progress']);
-      forward();
-      toast.show({
-        render(props) {
-          return (
-            <Toast {...props} status="success">
-              File has been saved!
-            </Toast>
-          );
-        },
-        placement: 'bottom',
-      });
+      setTimeout(() => {
+        const vocabularyId: string = data?.items[currentIdx]._id as string;
+        setSavedList(prev => ({...prev, [vocabularyId]: recorded}));
+        dispatch(addCompletedId(recorded._id));
+        queryClient.invalidateQueries(refreshKey);
+        queryClient.invalidateQueries(['progress']);
+        forward();
+        toast.show({
+          render(props) {
+            return (
+              <Toast {...props} status="success">
+                File has been saved!
+              </Toast>
+            );
+          },
+          placement: 'bottom',
+        });
+      }, 100);
     },
   });
   const handleSaveRecord = async () => {
@@ -238,6 +240,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
   };
 
   const mainHeight = screenHeight - footerHeight - headerHeight;
+  const vocabularies = data?.items || [];
 
   return (
     <View bg="white" h="full">
@@ -430,11 +433,11 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
           }}
           onSwipedLeft={cardIndex => {
             setCurrentIdx(
-              cardIndex === data?.items.length - 1 ? cardIndex : cardIndex + 1,
+              cardIndex === vocabularies.length - 1 ? cardIndex : cardIndex + 1,
             );
           }}
           onSwipedRight={cardIndex => {
-            if (cardIndex > data?.items.length - 1) {
+            if (cardIndex > vocabularies.length - 1) {
               return;
             }
             setCurrentIdx(cardIndex === 0 ? cardIndex : cardIndex - 1);
@@ -457,9 +460,9 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         w="full"
         px={5}
         space={1}>
-        {data?.items.length > 0 && data?.items.length - 1 !== currentIdx && (
+        {vocabularies.length > 0 && vocabularies.length - 1 !== currentIdx && (
           <Button
-            disabled={currentIdx === data?.items.length - 1}
+            disabled={currentIdx === vocabularies.length - 1}
             onPress={forward}
             variant="ghost">
             Skip

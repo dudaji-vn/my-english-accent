@@ -87,7 +87,8 @@ const Record = ({navigation, route, jumpTo}: Props) => {
     recordStatus: 'all',
     pageSize: 0,
   });
-  const {data, refetch, isFetching, queryKey} = useGetVocabularies(filter);
+  const {data, refetch, queryKey, isRefetching, isLoading} =
+    useGetVocabularies(filter);
   const {data: progress, refetch: refetchProgress} = useQuery({
     queryKey: ['progress'],
     queryFn: recordService.getRecordProgress,
@@ -192,13 +193,13 @@ const Record = ({navigation, route, jumpTo}: Props) => {
           filterItems={filterItems}
         />
       </View>
-      {isFetching && vocabularies.length === 0 ? (
+      {isLoading ? (
         <Spinner mt={12} size="lg" color={COLORS.highlight} />
       ) : (
         <FlatList
           refreshControl={
             <RefreshControl
-              refreshing={isFetching}
+              refreshing={isRefetching}
               onRefresh={() => {
                 refetch();
                 refetchProgress();

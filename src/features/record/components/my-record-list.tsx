@@ -86,7 +86,7 @@ const MyRecordList = ({navigation}: Props) => {
     pageSize: 0,
     q: searchQuery,
   });
-  const {data, isFetching, refetch, queryKey} = useGetMyRecords({
+  const {data, refetch, queryKey, isLoading, isRefetching} = useGetMyRecords({
     ...filter,
     q: searchQuery,
   });
@@ -197,7 +197,7 @@ const MyRecordList = ({navigation}: Props) => {
         <SendAllButton />
       </HStack>
 
-      {isFetching && vocabularies.length === 0 ? (
+      {isLoading ? (
         <Spinner mt={12} size="lg" color={COLORS.highlight} />
       ) : (
         <>
@@ -208,7 +208,7 @@ const MyRecordList = ({navigation}: Props) => {
               maxToRenderPerBatch={5}
               refreshControl={
                 <RefreshControl
-                  refreshing={isFetching}
+                  refreshing={isRefetching}
                   onRefresh={() => {
                     refetch();
                     refetchProgress();
