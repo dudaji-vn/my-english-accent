@@ -1,17 +1,23 @@
 import {
+  CogFilledIcon,
   CogIcon,
+  GamepadFilledIcon,
   GamepadIcon,
+  HeadphoneFilledIcon,
   HeadphoneIcon,
+  MicFilledIcon,
   MicrophoneIcon,
 } from '../../components/icons';
 
-import {ListenScreen} from '../listen/screens';
 import {Navbar} from '../../components/navbar';
 import React from 'react';
 import {SCREEN_NAMES} from '../../constants/screen';
 import SettingsScreen from '../settings/screens/settings-screen';
 import {StyleSheet} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import MainRecordScreen from '../record/screens/main-record-screen';
+import ExampleComponentsScreen from '../example/screens/example-components-screen';
+import ListenScreen from '../listen/screens/listen-screen';
 
 const Tab = createBottomTabNavigator();
 
@@ -25,6 +31,13 @@ const routeIconsMap = {
   settings: CogIcon,
 } as RouteIconsMap;
 
+const activeRouteIconsMap = {
+  listen: HeadphoneFilledIcon,
+  record: MicFilledIcon,
+  game: GamepadFilledIcon,
+  settings: CogFilledIcon,
+} as RouteIconsMap;
+
 export const BottomNavigator = () => {
   return (
     <Tab.Navigator
@@ -32,10 +45,29 @@ export const BottomNavigator = () => {
         tabBarShowLabel: false,
         tabBarStyle: styles.tabBarStyle,
       })}
-      tabBar={props => <Navbar routeIconsMap={routeIconsMap} {...props} />}>
-      <Tab.Screen name={SCREEN_NAMES.listen} component={ListenScreen} />
-      <Tab.Screen name={SCREEN_NAMES.record} component={ListenScreen} />
-      <Tab.Screen name={SCREEN_NAMES.game} component={ListenScreen} />
+      tabBar={props => (
+        <Navbar
+          activeRouteIconsMap={activeRouteIconsMap}
+          routeIconsMap={routeIconsMap}
+          {...props}
+        />
+      )}>
+      <Tab.Screen
+        options={{headerShown: false}}
+        name={SCREEN_NAMES.listen}
+        component={ListenScreen}
+      />
+      <Tab.Screen
+        name={SCREEN_NAMES.record}
+        options={{
+          title: 'Record',
+        }}
+        component={MainRecordScreen}
+      />
+      <Tab.Screen
+        name={SCREEN_NAMES.game}
+        component={ExampleComponentsScreen}
+      />
       <Tab.Screen
         name={SCREEN_NAMES.settings}
         options={{

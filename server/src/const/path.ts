@@ -1,6 +1,9 @@
 export const PATH = {
   auth: '/auth',
-  room: '/room',
-  message: '/message',
-  user: '/user'
+  file: '/file',
+  user: '/user',
+  vocabulary: '/vocabulary',
+  record: '/record',
+  listen: '/listen',
+  group: '/group'
 }

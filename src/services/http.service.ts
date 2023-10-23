@@ -21,7 +21,6 @@ export class HttpService {
             keyStorage.accessToken,
           );
           if (accessToken) {
-            console.log('accessToken', accessToken);
             config.headers.Authorization = `Bearer ${accessToken}`;
           }
         } catch (error) {
