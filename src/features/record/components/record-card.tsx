@@ -18,9 +18,15 @@ type Props = {
   children?: React.ReactNode;
   onHasRecord?: (uri: string) => void;
   onNoRecord?: () => void;
+  initialRecordUri?: string;
 };
 
-export const RecordCard = ({children, onHasRecord, onNoRecord}: Props) => {
+export const RecordCard = ({
+  children,
+  onHasRecord,
+  onNoRecord,
+  initialRecordUri,
+}: Props) => {
   const {
     startRecording,
     stopRecording,
@@ -31,7 +37,7 @@ export const RecordCard = ({children, onHasRecord, onNoRecord}: Props) => {
     isPlaying,
     metering,
     isRecording,
-  } = useAudioRecord();
+  } = useAudioRecord(initialRecordUri ? initialRecordUri : undefined);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const {close, isShowing, open} = useModal();
 

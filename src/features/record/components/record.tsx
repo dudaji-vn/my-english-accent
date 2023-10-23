@@ -104,6 +104,7 @@ const Record = ({navigation, route, jumpTo}: Props) => {
         category: vocabulary.category,
         filter,
         refreshKey: queryKey,
+        firstVocabulary: vocabulary,
       },
     });
   };

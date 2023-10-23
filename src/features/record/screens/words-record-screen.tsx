@@ -32,7 +32,6 @@ import {Record} from '../../../types/record';
 import {GetVocabulariesParams, Vocabulary} from '../../../types/vocabulary';
 import {uploadAudio} from '../../../utils/upload-audio';
 import {RecordCard} from '../components/record-card';
-import {RecordedCard} from '../components/recorded-card';
 import {SentenceContentCard} from '../components/sentence-content-card';
 import {WordContentCard} from '../components/word-content-card';
 import {useGetVocabularies} from '../hooks/use-get-vocabularies';
@@ -69,6 +68,7 @@ const tabItems: TabDataItem[] = [
 ];
 
 const WordsRecordScreen = ({navigation, route}: Props) => {
+  const firstVocabulary = route.params?.firstVocabulary as Vocabulary;
   const toast = useToast();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
@@ -189,6 +189,21 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     });
   }, []);
 
+  const vocabularies = React.useMemo(() => {
+    // add first vocabulary in first list and remove the duplicate if hav
+    const newVocabularies = data?.items || [];
+    if (firstVocabulary) {
+      const idx = newVocabularies.findIndex(
+        item => item._id === firstVocabulary._id,
+      );
+      if (idx !== -1) {
+        newVocabularies.splice(idx, 1);
+      }
+      newVocabularies.unshift(firstVocabulary);
+    }
+    return newVocabularies;
+  }, [data?.items, firstVocabulary]);
+
   if (!isMicPermissionGranted) {
     return (
       <PermissionScreen
@@ -240,7 +255,6 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
   };
 
   const mainHeight = screenHeight - footerHeight - headerHeight;
-  const vocabularies = data?.items || [];
 
   return (
     <View bg="white" h="full">
@@ -313,26 +327,20 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                   width={screenWith}
                   height={mainHeight}
                   justifyContent="center">
-                  {savedList[item?._id]?.recordUrl?.word ? (
-                    <RecordedCard
-                      recordUri={savedList[item?._id]?.recordUrl?.word}>
-                      <WordContentCard vocabulary={item} />
-                    </RecordedCard>
-                  ) : (
-                    <RecordCard
-                      onHasRecord={uri => {
-                        setRecordedWord({
-                          _id: item._id,
-                          uri,
-                          isSaved: false,
-                        });
-                      }}
-                      onNoRecord={() => {
-                        setRecordedWord(null);
-                      }}>
-                      <WordContentCard vocabulary={item} />
-                    </RecordCard>
-                  )}
+                  <RecordCard
+                    initialRecordUri={savedList[item?._id]?.recordUrl?.word}
+                    onHasRecord={uri => {
+                      setRecordedWord({
+                        _id: item._id,
+                        uri,
+                        isSaved: false,
+                      });
+                    }}
+                    onNoRecord={() => {
+                      setRecordedWord(null);
+                    }}>
+                    <WordContentCard vocabulary={item} />
+                  </RecordCard>
                 </Pressable>
                 <Pressable
                   px={5}
@@ -340,26 +348,20 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                   width={screenWith}
                   height={mainHeight}
                   justifyContent="center">
-                  {savedList[item?._id]?.recordUrl?.sentence ? (
-                    <RecordedCard
-                      recordUri={savedList[item?._id]?.recordUrl?.sentence}>
-                      <SentenceContentCard vocabulary={item} />
-                    </RecordedCard>
-                  ) : (
-                    <RecordCard
-                      onHasRecord={uri => {
-                        setRecordedSentence({
-                          _id: item._id,
-                          uri,
-                          isSaved: false,
-                        });
-                      }}
-                      onNoRecord={() => {
-                        setRecordedSentence(null);
-                      }}>
-                      <SentenceContentCard vocabulary={item} />
-                    </RecordCard>
-                  )}
+                  <RecordCard
+                    initialRecordUri={savedList[item?._id]?.recordUrl?.sentence}
+                    onHasRecord={uri => {
+                      setRecordedSentence({
+                        _id: item._id,
+                        uri,
+                        isSaved: false,
+                      });
+                    }}
+                    onNoRecord={() => {
+                      setRecordedSentence(null);
+                    }}>
+                    <SentenceContentCard vocabulary={item} />
+                  </RecordCard>
                 </Pressable>
                 <Pressable
                   style={{
@@ -378,51 +380,41 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                     <Pressable pb={5}>
                       <VStack mb={4} px={5} py={2} space={5}>
                         <>
-                          {savedList[item?._id]?.recordUrl?.word ? (
-                            <RecordedCard
-                              recordUri={savedList[item?._id]?.recordUrl?.word}>
-                              <WordContentCard vocabulary={item} />
-                            </RecordedCard>
-                          ) : (
-                            <RecordCard
-                              onHasRecord={uri => {
-                                setRecordedWord({
-                                  _id: item._id,
-                                  uri,
-                                  isSaved: false,
-                                });
-                              }}
-                              onNoRecord={() => {
-                                setRecordedWord(null);
-                              }}>
-                              <WordContentCard vocabulary={item} />
-                            </RecordCard>
-                          )}
+                          <RecordCard
+                            initialRecordUri={
+                              savedList[item?._id]?.recordUrl?.word
+                            }
+                            onHasRecord={uri => {
+                              setRecordedWord({
+                                _id: item._id,
+                                uri,
+                                isSaved: false,
+                              });
+                            }}
+                            onNoRecord={() => {
+                              setRecordedWord(null);
+                            }}>
+                            <WordContentCard vocabulary={item} />
+                          </RecordCard>
                         </>
 
                         <>
-                          {savedList[item?._id]?.recordUrl?.sentence ? (
-                            <RecordedCard
-                              recordUri={
-                                savedList[item?._id]?.recordUrl?.sentence
-                              }>
-                              <SentenceContentCard vocabulary={item} />
-                            </RecordedCard>
-                          ) : (
-                            <RecordCard
-                              onHasRecord={uri => {
-                                setRecordedSentence({
-                                  _id: item._id,
-                                  uri,
-                                  isSaved: false,
-                                });
-                              }}
-                              onNoRecord={() => {
-                                setRecordedSentence(null);
-                              }}>
-                              <SentenceContentCard vocabulary={item} />
-                            </RecordCard>
-                          )}
+                          <RecordCard
+                            initialRecordUri={
+                              savedList[item?._id]?.recordUrl?.sentence
+                            }
+                            onHasRecord={uri => {
+                              setRecordedSentence({
+                                _id: item._id,
+                                uri,
+                                isSaved: false,
+                              });
+                            }}
+                            onNoRecord={() => {
+                              setRecordedSentence(null);
+                            }}>
+                            <SentenceContentCard vocabulary={item} />
+                          </RecordCard>
                         </>
                       </VStack>
                     </Pressable>
