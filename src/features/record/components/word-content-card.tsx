@@ -31,7 +31,7 @@ export const WordContentCard = ({vocabulary}: Props) => {
   return (
     <VStack space={1}>
       <HStack alignItems="center" space={4}>
-        <Text style={styles.font}>{vocabulary.text.en}</Text>
+        <Text style={styles.font}>{vocabulary?.text?.en}</Text>
         {!isSpeaking ? (
           <Pressable onPress={handleSpeak}>
             <SpeakerIcon />
@@ -51,7 +51,7 @@ export const WordContentCard = ({vocabulary}: Props) => {
           </Pressable>
         )}
       </HStack>
-      <Text style={styles.pronunciation}>/{vocabulary.pronunciation}/</Text>
+      <Text style={styles?.pronunciation}>/{vocabulary?.pronunciation}/</Text>
       <HStack mt={3} alignItems="center" space={2}>
         <Image
           w={6}
@@ -59,7 +59,7 @@ export const WordContentCard = ({vocabulary}: Props) => {
           alt={flagMap[nativeLanguage]!.alt}
           source={flagMap[nativeLanguage]!.src}
         />
-        <Text style={styles.example}>{vocabulary.text[nativeLanguage]}</Text>
+        <Text style={styles.example}>{vocabulary?.text[nativeLanguage]}</Text>
       </HStack>
     </VStack>
   );

@@ -38,6 +38,7 @@ export const listenEndpoint = {
 };
 
 export const groupEndpoint = {
+  base: 'api/group',
   myGroups: 'api/group/myGroups',
   createGroup: 'api/group/createGroup',
 };

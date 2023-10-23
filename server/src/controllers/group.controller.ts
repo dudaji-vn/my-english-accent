@@ -1,5 +1,9 @@
 import { injectable } from 'tsyringe'
-import { IRequest, IResponse } from '../interfaces/common'
+import {
+  IPaginationParams,
+  IRequest,
+  IResponse
+} from '../interfaces/common'
 import GroupService from '../services/group.service'
 import { ICreateGroupDTO } from '../interfaces/dto/GroupDTO'
 
@@ -16,5 +20,23 @@ export default class GroupController {
     const me = req.user._id
     const groups = await this.groupService.getMyGroup(me)
     return res.success(groups)
+  }
+
+  async searchMyGroups(
+    req: Request & {
+      query: IPaginationParams
+      user: {
+        _id: string
+      }
+    },
+    res: IResponse
+  ) {
+    const me = req.user._id
+    const { page, pageSize, q } = req.query
+    const data = await this.groupService.searchMyGroups(
+      { page, pageSize, q },
+      me
+    )
+    return res.success(data)
   }
 }

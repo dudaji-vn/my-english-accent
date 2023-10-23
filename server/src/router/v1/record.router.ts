@@ -38,5 +38,27 @@ recordRouter.delete(
   auth,
   catchAsync(recordController.deleteRecord.bind(recordController))
 )
+recordRouter.post(
+  '/send-all/:groupId',
+  auth,
+  catchAsync(
+    recordController.sendAllRecordsToGroup.bind(recordController)
+  )
+)
+recordRouter.post(
+  '/:recordId/:groupId',
+  auth,
+  catchAsync(
+    recordController.sendRecordToGroup.bind(recordController)
+  )
+)
+
+recordRouter.delete(
+  '/:recordId/:groupId',
+  auth,
+  catchAsync(
+    recordController.unsendRecordFromGroups.bind(recordController)
+  )
+)
 
 export default recordRouter

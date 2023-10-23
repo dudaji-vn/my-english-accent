@@ -16,7 +16,17 @@ export const useGetVocabularies = (
       page,
     },
   ];
-  const {status, data, error, isFetching, isPreviousData, refetch} = useQuery({
+  const {
+    status,
+    data,
+    error,
+    isFetching,
+    isPreviousData,
+    refetch,
+    isRefetching,
+    isLoading,
+    ...rest
+  } = useQuery({
     queryKey: queryKey,
     queryFn: () =>
       vocabularyService.getVocabularies({
@@ -57,11 +67,14 @@ export const useGetVocabularies = (
     data,
     error,
     isFetching,
+    isRefetching,
     isPreviousData,
     page,
     setPage,
     fetchNextPage,
     refetch,
     queryKey,
+    isLoading,
+    ...rest,
   };
 };

@@ -54,4 +54,35 @@ export default class RecordController {
     )
     return res.success(record)
   }
+  async sendRecordToGroup(req: IRequest, res: IResponse) {
+    const { recordId, groupId } = req.params
+    const userId = req.user._id
+    const record = await this.recordService.sendToGroup(
+      recordId,
+      groupId,
+      userId
+    )
+    return res.success(record)
+  }
+  async sendAllRecordsToGroup(req: IRequest, res: IResponse) {
+    const { groupId } = req.params
+    console.log('😀', groupId)
+    const userId = req.user._id
+    const records = await this.recordService.sendAllToGroup(
+      groupId,
+      userId
+    )
+    return res.success(records)
+  }
+  async unsendRecordFromGroups(req: IRequest, res: IResponse) {
+    const { recordId, groupId } = req.params
+    console.log(recordId, groupId)
+    const userId = req.user._id
+    const record = await this.recordService.unsendFromGroup(
+      recordId,
+      groupId,
+      userId
+    )
+    return res.success(record)
+  }
 }

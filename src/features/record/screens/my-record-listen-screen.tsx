@@ -11,7 +11,7 @@ import {
 import React from 'react';
 import {X} from 'react-native-feather';
 import {Modal} from '../../../components/modal';
-import {ModalCard} from '../../../components/modal-card';
+import {ModalCard, ModalCardDelete} from '../../../components/modal-card';
 import {Toast} from '../../../components/toast';
 import {COLORS} from '../../../constants/design-system';
 import {useModal} from '../../../hooks/use-modal';
@@ -60,8 +60,10 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
   } = useModal();
   const {updateRecord, isLoading, mutateAsync} = useUpdateRecord({
     onSuccess: data => {
-      queryClient.invalidateQueries(refreshKey);
-      queryClient.invalidateQueries(['progress']);
+      setTimeout(() => {
+        queryClient.invalidateQueries(refreshKey);
+        queryClient.invalidateQueries(['progress']);
+      }, 100);
       if (!data) {
         navigation.goBack();
         return;
@@ -94,7 +96,7 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const uri = await uploadAudio(recordedSentence.uri);
+    const uri = await uploadAudio(newRecordUri as string);
     if (currentItem === 'word') {
       await mutateAsync({
         _id: record._id,
@@ -112,18 +114,19 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
         },
       });
     }
-    toast.show({
-      render(props) {
-        return (
-          <Toast {...props} status="success">
-            Your changes have been saved!
-          </Toast>
-        );
-      },
-      placement: 'bottom',
-    });
-
     setIsSaving(false);
+    setTimeout(() => {
+      toast.show({
+        render(props) {
+          return (
+            <Toast {...props} status="success">
+              Your changes have been saved!
+            </Toast>
+          );
+        },
+        placement: 'bottom',
+      });
+    }, 100);
   };
 
   return (
@@ -173,19 +176,12 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
         </RecordedCard>
       </VStack>
       <Modal isOpen={isShowingDelete} onClose={closeDelete}>
-        <ModalCard
+        <ModalCardDelete
           title="Delete recording"
           description="Are you sure you want to delete this recording?"
-          cancelButton={
-            <Button onPress={closeDelete} variant="outline">
-              Cancel
-            </Button>
-          }
-          confirmButton={
-            <Button isLoading={isLoading} onPress={handleDelete}>
-              Delete
-            </Button>
-          }
+          isLoading={isLoading}
+          onDelete={handleDelete}
+          onCancel={closeDelete}
         />
       </Modal>
       <Modal isOpen={isShowingRecordAgain} onClose={closeRecordAgain}>

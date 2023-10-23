@@ -20,4 +20,10 @@ groupRouter.post(
   catchAsync(groupController.createGroup.bind(groupController))
 )
 
+groupRouter.get(
+  '/search/me',
+  auth,
+  catchAsync(groupController.searchMyGroups.bind(groupController))
+)
+
 export default groupRouter

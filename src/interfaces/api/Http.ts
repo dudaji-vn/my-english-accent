@@ -17,3 +17,9 @@ export interface IPaginationResponse<T> {
   totalPage: number;
   hasNextPage: boolean;
 }
+
+export interface IPaginationParams {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+}

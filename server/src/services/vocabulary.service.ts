@@ -89,7 +89,6 @@ export default class VocabularyService {
         delete idCondition.$in
         break
     }
-    console.log(idCondition)
     const vocabularies = await VocabularyModel.find({
       ...(category && { category }),
       ...(type && { type }),

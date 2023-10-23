@@ -16,3 +16,5 @@ export * from './speaker-icon';
 export * from './play-icon';
 export * from './trash-icon';
 export * from './pause-icon';
+export * from './rotate-icon';
+export * from './send-filled-icon';

@@ -1,10 +1,18 @@
-import {HStack, Pressable, View} from 'native-base';
+import {Button, HStack, Pressable, View} from 'native-base';
 import React, {useEffect} from 'react';
 import {Animated} from 'react-native';
-import {PauseIcon, PlayIcon, TrashIcon} from '../../../components/icons';
+import {
+  PauseIcon,
+  PlayIcon,
+  RotateIcon,
+  TrashIcon,
+} from '../../../components/icons';
 import {SoundWave} from '../../../components/sound-wave';
 import {COLORS} from '../../../constants/design-system';
 import {useAudioRecord} from '../../../hooks/use-audio-record';
+import {useModal} from '../../../hooks/use-modal';
+import {Modal} from '../../../components/modal';
+import {ModalCard} from '../../../components/modal-card';
 
 type Props = {
   children?: React.ReactNode;
@@ -25,11 +33,16 @@ export const RecordCard = ({children, onHasRecord, onNoRecord}: Props) => {
     isRecording,
   } = useAudioRecord();
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const {close, isShowing, open} = useModal();
 
   const [isPressing, setIsPressing] = React.useState(false);
   const zoom = React.useRef(new Animated.Value(1)).current;
   const handlePressRecord = async () => {
     if (!isRecording) {
+      if (cacheFilePath) {
+        open();
+        return;
+      }
       await startRecording();
     } else {
       await stopRecording();
@@ -88,6 +101,14 @@ export const RecordCard = ({children, onHasRecord, onNoRecord}: Props) => {
     outputRange: [COLORS.error, COLORS.highlight],
   });
 
+  React.useEffect(() => {
+    return () => {
+      stopPlayer();
+      stopRecording();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <View rounded="lg" bg="white" shadow="e3" p={4}>
       <View rounded="lg" bg={COLORS.darkerBackground} p={4}>
@@ -128,6 +149,7 @@ export const RecordCard = ({children, onHasRecord, onNoRecord}: Props) => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
+              {cacheFilePath && !isRecording && <RotateIcon />}
               {isRecording && <SoundWave value={metering * -1} />}
             </Animated.View>
           </Pressable>
@@ -141,6 +163,26 @@ export const RecordCard = ({children, onHasRecord, onNoRecord}: Props) => {
           </Pressable>
         </HStack>
       </View>
+      <Modal isOpen={isShowing} onClose={close}>
+        <ModalCard
+          title="Overwrite!"
+          description="This action will overwrite your last recorded sound with the next one. Are you sure to overwrite it?"
+          cancelButton={
+            <Button onPress={close} variant="outline">
+              Cancel
+            </Button>
+          }
+          confirmButton={
+            <Button
+              onPress={() => {
+                close();
+                startRecording();
+              }}>
+              Record
+            </Button>
+          }
+        />
+      </Modal>
     </View>
   );
 };
