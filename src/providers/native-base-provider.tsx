@@ -32,6 +32,7 @@ const theme = extendTheme({
     46: 184,
     60: 240,
     68: 272,
+    96: 384,
   },
   shadows: {
     e3: {

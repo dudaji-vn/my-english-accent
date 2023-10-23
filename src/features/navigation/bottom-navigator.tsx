@@ -1,7 +1,11 @@
 import {
+  CogFilledIcon,
   CogIcon,
+  GamepadFilledIcon,
   GamepadIcon,
+  HeadphoneFilledIcon,
   HeadphoneIcon,
+  MicFilledIcon,
   MicrophoneIcon,
 } from '../../components/icons';
 
@@ -14,7 +18,6 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MainRecordScreen from '../record/screens/main-record-screen';
 import ExampleComponentsScreen from '../example/screens/example-components-screen';
 import ListenScreen from '../listen/screens/listen-screen';
-import {ListenNavigator} from './listen-navigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -28,6 +31,13 @@ const routeIconsMap = {
   settings: CogIcon,
 } as RouteIconsMap;
 
+const activeRouteIconsMap = {
+  listen: HeadphoneFilledIcon,
+  record: MicFilledIcon,
+  game: GamepadFilledIcon,
+  settings: CogFilledIcon,
+} as RouteIconsMap;
+
 export const BottomNavigator = () => {
   return (
     <Tab.Navigator
@@ -35,7 +45,13 @@ export const BottomNavigator = () => {
         tabBarShowLabel: false,
         tabBarStyle: styles.tabBarStyle,
       })}
-      tabBar={props => <Navbar routeIconsMap={routeIconsMap} {...props} />}>
+      tabBar={props => (
+        <Navbar
+          activeRouteIconsMap={activeRouteIconsMap}
+          routeIconsMap={routeIconsMap}
+          {...props}
+        />
+      )}>
       <Tab.Screen
         options={{headerShown: false}}
         name={SCREEN_NAMES.listen}

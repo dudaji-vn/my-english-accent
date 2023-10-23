@@ -18,3 +18,6 @@ export * from './trash-icon';
 export * from './pause-icon';
 export * from './rotate-icon';
 export * from './send-filled-icon';
+export * from './gamepad-filled-icon';
+export * from './headphone-filled-icon';
+export * from './cog-filled-icon';
