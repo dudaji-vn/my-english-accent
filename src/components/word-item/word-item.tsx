@@ -1,5 +1,5 @@
 import {HStack} from 'native-base';
-import React from 'react';
+import React, {memo} from 'react';
 import {COLORS} from '../../constants/design-system';
 import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 
@@ -12,7 +12,7 @@ type Props = {
   justifyContent?: 'space-between' | 'flex-start' | 'flex-end';
 };
 
-export const WordItem = ({status = 'default', ...props}: Props) => {
+export const WordItem = memo(({status = 'default', ...props}: Props) => {
   return (
     <TouchableOpacity
       onPress={props.onPress}
@@ -46,7 +46,7 @@ export const WordItem = ({status = 'default', ...props}: Props) => {
       </HStack>
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   text: {

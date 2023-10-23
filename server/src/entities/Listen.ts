@@ -8,8 +8,7 @@ const listenSchema = new mongoose.Schema(
     },
     record: {
       type: mongoose.Types.ObjectId,
-      ref: 'record',
-      unique: true
+      ref: 'record'
     }
   },
   {

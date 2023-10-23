@@ -20,4 +20,15 @@ listenRouter.post(
   auth,
   catchAsync(listenController.listenRecord.bind(listenController))
 )
+
+listenRouter.get(
+  '/listenDetail',
+  auth,
+  catchAsync(listenController.getListenDetail.bind(listenController))
+)
+listenRouter.get(
+  '/audioList/:recordId',
+  auth,
+  catchAsync(listenController.getAudioList.bind(listenController))
+)
 export default listenRouter
