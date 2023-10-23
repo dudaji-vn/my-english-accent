@@ -328,6 +328,11 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                   height={mainHeight}
                   justifyContent="center">
                   <RecordCard
+                    onDelete={() => {
+                      if (savedList[item?._id]?.recordUrl?.word) {
+                        console.log('delete');
+                      }
+                    }}
                     initialRecordUri={savedList[item?._id]?.recordUrl?.word}
                     onHasRecord={uri => {
                       setRecordedWord({
@@ -379,43 +384,39 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                     }}>
                     <Pressable pb={5}>
                       <VStack mb={4} px={5} py={2} space={5}>
-                        <>
-                          <RecordCard
-                            initialRecordUri={
-                              savedList[item?._id]?.recordUrl?.word
-                            }
-                            onHasRecord={uri => {
-                              setRecordedWord({
-                                _id: item._id,
-                                uri,
-                                isSaved: false,
-                              });
-                            }}
-                            onNoRecord={() => {
-                              setRecordedWord(null);
-                            }}>
-                            <WordContentCard vocabulary={item} />
-                          </RecordCard>
-                        </>
+                        <RecordCard
+                          initialRecordUri={
+                            savedList[item?._id]?.recordUrl?.word
+                          }
+                          onHasRecord={uri => {
+                            setRecordedWord({
+                              _id: item._id,
+                              uri,
+                              isSaved: false,
+                            });
+                          }}
+                          onNoRecord={() => {
+                            setRecordedWord(null);
+                          }}>
+                          <WordContentCard vocabulary={item} />
+                        </RecordCard>
 
-                        <>
-                          <RecordCard
-                            initialRecordUri={
-                              savedList[item?._id]?.recordUrl?.sentence
-                            }
-                            onHasRecord={uri => {
-                              setRecordedSentence({
-                                _id: item._id,
-                                uri,
-                                isSaved: false,
-                              });
-                            }}
-                            onNoRecord={() => {
-                              setRecordedSentence(null);
-                            }}>
-                            <SentenceContentCard vocabulary={item} />
-                          </RecordCard>
-                        </>
+                        <RecordCard
+                          initialRecordUri={
+                            savedList[item?._id]?.recordUrl?.sentence
+                          }
+                          onHasRecord={uri => {
+                            setRecordedSentence({
+                              _id: item._id,
+                              uri,
+                              isSaved: false,
+                            });
+                          }}
+                          onNoRecord={() => {
+                            setRecordedSentence(null);
+                          }}>
+                          <SentenceContentCard vocabulary={item} />
+                        </RecordCard>
                       </VStack>
                     </Pressable>
                   </ScrollView>

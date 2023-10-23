@@ -19,6 +19,7 @@ type Props = {
   onHasRecord?: (uri: string) => void;
   onNoRecord?: () => void;
   initialRecordUri?: string;
+  onDelete?: () => void;
 };
 
 export const RecordCard = ({
@@ -26,6 +27,7 @@ export const RecordCard = ({
   onHasRecord,
   onNoRecord,
   initialRecordUri,
+  onDelete,
 }: Props) => {
   const {
     startRecording,
@@ -63,6 +65,7 @@ export const RecordCard = ({
     }
   };
   const handlePressDelete = async () => {
+    onDelete?.();
     setIsDeleting(true);
     await deleteRecord();
     setIsDeleting(false);
