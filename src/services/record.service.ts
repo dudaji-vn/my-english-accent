@@ -81,6 +81,14 @@ class RecordService {
     );
     return res.data.data;
   }
+
+  async sendAllRecordsToGroup(groupId: string): Promise<Record[]> {
+    console.log('😀', groupId);
+    const res = await httpService.post<IApiResponse<Record[]>>(
+      recordEndpoint.base + '/send-all/' + groupId,
+    );
+    return res.data.data;
+  }
 }
 
 export const recordService = new RecordService();

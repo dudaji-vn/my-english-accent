@@ -22,9 +22,10 @@ import {Toast} from '../toast';
 
 type Props = {
   recordId: string;
+  isSendAll?: boolean;
 };
 
-export const ShareModal = (props: Props) => {
+export const ShareModal = ({isSendAll = false, ...props}: Props) => {
   const [sendedGroupIds, setSendedGroupIds] = React.useState<string[]>([]);
   const [currentSendGroupId, setCurrentSendGroupId] =
     React.useState<string>('');
@@ -74,6 +75,28 @@ export const ShareModal = (props: Props) => {
       setSendedGroupIds(prev => prev.filter(id => id !== variables.groupId));
     },
   });
+
+  const {mutate: sendAll, isLoading: isLoadingSendAll} = useMutation({
+    mutationFn: recordService.sendAllRecordsToGroup,
+    onSuccess: (data, variables) => {
+      setSendedGroupIds(prev => [...prev, variables]);
+      toast.show({
+        render(props) {
+          return (
+            <Toast
+              {...props}
+              status="success"
+              leftElement={<></>}
+              leftElementOnPress={() => {}}
+              autoHideDuration={1000}>
+              File has been sent!
+            </Toast>
+          );
+        },
+      });
+    },
+  });
+
   const [query, setQuery] = React.useState('');
   const queryKey = ['groups', query];
   const {data, isFetching, refetch} = useQuery({
@@ -121,6 +144,10 @@ export const ShareModal = (props: Props) => {
                       return;
                     }
                     setCurrentSendGroupId(item._id);
+                    if (isSendAll) {
+                      sendAll(item._id);
+                      return;
+                    }
                     send({
                       recordId: props.recordId,
                       groupId: item._id,
@@ -129,7 +156,8 @@ export const ShareModal = (props: Props) => {
                   justifyContent="center"
                   alignItems="center"
                   px={3}>
-                  {isLoading && currentSendGroupId === item._id ? (
+                  {(isLoading || isLoadingSendAll) &&
+                  currentSendGroupId === item._id ? (
                     <Spinner
                       color={COLORS.highlight}
                       accessibilityLabel="Sending..."

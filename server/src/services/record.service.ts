@@ -233,6 +233,36 @@ export default class RecordService {
     return newGroupRecord
   }
 
+  async sendAllToGroup(
+    groupId: String,
+    userId: string
+  ): Promise<any> {
+    const group = await GroupModel.findOne({
+      _id: groupId,
+      $or: [{ members: { $in: [userId] } }, { creator: userId }]
+    })
+    if (!group) {
+      throw new Error('Group not found')
+    }
+    const recordHasSent = await GroupRecordModel.find({
+      group: groupId
+    }).select('record')
+    const records = await RecordModel.find({
+      user: userId,
+      _id: {
+        $nin: recordHasSent.map((record) => record.record)
+      }
+    }).select('_id')
+
+    const newGroupRecords = await GroupRecordModel.insertMany(
+      records.map((record) => ({
+        group: groupId,
+        record: record._id
+      }))
+    )
+    return newGroupRecords
+  }
+
   async unsendFromGroup(
     recordId: String,
     groupId: String,
