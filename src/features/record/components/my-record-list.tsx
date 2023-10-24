@@ -206,16 +206,16 @@ const MyRecordList = ({navigation}: Props) => {
               removeClippedSubviews={true}
               initialNumToRender={5}
               maxToRenderPerBatch={5}
-              refreshControl={
-                <RefreshControl
-                  refreshing={isRefetching}
-                  onRefresh={() => {
-                    refetch();
-                    refetchProgress();
-                  }}
-                  colors={[COLORS.highlight]}
-                />
-              }
+              // refreshControl={
+              //   <RefreshControl
+              //     refreshing={isRefetching}
+              //     onRefresh={() => {
+              //       refetch();
+              //       refetchProgress();
+              //     }}
+              //     colors={[COLORS.highlight]}
+              //   />
+              // }
               mt={5}
               ItemSeparatorComponent={renderSeparator}
               data={vocabularies}
