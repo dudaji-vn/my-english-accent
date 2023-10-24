@@ -1,10 +1,17 @@
-import {configureStore} from '@reduxjs/toolkit';
+import {combineReducers, configureStore} from '@reduxjs/toolkit';
+import {persistStore, persistReducer} from 'redux-persist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector} from 'react-redux';
 import userReducer from './user.reducer';
 import {IUserStore} from '../interface/IUserStore';
 import recordReducer from './record.reducer';
 import {IRecordStore} from '../interface/IRecordStore';
 import sliderReducer, {ISliderStore} from './slider.reducer';
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+  whitelist: ['user'],
+};
 
 export interface IRootSate {
   user: IUserStore;
@@ -12,12 +19,16 @@ export interface IRootSate {
   slider: ISliderStore;
 }
 
+const rootReducer = combineReducers({
+  user: userReducer,
+  record: recordReducer,
+  slider: sliderReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 const store = configureStore({
-  reducer: {
-    user: userReducer,
-    record: recordReducer,
-    slider: sliderReducer,
-  },
+  reducer: persistedReducer,
 });
 
 export const useRootSelector = <T>(
@@ -32,3 +43,4 @@ export const useRootSelector = <T>(
   }
 };
 export default store;
+export const persistor = persistStore(store);
