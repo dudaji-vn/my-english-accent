@@ -42,6 +42,7 @@ export const BottomNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({}) => ({
+        lazy: false,
         tabBarShowLabel: false,
         tabBarStyle: styles.tabBarStyle,
       })}
