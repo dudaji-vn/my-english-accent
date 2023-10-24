@@ -38,6 +38,7 @@ import {useGetVocabularies} from '../hooks/use-get-vocabularies';
 import Swiper from 'react-native-swiper';
 import SwiperDeck from 'react-native-deck-swiper';
 import {Text600} from '../../../components/text-600';
+import {CompleteRecordScreen} from './complete-record-screen';
 
 const PAGE_SIZE = 0;
 
@@ -69,7 +70,7 @@ const tabItems: TabDataItem[] = [
 
 const WordsRecordScreen = ({navigation, route}: Props) => {
   const firstVocabulary = route.params?.firstVocabulary as Vocabulary;
-  const toast = useToast();
+  // const toast = useToast();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const filter = route.params?.filter as GetVocabulariesParams;
@@ -128,16 +129,16 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         queryClient.invalidateQueries(refreshKey);
         queryClient.invalidateQueries(['progress']);
         forward();
-        toast.show({
-          render(props) {
-            return (
-              <Toast {...props} status="success">
-                File has been saved!
-              </Toast>
-            );
-          },
-          placement: 'bottom',
-        });
+        // toast.show({
+        //   render(props) {
+        //     return (
+        //       <Toast {...props} status="success">
+        //         File has been saved!
+        //       </Toast>
+        //     );
+        //   },
+        //   placement: 'bottom',
+        // });
       }, 100);
     },
   });
@@ -233,6 +234,10 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     return <LoadingScreen />;
   }
 
+  if (Object.keys(savedList).length === data?.items.length) {
+    return <CompleteRecordScreen navigation={navigation} />;
+  }
+
   const forward = () => {
     if (data?.items?.length && currentIdx === data.items.length - 1) {
       const firstUnsavedIdx = data.items.findIndex(
@@ -294,6 +299,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
 
       <View>
         <SwiperDeck
+          stackSize={1}
           containerStyle={[
             styles.swiperDeckContainer,
             {
@@ -308,6 +314,21 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
               height: mainHeight,
             },
           ]}
+          onSwipedLeft={cardIndex => {
+            setCurrentIdx(
+              cardIndex === vocabularies.length - 1 ? cardIndex : cardIndex + 1,
+            );
+          }}
+          onSwipedRight={cardIndex => {
+            if (cardIndex > vocabularies.length - 1) {
+              return;
+            }
+            setCurrentIdx(cardIndex === 0 ? cardIndex : cardIndex - 1);
+          }}
+          goBackToPreviousCardOnSwipeRight={true}
+          showSecondCard={false}
+          horizontalSwipe={false}
+          verticalSwipe={false}
           ref={swiperDeckRef}
           cards={data?.items || []}
           renderCard={item => {
@@ -424,21 +445,6 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
               </Swiper>
             );
           }}
-          onSwipedLeft={cardIndex => {
-            setCurrentIdx(
-              cardIndex === vocabularies.length - 1 ? cardIndex : cardIndex + 1,
-            );
-          }}
-          onSwipedRight={cardIndex => {
-            if (cardIndex > vocabularies.length - 1) {
-              return;
-            }
-            setCurrentIdx(cardIndex === 0 ? cardIndex : cardIndex - 1);
-          }}
-          goBackToPreviousCardOnSwipeRight={true}
-          showSecondCard={false}
-          horizontalSwipe={false}
-          verticalSwipe={false}
         />
       </View>
 
