@@ -16,6 +16,7 @@ import {useRootSelector} from '../../../redux/reducers';
 import {recordService} from '../../../services/record.service';
 import {GetVocabulariesParams, Vocabulary} from '../../../types/vocabulary';
 import {useGetVocabularies} from '../hooks/use-get-vocabularies';
+import {useIsFocused} from '@react-navigation/native';
 const designerImg = require('../../../assets/images/Designer.png');
 
 const generalImg = require('../../../assets/images/Chat.png');
@@ -81,6 +82,7 @@ const Record = ({navigation, route, jumpTo}: Props) => {
   const role = useRootSelector(state => state.user.profile?.role);
   const hasNewRecord = route.params?.hasNewRecord;
   const savedNumber = route.params?.savedNumber;
+  const isFocused = useIsFocused();
   const toast = useToast();
   const [filter, setFilter] = React.useState<GetVocabulariesParams>({
     category: topics[0]._id,
@@ -194,47 +196,58 @@ const Record = ({navigation, route, jumpTo}: Props) => {
           filterItems={filterItems}
         />
       </View>
-      {isLoading ? (
-        <Spinner mt={12} size="lg" color={COLORS.highlight} />
-      ) : (
-        <FlatList
-          // refreshControl={
-          //   <RefreshControl
-          //     refreshing={isRefetching}
-          //     onRefresh={() => {
-          //       refetch();
-          //       refetchProgress();
-          //     }}
-          //     colors={[COLORS.highlight]}
-          //   />
-          // }
-          mt={5}
-          ItemSeparatorComponent={renderSeparator}
-          data={vocabularies}
-          numColumns={1}
-          renderItem={({item, index}) => {
-            const isRecorded = item.isRecorded;
-            return (
-              <>
-                <WordItem
-                  onPress={isRecorded ? undefined : () => handlePressItem(item)}
-                  key={index}
-                  word={item.text.en}
-                  status={isRecorded ? 'disabled' : 'active'}
-                  rightElement={
-                    isRecorded ? (
-                      <MicCheckIcon />
-                    ) : (
-                      <MicFilledIcon opacity={0.1} color={COLORS.text} />
-                    )
-                  }
-                />
-                {index === vocabularies.length - 1 && <View h={31} />}
-              </>
-            );
-          }}
-          keyExtractor={item => item._id}
-        />
+      {isFocused && (
+        <>
+          {isLoading ? (
+            <Spinner mt={12} size="lg" color={COLORS.highlight} />
+          ) : (
+            <FlatList
+              // getItemLayout={(data, index) => ({
+              //   length: 60,
+              //   offset: 60 * index,
+              //   index,
+              // })}
+              // refreshControl={
+              //   <RefreshControl
+              //     refreshing={isRefetching}
+              //     onRefresh={() => {
+              //       refetch();
+              //       refetchProgress();
+              //     }}
+              //     colors={[COLORS.highlight]}
+              //   />
+              // }
+              mt={5}
+              ItemSeparatorComponent={renderSeparator}
+              data={vocabularies}
+              numColumns={1}
+              renderItem={({item, index}) => {
+                const isRecorded = item.isRecorded;
+                return (
+                  <>
+                    <WordItem
+                      onPress={
+                        isRecorded ? undefined : () => handlePressItem(item)
+                      }
+                      key={index}
+                      word={item.text.en}
+                      status={isRecorded ? 'disabled' : 'active'}
+                      rightElement={
+                        isRecorded ? (
+                          <MicCheckIcon />
+                        ) : (
+                          <MicFilledIcon opacity={0.1} color={COLORS.text} />
+                        )
+                      }
+                    />
+                    {index === vocabularies.length - 1 && <View h={31} />}
+                  </>
+                );
+              }}
+              keyExtractor={item => item._id}
+            />
+          )}
+        </>
       )}
     </VStack>
   );

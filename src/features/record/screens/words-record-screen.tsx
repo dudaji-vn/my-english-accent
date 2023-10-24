@@ -70,7 +70,7 @@ const tabItems: TabDataItem[] = [
 
 const WordsRecordScreen = ({navigation, route}: Props) => {
   const firstVocabulary = route.params?.firstVocabulary as Vocabulary;
-  // const toast = useToast();
+  const toast = useToast();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const filter = route.params?.filter as GetVocabulariesParams;
@@ -129,17 +129,17 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         queryClient.invalidateQueries(refreshKey);
         queryClient.invalidateQueries(['progress']);
         forward();
-        // toast.show({
-        //   render(props) {
-        //     return (
-        //       <Toast {...props} status="success">
-        //         File has been saved!
-        //       </Toast>
-        //     );
-        //   },
-        //   placement: 'bottom',
-        // });
-      }, 100);
+        toast.show({
+          render(props) {
+            return (
+              <Toast {...props} status="success">
+                File has been saved!
+              </Toast>
+            );
+          },
+          placement: 'bottom',
+        });
+      }, 50);
     },
   });
   const handleSaveRecord = async () => {
@@ -299,7 +299,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
 
       <View>
         <SwiperDeck
-          stackSize={1}
+          stackSize={2}
           containerStyle={[
             styles.swiperDeckContainer,
             {
@@ -331,7 +331,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
           verticalSwipe={false}
           ref={swiperDeckRef}
           cards={data?.items || []}
-          renderCard={item => {
+          renderCard={(item, cardIndex) => {
             return (
               <Swiper
                 index={tabIndex}
