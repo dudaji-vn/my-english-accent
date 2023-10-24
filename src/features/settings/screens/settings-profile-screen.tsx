@@ -191,7 +191,7 @@ const SettingsProfileScreen = ({navigation}: Props) => {
           </Section>
           <Button
             isLoading={isLoading}
-            opacity={isValid ? 1 : 0.3}
+            opacity={isValid ? 1 : 0.6}
             disabled={!isValid}
             onPress={handleSubmit(onSubmit)}
             h={14.5}

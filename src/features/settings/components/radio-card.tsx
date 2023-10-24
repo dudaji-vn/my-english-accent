@@ -1,4 +1,5 @@
 import {Pressable, Text, VStack, View} from 'native-base';
+import {TouchableOpacity} from 'react-native';
 
 import {COLORS} from '../../../constants/design-system';
 import React from 'react';
@@ -14,8 +15,8 @@ type RadioCardProps = {
 };
 export const RadioCard = ({isActive, content, onPress}: RadioCardProps) => {
   return (
-    <Pressable _pressed={{opacity: 0.6}} flex={1} onPress={onPress}>
-      <VStack opacity={isActive ? 1 : 0.6} space={2}>
+    <TouchableOpacity style={{flex: 1}} onPress={onPress}>
+      <VStack opacity={isActive ? 1 : 0.3} space={2}>
         <View
           shadow={isActive ? 1 : 'none'}
           borderWidth={isActive ? 1 : 0}
@@ -35,6 +36,6 @@ export const RadioCard = ({isActive, content, onPress}: RadioCardProps) => {
           {content.name}
         </Text>
       </VStack>
-    </Pressable>
+    </TouchableOpacity>
   );
 };

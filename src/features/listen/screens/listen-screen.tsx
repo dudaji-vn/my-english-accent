@@ -27,6 +27,7 @@ import MainGroupScreen from './group/main-group-screen';
 var fullWidth = Dimensions.get('window').width;
 
 const ListenScreen: FC = () => {
+  const [isFocused, setIsFocused] = useState(false);
   const [index, setIndex] = useState(0);
   const navigation = useNavigation<any>();
   const layout = useWindowDimensions();
@@ -61,6 +62,12 @@ const ListenScreen: FC = () => {
         return null;
     }
   };
+  React.useEffect(() => {
+    setTimeout(() => {
+      setIsFocused(true);
+    }, 1);
+  }, []);
+
   return (
     <View style={[{flex: 1, backgroundColor: '#fff'}]}>
       <Row rowStyle={styles.header}>
@@ -74,14 +81,16 @@ const ListenScreen: FC = () => {
           <SearchIcon />
         </Pressable>
       </Row>
-      <TabView
-        swipeEnabled={false}
-        renderTabBar={props => <CustomTabBarListen {...props} />}
-        navigationState={{index, routes}}
-        renderScene={renderScene}
-        onIndexChange={handleIndexChange}
-        initialLayout={{width: layout.width, height: 0}}
-      />
+      {isFocused && (
+        <TabView
+          swipeEnabled={false}
+          renderTabBar={props => <CustomTabBarListen {...props} />}
+          navigationState={{index, routes}}
+          renderScene={renderScene}
+          onIndexChange={handleIndexChange}
+          initialLayout={{width: layout.width, height: 0}}
+        />
+      )}
     </View>
   );
 };

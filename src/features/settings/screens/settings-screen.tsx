@@ -28,12 +28,13 @@ import {DataAndStorage} from '../components/data-storage';
 import {SettingButton} from '../components/setting-button';
 import {PencilIcon} from '../../../components/icons';
 import {ModalCard} from '../../../components/modal-card';
+import {PERMISSIONS, request} from 'react-native-permissions';
 const fullWidth = Dimensions.get('window').width;
 
 const SettingsScreen = ({navigation}: any) => {
   const user = useRootSelector(state => state.user.profile);
   const [isPressUpdateAvatar, setIsPressUpdateAvatar] = React.useState(false);
-  const {logout} = useLogout(navigation);
+  const {logout} = useLogout();
   const dispatch = useDispatch();
   const avatar = user?.avatar;
   const {mutate} = useMutation({
@@ -47,14 +48,24 @@ const SettingsScreen = ({navigation}: any) => {
   });
 
   const handleCropAvatar = React.useCallback(async () => {
+    const result = await request(PERMISSIONS.ANDROID.READ_MEDIA_IMAGES);
+    if (result !== 'granted') {
+      setIsPressUpdateAvatar(false);
+      return;
+    }
+    setIsPressUpdateAvatar(false);
     const image = await ImagePicker.openPicker({
       width: 300,
       height: 300,
       cropping: true,
+      cropperTintColor: COLORS.highlight,
+      cropperActiveWidgetColor: COLORS.highlight,
     });
+
     if (!image) {
       return;
     }
+
     const url = await uploadImage({
       uri: image.path,
       name: image.filename || 'avatar',
@@ -81,9 +92,9 @@ const SettingsScreen = ({navigation}: any) => {
         <VStack space={4}>
           <HStack alignItems="center" space={4}>
             <Pressable
-              onPressOut={() => {
-                setIsPressUpdateAvatar(false);
-              }}
+              // onPressOut={() => {
+              //   setIsPressUpdateAvatar(false);
+              // }}
               onPressIn={() => {
                 setIsPressUpdateAvatar(true);
               }}

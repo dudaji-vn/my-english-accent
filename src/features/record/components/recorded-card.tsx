@@ -55,7 +55,7 @@ export const RecordedCard = ({
           justifyContent={recordUri ? 'space-between' : 'center'}
           alignItems="center">
           <Pressable p={4} onPress={onReRecord}>
-            <MicFilledIcon opacity={0.6} />
+            <MicFilledIcon color={COLORS.text} opacity={0.6} />
           </Pressable>
           {recordUri && (
             <Pressable
