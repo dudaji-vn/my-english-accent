@@ -16,6 +16,7 @@ import {userService} from '../../../services/user.service';
 import {useDispatch} from 'react-redux';
 import {updateProfile} from '../../../redux/reducers/user.reducer';
 import {useRootSelector} from '../../../redux/reducers';
+import {Linking} from 'react-native';
 
 export const AppSetting = () => {
   const {close, open, isShowing} = useModal();
@@ -43,6 +44,10 @@ export const AppSetting = () => {
     mutate({
       autoDownload: !isEnabled,
     });
+  };
+
+  const openSetting = () => {
+    Linking.openSettings();
   };
 
   return (
@@ -110,7 +115,7 @@ export const AppSetting = () => {
           title="App’s permissions"
           description="Please kindly accept these permissions to allow the app runs smoothly!"
           cancelButton={
-            <Button flex={1} onPress={close}>
+            <Button flex={1} onPress={openSetting}>
               Go to setting
             </Button>
           }>

@@ -16,7 +16,7 @@ type RadioCardProps = {
 export const RadioCard = ({isActive, content, onPress}: RadioCardProps) => {
   return (
     <TouchableOpacity style={{flex: 1}} onPress={onPress}>
-      <VStack opacity={isActive ? 1 : 0.6} space={2}>
+      <VStack opacity={isActive ? 1 : 0.3} space={2}>
         <View
           shadow={isActive ? 1 : 'none'}
           borderWidth={isActive ? 1 : 0}
