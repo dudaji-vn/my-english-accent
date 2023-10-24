@@ -79,7 +79,12 @@ export const AppSetting = () => {
             </Text>
 
             <IconWrapper onPress={showQuestion} colorOnPress={COLORS.highlight}>
-              <HelpCircle color={COLORS.text} width={20} height={20} />
+              <HelpCircle
+                opacity={0.6}
+                color={COLORS.text}
+                width={20}
+                height={20}
+              />
             </IconWrapper>
             <Modal isOpen={isShowQuestion} onClose={hideQuestion}>
               <ModalCard

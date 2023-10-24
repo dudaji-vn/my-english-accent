@@ -51,6 +51,8 @@ const SettingsScreen = ({navigation}: any) => {
       width: 300,
       height: 300,
       cropping: true,
+      cropperTintColor: COLORS.highlight,
+      cropperActiveWidgetColor: COLORS.highlight,
     });
     if (!image) {
       return;
