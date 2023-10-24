@@ -14,7 +14,7 @@ type Props = {
 export const ModalCard = (props: Props) => {
   return (
     <VStack p={8} space={8} justifyContent="center">
-      <VStack space={4}>
+      <VStack space={3}>
         <Heading textAlign="center" fontSize="xl" fontWeight="medium">
           {props.title}
         </Heading>

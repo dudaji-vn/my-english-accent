@@ -38,6 +38,7 @@ import {useGetVocabularies} from '../hooks/use-get-vocabularies';
 import Swiper from 'react-native-swiper';
 import SwiperDeck from 'react-native-deck-swiper';
 import {Text600} from '../../../components/text-600';
+import {CompleteRecordScreen} from './complete-record-screen';
 
 const PAGE_SIZE = 0;
 
@@ -138,7 +139,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
           },
           placement: 'bottom',
         });
-      }, 100);
+      }, 50);
     },
   });
   const handleSaveRecord = async () => {
@@ -233,6 +234,10 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     return <LoadingScreen />;
   }
 
+  if (Object.keys(savedList).length === data?.items.length) {
+    return <CompleteRecordScreen navigation={navigation} />;
+  }
+
   const forward = () => {
     if (data?.items?.length && currentIdx === data.items.length - 1) {
       const firstUnsavedIdx = data.items.findIndex(
@@ -294,6 +299,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
 
       <View>
         <SwiperDeck
+          stackSize={2}
           containerStyle={[
             styles.swiperDeckContainer,
             {
@@ -308,9 +314,24 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
               height: mainHeight,
             },
           ]}
+          onSwipedLeft={cardIndex => {
+            setCurrentIdx(
+              cardIndex === vocabularies.length - 1 ? cardIndex : cardIndex + 1,
+            );
+          }}
+          onSwipedRight={cardIndex => {
+            if (cardIndex > vocabularies.length - 1) {
+              return;
+            }
+            setCurrentIdx(cardIndex === 0 ? cardIndex : cardIndex - 1);
+          }}
+          goBackToPreviousCardOnSwipeRight={true}
+          showSecondCard={false}
+          horizontalSwipe={false}
+          verticalSwipe={false}
           ref={swiperDeckRef}
           cards={data?.items || []}
-          renderCard={item => {
+          renderCard={(item, cardIndex) => {
             return (
               <Swiper
                 index={tabIndex}
@@ -424,21 +445,6 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
               </Swiper>
             );
           }}
-          onSwipedLeft={cardIndex => {
-            setCurrentIdx(
-              cardIndex === vocabularies.length - 1 ? cardIndex : cardIndex + 1,
-            );
-          }}
-          onSwipedRight={cardIndex => {
-            if (cardIndex > vocabularies.length - 1) {
-              return;
-            }
-            setCurrentIdx(cardIndex === 0 ? cardIndex : cardIndex - 1);
-          }}
-          goBackToPreviousCardOnSwipeRight={true}
-          showSecondCard={false}
-          horizontalSwipe={false}
-          verticalSwipe={false}
         />
       </View>
 
