@@ -12,12 +12,17 @@ const ListUser = (props: IListUser) => {
   return (
     <View style={{marginHorizontal: -10}}>
       <FlatList
+        keyboardShouldPersistTaps="handled"
         initialNumToRender={2}
         maxToRenderPerBatch={2}
         horizontal={false}
         data={users}
         numColumns={2}
-        renderItem={({item}) => <UserCard userProgress={item} />}
+        renderItem={({item}) => (
+          <View width={'50%'}>
+            <UserCard userProgress={item} />
+          </View>
+        )}
         keyExtractor={item => item._id}
       />
     </View>
