@@ -3,6 +3,7 @@ export interface IQueryListen {
   category: string
   type: 'Verb' | 'Noun' | 'Place / Time'
   sortBy: 'latestFile' | 'completedRecently'
+  groupId?: string
 }
 
 export interface IQueryAudio {
