@@ -9,7 +9,7 @@ const generalImg = require('../assets/images/Chat.png');
 const otherImg = require('../assets/images/Other.png');
 
 // import {API_URL} from '@env';
-export const baseApiUrl = 'http://10.0.100.14:5000/';
+export const baseApiUrl = 'http://10.0.100.81:5000/';
 export const googleClientId =
   '87150114919-c8fv6vqb433lcmb3n6vc92d2q5688nd4.apps.googleusercontent.com';
 
@@ -21,6 +21,9 @@ export const authEndpoint = {
 
 export const userEndpoint = {
   base: 'api/user',
+  myKeyword: 'api/user/myKeyword',
+  addKeyword: 'api/user/keyword/add',
+  deleteKeyword: 'api/user/keyword/delete',
 };
 
 export const vocabularyEndpoint = {
@@ -34,7 +37,9 @@ export const recordEndpoint = {
 export const listenEndpoint = {
   getUserProgress: 'api/listen/getUserProgress',
   getListenDetail: 'api/listen/listenDetail',
+  getListenDetailInGroup: 'api/listen/listenDetailInGroup',
   getAudioList: 'api/listen/audioList',
+  listenRecord: 'api/listen/listenRecord',
 };
 
 export const groupEndpoint = {
@@ -95,7 +100,7 @@ export const initTopics: Record<Category, Topic> = {
   },
   others: {
     _id: '2',
-    name: 'Designer',
+    name: 'Other',
     image: otherImg,
     description: 'General description',
     totalWords: 1,
