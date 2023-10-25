@@ -16,4 +16,24 @@ export default class UserController {
     )
     return res.success(user)
   }
+  async addKeyword(req: IRequest, res: IResponse) {
+    const { keyword } = req.body
+    const result = await this.userService.addKeyword(
+      keyword,
+      req.user._id
+    )
+    return res.success(result)
+  }
+
+  async getKeywordByUser(req: IRequest, res: IResponse) {
+    const result = await this.userService.getKeywordByUser(
+      req.user._id
+    )
+    return res.success(result)
+  }
+  async deleteKeyword(req: IRequest, res: IResponse) {
+    const { id } = req.body
+    const result = await this.userService.deleteKeyword(id)
+    return res.success(result)
+  }
 }
