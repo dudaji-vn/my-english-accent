@@ -2,7 +2,7 @@ import {View} from 'native-base';
 import React from 'react';
 import {FlatList, StyleSheet} from 'react-native';
 import GroupCard from '../../../components/group-card';
-import {IGroups} from '../../../interfaces/api/Group';
+import {IGroup} from '../../../interfaces/api/Group';
 
 const data = [
   {id: '1', text: 'Item 1'},
@@ -13,17 +13,19 @@ const data = [
   {id: '6', text: 'Item 2'},
 ];
 
-const ListGroup = ({groups}: {groups: IGroups[]}) => {
+const ListGroup = ({groups}: {groups: IGroup[]}) => {
   return (
-    <View style={{marginHorizontal: -10, maxHeight: 900}}>
-      <FlatList
-        horizontal={false}
-        data={groups}
-        numColumns={2}
-        renderItem={({item}) => <GroupCard group={item} />}
-        keyExtractor={item => item._id}
-      />
-    </View>
+    <FlatList
+      initialNumToRender={3}
+      maxToRenderPerBatch={2}
+      horizontal={false}
+      data={groups}
+      numColumns={2}
+      renderItem={({item}) => (
+        <View width={'50%'}>{item && <GroupCard group={item} />}</View>
+      )}
+      keyExtractor={item => item._id}
+    />
   );
 };
 
