@@ -4,10 +4,9 @@ import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text} from 'react-native';
 import {COLORS} from '../../constants/design-system';
 import {SCREEN_NAMES} from '../../constants/screen';
-import {IGroupMember, IGroups} from '../../interfaces/api/Group';
-import {IUser} from '../../interfaces/api/User';
+import {IGroupMember, IGroup} from '../../interfaces/api/Group';
 
-const GroupCard = ({group}: {group: IGroups}) => {
+const GroupCard = ({group}: {group: IGroup}) => {
   const navigation = useNavigation<any>();
 
   const [users, setUsers] = useState<IGroupMember[]>([]);
@@ -32,7 +31,7 @@ const GroupCard = ({group}: {group: IGroups}) => {
   const handleClick = () => {
     navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
       screen: SCREEN_NAMES.listenDetailScreen,
-      params: {typeScreen: 'group'},
+      params: {typeScreen: 'group', groupId: group._id},
     });
   };
   const renderMember = ({item, index}: {item: IGroupMember; index: number}) => {
@@ -54,7 +53,6 @@ const GroupCard = ({group}: {group: IGroups}) => {
   return (
     <Pressable onPress={handleClick} style={styles.container}>
       <FlatList
-        initialNumToRender={2}
         data={users}
         keyExtractor={(item, index) => item._id.toString()}
         numColumns={2}
@@ -99,6 +97,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontSize: 16,
     marginBottom: 8,
+    textAlign: 'center',
   },
   textRole: {
     color: COLORS.darkColor,
