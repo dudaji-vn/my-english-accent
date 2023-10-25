@@ -30,24 +30,24 @@ export const useAudioRecord = (path?: string) => {
     await recorder.startRecorder(path, undefined, true);
     setIsRecording(true);
 
-    let silenceTimeout: NodeJS.Timeout | null = null;
+    // let silenceTimeout: NodeJS.Timeout | null = null;
 
     recorder.addRecordBackListener(e => {
       const currentMetering = e.currentMetering || MIN_METERING;
       setMetering(currentMetering);
 
-      // Check for silence and start a timer
-      if (currentMetering <= SILENCE_THRESHOLD) {
-        if (!silenceTimeout) {
-          silenceTimeout = setTimeout(stopRecording, SILENCE_DURATION);
-        }
-      } else {
-        // Reset the silence timer if there's sound detected
-        if (silenceTimeout) {
-          clearTimeout(silenceTimeout);
-          silenceTimeout = null;
-        }
-      }
+      // // Check for silence and start a timer
+      // if (currentMetering <= SILENCE_THRESHOLD) {
+      //   if (!silenceTimeout) {
+      //     silenceTimeout = setTimeout(stopRecording, SILENCE_DURATION);
+      //   }
+      // } else {
+      //   // Reset the silence timer if there's sound detected
+      //   if (silenceTimeout) {
+      //     clearTimeout(silenceTimeout);
+      //     silenceTimeout = null;
+      //   }
+      // }
     });
   }
 
