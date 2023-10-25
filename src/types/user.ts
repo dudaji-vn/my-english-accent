@@ -21,3 +21,7 @@ export type User = {
 } & BaseEntity;
 
 export type Category = 'general' | 'developer' | 'designer' | 'others';
+export type Keyword = {
+  text: string;
+  _id: string;
+};
