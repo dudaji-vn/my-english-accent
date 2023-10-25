@@ -70,7 +70,6 @@ const UserCard = (props: IUserCardProps) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.lighterBackground,
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     margin: 10,
