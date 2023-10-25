@@ -3,11 +3,14 @@ import RecordModel from '../entities/Record'
 import UserModel from '../entities/User'
 import ListenModel from '../entities/Listen'
 import { BadRequestError } from '../interfaces/dto/Error'
-import mongoose from 'mongoose'
+import mongoose, { Mongoose } from 'mongoose'
 import {
   IQueryAudio,
   IQueryListen
 } from '../interfaces/dto/ListenDTO'
+import GroupRecordModel from '../entities/GroupRecord'
+import GroupModel from '../entities/Group'
+import { Category, ROLE } from '../const/common'
 
 @injectable()
 export default class ListenService {
@@ -83,6 +86,33 @@ export default class ListenService {
     return data
   }
 
+  async listenRecordInGroup(
+    me: string,
+    recordId: string,
+    groupId: string
+  ) {
+    if (!recordId) {
+      throw new BadRequestError('recordId is required')
+    }
+    if (!groupId) {
+      throw new BadRequestError('groupId is required')
+    }
+    const isExist = await ListenModel.exists({
+      user: '651fbed3b87dcb638078aa17',
+      record: recordId,
+      group: groupId
+    })
+    if (isExist) {
+      throw new BadRequestError('user listened record in group')
+    }
+    const listen = new ListenModel({
+      user: '651fbed3b87dcb638078aa17',
+      record: recordId,
+      group: groupId
+    })
+    await listen.save()
+    return true
+  }
   async listenRecord(me: string, recordId: string) {
     if (!recordId) {
       throw new BadRequestError('recordId is required')
@@ -108,7 +138,11 @@ export default class ListenService {
     if (!userId) {
       throw new BadRequestError('userId is required')
     }
-    console.log(category)
+    const user = await UserModel.findById(userId)
+    if (!user) {
+      throw new BadRequestError('user not found')
+    }
+
     const data = await RecordModel.aggregate([
       {
         $match: {
@@ -213,21 +247,200 @@ export default class ListenService {
         }
       }
     ])
-    return data
+    if (!data.find((item) => item.category === 'general')) {
+      data.push({ category: 'general', records: [], totalRecord: 0 })
+    }
+    if (data.find((item) => item.category === user.role)) {
+      return {
+        user: {},
+        recordInfo: data
+      }
+    }
+    let item = {}
+    switch (user.role) {
+      case ROLE.designer:
+        item = {
+          category: ROLE.designer,
+          records: [],
+          totalRecord: 0
+        }
+      case ROLE.developer:
+        item = {
+          category: ROLE.developer,
+          records: [],
+          totalRecord: 0
+        }
+
+      default:
+        item = { category: 'developer', records: [], totalRecord: 0 }
+    }
+    data.push(item)
+    return {
+      user: {},
+      recordInfo: data
+    }
+  }
+  async getListenDetailInGroup(query: IQueryListen, me: string) {
+    let group = await GroupModel.findById(query.groupId)
+      .populate('members')
+      .lean()
+    if (!group) {
+      throw new BadRequestError('group not found')
+    }
+    const recordInfo = await GroupRecordModel.aggregate([
+      {
+        $match: {
+          group: new mongoose.Types.ObjectId(query.groupId)
+        }
+      },
+      {
+        $lookup: {
+          from: 'records',
+          localField: 'record',
+          foreignField: '_id',
+          as: 'recordData'
+        }
+      },
+      {
+        $unwind: {
+          path: '$recordData'
+        }
+      },
+      {
+        $lookup: {
+          from: 'vocabularies',
+          localField: 'recordData.vocabulary',
+          foreignField: '_id',
+          as: 'vocabularyData'
+        }
+      },
+      {
+        $unwind: {
+          path: '$vocabularyData'
+        }
+      },
+      {
+        $match: {
+          ...(query.type && { 'vocabularyData.type': query.type })
+        }
+      },
+      {
+        $lookup: {
+          from: 'listens',
+          localField: 'group',
+          foreignField: 'group',
+          as: 'listenData'
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          createdAt: 1,
+          listenData: 1,
+          recordData: 1,
+          category: '$vocabularyData.category',
+          isListen: {
+            $cond: {
+              if: {
+                $and: [
+                  {
+                    $in: ['$recordData._id', '$listenData.record']
+                  },
+                  {
+                    $in: [
+                      new mongoose.Types.ObjectId(
+                        '6523652ba75917a85dfeac5b'
+                      ),
+                      '$listenData.user'
+                    ]
+                  }
+                ]
+              },
+              then: true,
+              else: false
+            }
+          },
+
+          vocabulary: {
+            text: '$vocabularyData.text',
+            _id: '$vocabularyData._id',
+            type: '$vocabularyData.type'
+          }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            category: '$category'
+          },
+          totalRecord: { $sum: 1 },
+          records: {
+            $push: {
+              _id: '$recordData._id',
+              vocabulary: '$vocabulary',
+              isListen: '$isListen'
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          category: '$_id.category',
+          user: '$_id.user',
+          totalRecord: 1,
+          records: 1
+        }
+      }
+    ])
+    Object.values(Category).forEach((category) => {
+      if (!recordInfo.find((item) => item.category === category)) {
+        recordInfo.push({
+          category: category,
+          records: [],
+          totalRecord: 0
+        })
+      }
+    })
+
+    return {
+      group,
+      recordInfo
+    }
   }
 
   async getAudioList(query: IQueryAudio) {
-    const currentRecord = await RecordModel.findById(
-      query.recordId
-    ).populate('vocabulary user')
-    const nextRecord = await RecordModel.find({
-      _id: { $ne: query.recordId },
-      user: currentRecord?.user
-    }).populate('vocabulary user')
+    let currentRecord: any
+
+    let nextRecord: any = []
+    if (query.groupId) {
+      currentRecord = await GroupRecordModel.findOne({
+        record: query.recordId,
+        group: query.groupId
+      }).populate('vocabulary user')
+      const nextRecordData = await GroupRecordModel.find({
+        record: { $ne: query.recordId },
+        group: query.groupId
+      })
+        .populate({
+          path: 'record',
+          populate: 'vocabulary user'
+        })
+        .select('record')
+      nextRecord = nextRecordData.map((item: any) => item.record)
+    } else {
+      currentRecord = await RecordModel.findById(
+        query.recordId
+      ).populate('vocabulary user')
+      nextRecord = await RecordModel.find({
+        _id: { $ne: query.recordId },
+        user: currentRecord?.user
+      }).populate('vocabulary user')
+    }
 
     return {
       currentRecord,
-      nextRecord
+      nextRecord: nextRecord
     }
   }
 }
