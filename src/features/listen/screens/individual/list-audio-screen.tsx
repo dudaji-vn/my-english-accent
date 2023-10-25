@@ -104,7 +104,7 @@ const ListAudioListenScreen = (props: Props) => {
       return;
     }
     setSelectUser(prev => dataRecord[currentIdx].user);
-  }, [currentIdx]);
+  }, [currentIdx, dataRecord?.length]);
   return (
     <ScreenWrapper>
       <HStack justifyContent={'space-between'} mb={6}>

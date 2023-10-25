@@ -34,7 +34,7 @@ import RowGroup from '../../components/RowGroup';
 import RowUserAvatar from '../../components/RowUserAvatar';
 
 type RootStackParamList = {
-  ListenDetail: {user?: IUserProgress; typeScreen: string};
+  ListenDetail: {user?: IUserProgress; typeScreen: string; groupId?: string};
 };
 type Props = {
   route: RouteProp<RootStackParamList, 'ListenDetail'>;
@@ -64,7 +64,7 @@ const filterItems = [
   },
 ];
 const ListenDetailScreen = ({route}: Props) => {
-  const {typeScreen, user} = route.params!;
+  const {typeScreen, user, groupId} = route.params!;
   const [topicShow, setTopicShow] = useState<Topic[]>([]);
   const dispatch = useDispatch();
 
@@ -73,6 +73,7 @@ const ListenDetailScreen = ({route}: Props) => {
   const [params, setParams] = useState<IParamListenDetail>({
     userId: user?._id,
     category: 'general',
+    groupId: groupId,
   });
   const currentProgress = useMemo(() => {
     if (!user) {
@@ -87,6 +88,7 @@ const ListenDetailScreen = ({route}: Props) => {
   } = useQuery(['listenDetail', params], () =>
     listenService.getListenDetail(params),
   );
+  console.log(listenDetail);
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       if (refetch) {
@@ -98,8 +100,8 @@ const ListenDetailScreen = ({route}: Props) => {
     return unsubscribe;
   }, [navigation]);
   useEffect(() => {
-    if (listenDetail) {
-      const topics = listenDetail
+    if (listenDetail && listenDetail.recordInfo) {
+      const topics = listenDetail.recordInfo
         .map(item => {
           const topic = initTopics[item.category];
           (topic.totalWords = item.totalRecord),
@@ -120,7 +122,7 @@ const ListenDetailScreen = ({route}: Props) => {
     if (!params.category) {
       return;
     }
-    return listenDetail.find(
+    return listenDetail.recordInfo.find(
       item => item.category.toUpperCase() === params?.category?.toUpperCase(),
     )?.records;
   }, [params, listenDetail]);
@@ -131,18 +133,19 @@ const ListenDetailScreen = ({route}: Props) => {
         parentTitle="Listen"
         mainTitle={typeScreen === 'user' ? 'Individual' : 'Group'}
       />
+
       <HStack
         mt={5}
         mb={6}
         justifyContent={'space-between'}
         alignItems={'center'}>
         <HStack space={2} alignItems={'center'}>
-          {typeScreen === 'group' ? (
-            <RowGroup />
-          ) : (
-            user && <RowUserAvatar user={user} />
-          )}
-          <InfoIcon />
+          {typeScreen === 'group'
+            ? listenDetail &&
+              listenDetail?.group && <RowGroup group={listenDetail.group} />
+            : user && <RowUserAvatar user={user} />}
+
+          {!isFetching && <InfoIcon />}
         </HStack>
         <DownLoadIcon />
       </HStack>
@@ -157,6 +160,7 @@ const ListenDetailScreen = ({route}: Props) => {
         {topicShow &&
           topicShow.map((topic, index) => (
             <TopicCard
+              minimalOnInActive={index !== indexTopicActive && !!params.groupId}
               onPress={() => {
                 setParams({...params, category: topic.name});
                 setIndexTopicActive(index);
@@ -176,6 +180,7 @@ const ListenDetailScreen = ({route}: Props) => {
             const newParams = {
               userId: params.userId,
               category: params.category,
+              groupId: params.groupId,
               [key]: value,
             };
             setParams(newParams);
@@ -216,7 +221,12 @@ const ListenDetailScreen = ({route}: Props) => {
                   dispatch(turnOffPlayAll());
                   navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
                     screen: SCREEN_NAMES.listAudioListenScreen,
-                    params: {typeScreen: 'user', recordId: item._id},
+                    params: {
+                      typeScreen: !!params.groupId ? 'group' : 'user',
+                      recordId: item._id,
+                      groupId: params.groupId,
+                      group: listenDetail?.group,
+                    },
                   });
                 }}
                 word={item.vocabulary.text.en}
