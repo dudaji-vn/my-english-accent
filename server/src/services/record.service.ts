@@ -163,6 +163,12 @@ export default class RecordService {
       _id: recordId,
       user: userId
     })
+
+    // delete group record
+    await GroupRecordModel.deleteMany({
+      record: recordId
+    })
+
     if (!record) {
       throw new Error('Record not found')
     }
