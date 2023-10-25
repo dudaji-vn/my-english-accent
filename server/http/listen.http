@@ -3,7 +3,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTIzN
 Content-Type: application/json
 
 {
-  "recordId":"652ca5cc51858b83d25c3339"
+  "recordId":"65321d929411c482b8ae8c3f",
+  "groupId":"652e0ee488fc106458535bc8"
 }
 
 
@@ -14,13 +15,23 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTIzN
 
 ###
 GET http://localhost:5000/api/listen/listenDetail
-?userId=651fbed3b87dcb638078aa17
+?userId=6523734d422f636658a02c65
 &category=general
 &sortBy=latestFile
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTIzNjUyYmE3NTkxN2E4NWRmZWFjNWIiLCJlbWFpbCI6ImhvcXVhbmdsaW5oMjcxMEBnbWFpbC5jb20iLCJpYXQiOjE2OTY5OTU5OTIsImV4cCI6MTY5OTU4Nzk5Mn0.aCIl7ILy4Qx-dvqertuU-OiOfKQqBwQ_Rl5g1DZQTsI
 
 
 
+
+###
+GET http://localhost:5000/api/listen/listenDetailInGroup
+?groupId=652e0ee488fc106458535bc8
+ &category=developer
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTIzNjUyYmE3NTkxN2E4NWRmZWFjNWIiLCJlbWFpbCI6ImhvcXVhbmdsaW5oMjcxMEBnbWFpbC5jb20iLCJpYXQiOjE2OTY5OTU5OTIsImV4cCI6MTY5OTU4Nzk5Mn0.aCIl7ILy4Qx-dvqertuU-OiOfKQqBwQ_Rl5g1DZQTsI
+
+
+
 ###
 GET http://localhost:5000/api/listen/audioList/652e4a9f74dd275920ab15f6
+?groupId=652e0ee488fc106458535bc8
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NTIzNjUyYmE3NTkxN2E4NWRmZWFjNWIiLCJlbWFpbCI6ImhvcXVhbmdsaW5oMjcxMEBnbWFpbC5jb20iLCJpYXQiOjE2OTY5OTU5OTIsImV4cCI6MTY5OTU4Nzk5Mn0.aCIl7ILy4Qx-dvqertuU-OiOfKQqBwQ_Rl5g1DZQTsI
