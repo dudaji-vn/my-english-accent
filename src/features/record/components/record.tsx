@@ -6,7 +6,11 @@ import React from 'react';
 import {Mic} from 'react-native-feather';
 import {AppProgress} from '../../../components/app-progress';
 import {Filter} from '../../../components/filter';
-import {MicCheckIcon, MicFilledIcon} from '../../../components/icons';
+import {
+  MicCheckIcon,
+  MicFilledIcon,
+  SmallMicFilledIcon,
+} from '../../../components/icons';
 import {Toast} from '../../../components/toast';
 import {Topic, TopicCard} from '../../../components/topic-card';
 import {WordItem} from '../../../components/word-item';
@@ -233,11 +237,7 @@ const Record = ({navigation, route, jumpTo}: Props) => {
                       word={item.text.en}
                       status={isRecorded ? 'disabled' : 'active'}
                       rightElement={
-                        isRecorded ? (
-                          <MicCheckIcon />
-                        ) : (
-                          <MicFilledIcon opacity={0.1} color={COLORS.text} />
-                        )
+                        isRecorded ? <MicCheckIcon /> : <SmallMicFilledIcon />
                       }
                     />
                     {index === vocabularies.length - 1 && <View h={31} />}
