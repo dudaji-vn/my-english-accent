@@ -20,4 +20,19 @@ userRouter.patch(
   auth,
   catchAsync(userController.updateUser.bind(userController))
 )
+userRouter.post(
+  '/keyword/add',
+  auth,
+  catchAsync(userController.addKeyword.bind(userController))
+)
+userRouter.get(
+  '/myKeyword',
+  auth,
+  catchAsync(userController.getKeywordByUser.bind(userController))
+)
+userRouter.post(
+  '/keyword/delete',
+  auth,
+  catchAsync(userController.deleteKeyword.bind(userController))
+)
 export default userRouter
