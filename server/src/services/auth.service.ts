@@ -6,7 +6,10 @@ import {
   IUserLoginDTO
 } from '../interfaces/dto/UserDTO'
 import JwtService from './jwt.service'
-import { UnAuthorizeError } from '../interfaces/dto/Error'
+import {
+  BadRequestError,
+  UnAuthorizeError
+} from '../interfaces/dto/Error'
 @injectable()
 export default class AuthService {
   constructor(private jwtService: JwtService) {}
@@ -47,12 +50,12 @@ export default class AuthService {
       'nativeLanguage'
     ]
     if (!this.checkFieldsExist(userDto, requiredFields)) {
-      throw new Error('Please input all fields')
+      throw new BadRequestError('Please input all fields')
     }
 
     const isExistUser = await UserModel.exists({ email: email })
     if (isExistUser) {
-      throw new Error('email is existed')
+      throw new BadRequestError('email is existed')
     }
 
     const user = new UserModel({
