@@ -5,7 +5,7 @@ import {
 } from '@react-navigation/native';
 import {useQuery} from '@tanstack/react-query';
 import {HStack, Pressable, View} from 'native-base';
-import {useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {Dimensions} from 'react-native';
 import SwiperDeck from 'react-native-deck-swiper';
 import {Filter} from '../../../../components/filter';
@@ -26,50 +26,32 @@ import {useDispatch} from 'react-redux';
 import {togglePlayAll} from '../../../../redux/reducers/slider.reducer';
 import {useRootSelector} from '../../../../redux/reducers';
 import HeaderSwiper from '../../components/HeaderSwiper';
+import {IUser} from '../../../../interfaces/api/User';
+import {IParamAudio} from '../../../../interfaces/api/Listen';
 
 const ListAudioListenScreen = (props: Props) => {
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
   const swiperRef = useRef<SwiperDeck>(null);
+  const [selectedUser, setSelectUser] = useState<IUser>();
   const [currentIdx, setCurrentIdx] = useState(0);
   const dispatch = useDispatch();
   const playAll = useRootSelector(item => item.slider.isPlayAll);
   const navigation = useNavigation();
 
-  const filterItems = [
-    {
-      label: 'Test',
-      value: 'test',
-      icon: <UserAvatar w={6} h={6} flagWidth={2} nation={'ko'} />,
-    },
-    {
-      label: 'Test1',
-      value: 'test1',
-      icon: <UserAvatar w={6} h={6} flagWidth={2} nation={'ko'} />,
-    },
-    {
-      label: 'Test2',
-      value: 'test2',
-      icon: <UserAvatar w={6} h={6} flagWidth={2} nation={'ko'} />,
-    },
-    {
-      label: 'Test3',
-      value: 'test3',
-      icon: <UserAvatar w={6} h={6} flagWidth={2} nation={'ko'} />,
-    },
-    {
-      label: 'Test4',
-      value: 'test4',
-      icon: <UserAvatar w={6} h={6} flagWidth={2} nation={'ko'} />,
-    },
-  ];
   const {route} = props;
-  const {typeScreen, recordId} = route.params!;
+  const {typeScreen, recordId, groupId, group} = route.params!;
+  const [params, setParams] = useState<IParamAudio>({
+    recordId: recordId,
+    groupId: groupId,
+  });
 
   if (!recordId) {
     return null;
   }
-  const {data: audioList, isSuccess} = useQuery(
-    ['getAudioDetail', recordId],
-    () => listenService.getAudioList(recordId),
+  const keyCaches = ['getAudioDetail', params];
+
+  const {data: audioList, isSuccess} = useQuery(keyCaches, () =>
+    listenService.getAudioList(params),
   );
   const dataRecord = useMemo(() => {
     let mergeArray = [];
@@ -86,6 +68,25 @@ const ListAudioListenScreen = (props: Props) => {
     return mergeArray;
   }, [audioList]);
 
+  const groupMember = useMemo(() => {
+    if (!group || !group.members) {
+      return [];
+    }
+    return group.members.map((item: any) => ({
+      label: item.displayName,
+      value: item._id,
+      icon: (
+        <UserAvatar
+          imageUrl={item.avatar}
+          w={6}
+          h={6}
+          flagWidth={2}
+          nativeLanguage={item.nativeLanguage}
+        />
+      ),
+    }));
+  }, [group]);
+
   const handleNext = () => {
     swiperRef.current?.swipeLeft();
   };
@@ -98,6 +99,12 @@ const ListAudioListenScreen = (props: Props) => {
     }
     swiperRef.current?.swipeRight();
   };
+  useEffect(() => {
+    if (currentIdx < 0 || !dataRecord) {
+      return;
+    }
+    setSelectUser(prev => dataRecord[currentIdx].user);
+  }, [currentIdx]);
   return (
     <ScreenWrapper>
       <HStack justifyContent={'space-between'} mb={6}>
@@ -124,8 +131,8 @@ const ListAudioListenScreen = (props: Props) => {
           <PlayAllIcon isHighLight={playAll} />
         </Pressable>
       </HStack>
-      <HStack>
-        {typeScreen === 'group' && (
+      <HStack justifyContent={'center'}>
+        {typeScreen === 'group' && selectedUser && (
           <Filter
             maxHeight={220}
             marginTop={2}
@@ -133,14 +140,31 @@ const ListAudioListenScreen = (props: Props) => {
             placement="bottom"
             icon={
               <HStack space={2} alignItems={'center'}>
-                <UserAvatar nativeLanguage={'ko'} />
+                <UserAvatar
+                  imageUrl={selectedUser.avatar}
+                  nativeLanguage={selectedUser.nativeLanguage}
+                />
                 <ArrowDownIcon />
               </HStack>
             }
-            onSelected={value => {
-              console.log(value);
+            onSelected={data => {
+              if (!group.members) {
+                return;
+              }
+              setParams(prev => {
+                return {
+                  ...prev,
+                  userId: data.value,
+                };
+              });
+              const user = group.members.find(
+                (item: any) => item._id === data.value,
+              );
+
+              console.log({user, data, groupMember});
+              setSelectUser(user);
             }}
-            filterItems={filterItems}
+            filterItems={groupMember}
           />
         )}
       </HStack>
@@ -174,29 +198,6 @@ const ListAudioListenScreen = (props: Props) => {
             backgroundColor="transparent"
             showSecondCard={false}
           />
-          // <Swiper
-          //   index={currentPlayingIndex}
-          //   ref={swiperRef}
-          //   loadMinimalLoader={<Text>sss</Text>}
-          //   refreshControl={
-          //     <RefreshControl
-          //       refreshing={isFetching}
-          //       colors={[COLORS.highlight]}
-          //     />
-          //   }
-          //   showsButtons={false}
-          //   loop={false}
-          //   showsPagination={false}>
-          //   {dataRecord.map(item => {
-          //     return (
-          //       <AudioItem
-          //         handleNext={handleNext}
-          //         key={item._id}
-          //         record={item}
-          //       />
-          //     );
-          //   })}
-          // </Swiper>
         )}
       </View>
     </ScreenWrapper>
