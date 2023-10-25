@@ -3,7 +3,7 @@ import {IUser} from './User';
 export interface IUserInvite extends IUser {
   isInvite: boolean;
 }
-export interface IGroups {
+export interface IGroup {
   _id: string;
   name: string;
   members: IGroupMember[];
