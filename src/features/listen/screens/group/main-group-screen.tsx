@@ -1,19 +1,20 @@
-import {View, Button, HStack, Text} from 'native-base';
-import ListGroup from '../../components/ListGroup';
-import {Dimensions} from 'react-native';
-import {COLORS} from '../../../../constants/design-system';
-import AddIcon from '../../../../components/icons/add-icon';
-import {SCREEN_NAMES} from '../../../../constants/screen';
 import {useNavigation} from '@react-navigation/native';
-import GroupNotFound from './group-notfound';
-import {memo} from 'react';
 import {useQuery} from '@tanstack/react-query';
+import {Button, HStack, Text, VStack, View} from 'native-base';
+import {memo} from 'react';
+import {Dimensions} from 'react-native';
+import AddIcon from '../../../../components/icons/add-icon';
+import {LoadingScreen} from '../../../../components/screens/loading-screen';
+import {COLORS} from '../../../../constants/design-system';
+import {SCREEN_NAMES} from '../../../../constants/screen';
 import {groupService} from '../../../../services/group.service';
+import ListGroup from '../../components/ListGroup';
+import GroupNotFound from './group-notfound';
 
 const fullWidth = Dimensions.get('window').width;
 const MainGroupScreen = () => {
   const navigation = useNavigation<any>();
-  const {data: myGroups} = useQuery({
+  const {data: myGroups, isFetching} = useQuery({
     queryKey: ['myGroups'],
     queryFn: groupService.getMyGroup,
   });
@@ -23,10 +24,14 @@ const MainGroupScreen = () => {
     });
   };
 
-  return !myGroups ? (
+  if (isFetching || !myGroups) {
+    return <LoadingScreen />;
+  }
+
+  return myGroups?.length === 0 ? (
     <GroupNotFound />
   ) : (
-    <View marginX={5} marginTop={5}>
+    <View flex={1} marginX={5} marginTop={5}>
       <Button
         onPress={handleClick}
         marginBottom={5}
@@ -41,9 +46,9 @@ const MainGroupScreen = () => {
           <Text color={COLORS.highlight}>Create new group</Text>
         </HStack>
       </Button>
-      <View>
+      <VStack marginX={-2} flex={1} mb={20}>
         <ListGroup groups={myGroups} />
-      </View>
+      </VStack>
     </View>
   );
 };

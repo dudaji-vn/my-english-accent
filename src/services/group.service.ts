@@ -1,6 +1,6 @@
 import queryString from 'query-string';
 import {groupEndpoint} from '../configs';
-import {IFormAddGroup, IGroups as IGroup} from '../interfaces/api/Group';
+import {IFormAddGroup, IGroup as IGroup} from '../interfaces/api/Group';
 import {
   IApiResponse,
   IPaginationParams,

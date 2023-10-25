@@ -10,9 +10,19 @@ import {
 export default class ListenController {
   constructor(private readonly listenService: ListenService) {}
   async listenRecord(req: IRequest, res: IResponse) {
-    const { recordId } = req.body
+    const { recordId, groupId } = req.body
     const me = req.user._id
-    const data = await this.listenService.listenRecord(me, recordId)
+    let data = null
+    if (groupId) {
+      data = await this.listenService.listenRecordInGroup(
+        me,
+        recordId,
+        groupId
+      )
+    } else {
+      data = await this.listenService.listenRecord(me, recordId)
+    }
+
     return res.success(data)
   }
 
@@ -30,14 +40,25 @@ export default class ListenController {
     return res.success(data)
   }
 
+  async getListenDetailInGroup(req: IRequest, res: IResponse) {
+    const query = req.query as unknown as IQueryListen
+    const me = req.user._id
+    const data = await this.listenService.getListenDetailInGroup(
+      query,
+      me
+    )
+    return res.success(data)
+  }
+
   async getAudioList(req: IRequest, res: IResponse) {
     const me = req.user._id
     const { recordId } = req.params
-    const { isCurrent, isNext } = req.query as any
-    //type:'current' | 'next'
+    const { groupId } = req.query as unknown as IQueryListen
+
     const query: IQueryAudio = {
       recordId: recordId,
-      userId: me
+      userId: me,
+      groupId: groupId
     }
     const data = await this.listenService.getAudioList(query)
     return res.success(data)

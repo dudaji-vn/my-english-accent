@@ -12,7 +12,7 @@ export default class GroupService {
     const { avatar, members, creator, name } = group
     await GroupModel.create({
       avatar,
-      members,
+      members: [...members, creator],
       creator,
       name
     })
@@ -21,7 +21,9 @@ export default class GroupService {
   async getMyGroup(me: string) {
     const groups = await GroupModel.find({
       $or: [{ members: { $in: [me] } }, { creator: me }]
-    }).populate('members')
+    })
+      .sort({ createdAt: -1 })
+      .populate('members')
     return groups
   }
 

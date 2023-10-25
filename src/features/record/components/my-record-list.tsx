@@ -1,6 +1,6 @@
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {FlatList, HStack, Spinner, VStack, View} from 'native-base';
+import {FlatList, HStack, Spinner, Text, VStack, View} from 'native-base';
 import React from 'react';
 import {RefreshControl} from 'react-native';
 import {EmptyData} from '../../../components/empty-data';
@@ -243,7 +243,9 @@ const MyRecordList = ({navigation}: Props) => {
             />
           ) : (
             <>
-              <EmptyData>Record your words to see them here</EmptyData>
+              <EmptyData>
+                <Text>Record your words to see them here</Text>
+              </EmptyData>
               <View h={31} />
             </>
           )}

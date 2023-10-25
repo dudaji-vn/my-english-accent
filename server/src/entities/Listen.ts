@@ -9,6 +9,10 @@ const listenSchema = new mongoose.Schema(
     record: {
       type: mongoose.Types.ObjectId,
       ref: 'record'
+    },
+    group: {
+      type: mongoose.Types.ObjectId,
+      ref: 'group'
     }
   },
   {

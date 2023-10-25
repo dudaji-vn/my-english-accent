@@ -3,6 +3,7 @@ import {IApiResponse} from '../interfaces/api/Http';
 import {
   IGetAudioList,
   IListenDetailResponse,
+  IParamAudio,
   IParamListenDetail,
 } from '../interfaces/api/Listen';
 import {IUserProgress} from '../interfaces/api/User';
@@ -27,11 +28,13 @@ class ListenService {
   }
   async getListenDetail(
     params: IParamListenDetail,
-  ): Promise<IListenDetailResponse[]> {
+  ): Promise<IListenDetailResponse> {
     console.log('call');
     console.log(params);
-    const res = await httpService.get<IApiResponse<IListenDetailResponse[]>>(
-      listenEndpoint.getListenDetail,
+    const res = await httpService.get<IApiResponse<IListenDetailResponse>>(
+      params.groupId
+        ? listenEndpoint.getListenDetailInGroup
+        : listenEndpoint.getListenDetail,
       {
         params: {...params},
       },
@@ -39,9 +42,15 @@ class ListenService {
     return res.data.data;
   }
 
-  async getAudioList(recordId: string) {
+  async getAudioList(paramAudio: IParamAudio) {
     const res = await httpService.get<IApiResponse<IGetAudioList>>(
-      `${listenEndpoint.getAudioList}/${recordId}`,
+      `${listenEndpoint.getAudioList}/${paramAudio.recordId}`,
+      {
+        params: {
+          groupId: paramAudio.groupId,
+          userId: paramAudio.userId,
+        },
+      },
     );
 
     return res.data.data;

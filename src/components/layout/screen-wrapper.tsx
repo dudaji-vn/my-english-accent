@@ -10,7 +10,12 @@ interface IScreenWrapper {
 const ScreenWrapper = (props: IScreenWrapper) => {
   const {children, bg} = props;
   return (
-    <VStack height={fullHeight} paddingX={5} paddingY={4} bg={bg || '#FFF'}>
+    <VStack
+      {...props}
+      height={fullHeight}
+      paddingX={5}
+      paddingY={4}
+      bg={bg || '#FFF'}>
       {children}
     </VStack>
   );

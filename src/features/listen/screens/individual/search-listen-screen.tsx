@@ -1,4 +1,4 @@
-import {CloseIcon, HStack, Text} from 'native-base';
+import {CloseIcon, HStack, Text, VStack} from 'native-base';
 import {useState} from 'react';
 import {FlatList, Pressable, SafeAreaView, View} from 'react-native';
 import BreadCrumb from '../../../../components/bread-crumb/bread-crumb';
@@ -7,48 +7,46 @@ import ScreenWrapper from '../../../../components/layout/screen-wrapper';
 import {WordItem} from '../../../../components/word-item';
 import {COLORS, OPACITY} from '../../../../constants/design-system';
 import SearchResult from '../../components/SearchResult';
+import {useUser} from '../../../../hooks/useUser';
 
 const SearchListenScreen = () => {
-  const words = [
-    'Keyword1',
-    'Keyword2',
-    'Keyword3',
-    'Keyword4',
-    'Keyword5',
-    'Keyword6',
-    'Keyword7',
-    'Keyword8',
-    'Keyword9',
-    'Keyword10',
-    'Keyword11',
-  ];
+  const {keywords, addUserKeyword, deleteUserKeyword} = useUser();
   const [textSearch, setTextSearch] = useState('');
   const renderRecentSearch = () => {
     return (
-      <SafeAreaView>
+      <VStack flex={1} my={5}>
         <HStack justifyContent={'space-between'} alignItems={'center'} mb={5}>
           <Text style={{color: COLORS.highlight}}>Recent Search</Text>
           <Pressable>
             <Text style={{opacity: OPACITY.normal}}>Clear all</Text>
           </Pressable>
         </HStack>
+
         <FlatList
           numColumns={1}
           horizontal={false}
           nestedScrollEnabled={true}
-          data={words}
+          data={keywords}
           renderItem={({item}) => (
             <View style={{marginBottom: 10}}>
               <WordItem
-                word={item}
+                word={item.text}
                 status={'active'}
-                leftElement={<CloseIcon />}
+                rightElement={
+                  <Pressable
+                    onPress={() => {
+                      console.log('test');
+                      deleteUserKeyword(item._id);
+                    }}>
+                    <CloseIcon />
+                  </Pressable>
+                }
               />
             </View>
           )}
-          keyExtractor={item => item}
+          keyExtractor={item => item._id}
         />
-      </SafeAreaView>
+      </VStack>
     );
   };
 
@@ -58,6 +56,12 @@ const SearchListenScreen = () => {
         <BreadCrumb parentTitle="Listen" mainTitle="Search" />
       </HStack>
       <Input
+        autoFocus
+        showSoftInputOnFocus={true}
+        blurOnSubmit={false}
+        onSubmitEditing={value => {
+          addUserKeyword(textSearch);
+        }}
         onChangeText={value => {
           setTextSearch(value);
         }}
@@ -65,7 +69,11 @@ const SearchListenScreen = () => {
         marginBottom={5}
         placeholder="Search for Individuals or Groups"
       />
-      {!textSearch ? renderRecentSearch() : <SearchResult />}
+      {!textSearch ? (
+        renderRecentSearch()
+      ) : (
+        <SearchResult textSearch={textSearch} />
+      )}
     </ScreenWrapper>
   );
 };

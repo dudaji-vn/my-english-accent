@@ -26,6 +26,15 @@ listenRouter.get(
   auth,
   catchAsync(listenController.getListenDetail.bind(listenController))
 )
+
+listenRouter.get(
+  '/listenDetailInGroup',
+  auth,
+  catchAsync(
+    listenController.getListenDetailInGroup.bind(listenController)
+  )
+)
+
 listenRouter.get(
   '/audioList/:recordId',
   auth,
