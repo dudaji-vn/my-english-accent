@@ -410,14 +410,21 @@ export default class ListenService {
   }
 
   async getAudioList(query: IQueryAudio) {
+    console.log('audio list pro')
     let currentRecord: any
 
     let nextRecord: any = []
     if (query.groupId) {
-      currentRecord = await GroupRecordModel.findOne({
-        record: query.recordId,
-        group: query.groupId
-      }).populate('vocabulary user')
+      currentRecord = await RecordModel.findById(
+        query.recordId
+      ).populate('vocabulary user')
+      if (query.userId) {
+        currentRecord = await RecordModel.findOne({
+          user: query.userId,
+          vocabulary: currentRecord.vocabulary
+        }).populate('vocabulary user')
+      }
+
       const nextRecordData = await GroupRecordModel.find({
         record: { $ne: query.recordId },
         group: query.groupId
@@ -437,7 +444,7 @@ export default class ListenService {
         user: currentRecord?.user
       }).populate('vocabulary user')
     }
-
+    console.log(currentRecord)
     return {
       currentRecord,
       nextRecord: nextRecord
