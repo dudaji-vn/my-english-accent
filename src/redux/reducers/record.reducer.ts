@@ -12,8 +12,13 @@ const recordSlice: any = createSlice({
     addCompletedId: (state: IRecordStore, action: any) => {
       state.completedIds.push(action.payload);
     },
+    removeCompletedId: (state: IRecordStore, action: any) => {
+      state.completedIds = state.completedIds.filter(
+        (id: string) => id !== action.payload,
+      );
+    },
   },
 });
 
-export const {addCompletedId} = recordSlice.actions;
+export const {addCompletedId, removeCompletedId} = recordSlice.actions;
 export default recordSlice.reducer;

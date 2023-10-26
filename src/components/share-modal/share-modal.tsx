@@ -23,6 +23,7 @@ import {Toast} from '../toast';
 type Props = {
   recordId: string;
   isSendAll?: boolean;
+  onDone?: () => void;
 };
 
 export const ShareModal = ({isSendAll = false, ...props}: Props) => {
@@ -183,7 +184,12 @@ export const ShareModal = ({isSendAll = false, ...props}: Props) => {
         }}
         keyExtractor={item => item._id}
       />
-      <Button>Done</Button>
+      <Button
+        onPress={() => {
+          props.onDone && props.onDone();
+        }}>
+        Done
+      </Button>
     </VStack>
   );
 };
