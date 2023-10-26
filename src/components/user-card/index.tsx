@@ -9,6 +9,7 @@ import HeadPhoneListenIcon from '../icons/headphone-listen-icon';
 import {flagMap} from '../../configs';
 import {IUserProgress} from '../../interfaces/api/User';
 import {capitalizeFirstLetter} from '../../utils/string';
+import {Headphones} from 'react-native-feather';
 
 interface IUserCardProps {
   userProgress: IUserProgress;
@@ -52,7 +53,9 @@ const UserCard = (props: IUserCardProps) => {
         {userProgress?.totalRecord} sentences
       </Text>
       <HStack space={2} width={'100%'} alignItems={'center'}>
-        <HeadPhoneListenIcon />
+        <View rounded="full" p={1} bg={'#d4d4d4'}>
+          <Headphones width={16} height={16} color="white" />
+        </View>
         <Progress
           flex={1}
           _filledTrack={{
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
     color: COLORS.darkColor,
     fontWeight: '500',
     fontSize: 16,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   textRole: {
     color: COLORS.darkColor,
@@ -109,6 +112,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 16,
     marginBottom: 20,
+    lineHeight: 24,
   },
 });
 export default UserCard;

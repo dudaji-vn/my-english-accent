@@ -1,31 +1,42 @@
-import {View} from 'native-base';
+import {Text, View} from 'native-base';
 import React from 'react';
-import {FlatList, StyleSheet} from 'react-native';
+import {FlatList} from 'react-native';
 import GroupCard from '../../../components/group-card';
 import {IGroup} from '../../../interfaces/api/Group';
+import SearchNotFound from '../../../components/search-notfound';
 
-const data = [
-  {id: '1', text: 'Item 1'},
-  {id: '2', text: 'Item 2'},
-  {id: '3', text: 'Item 3'},
-  {id: '4', text: 'Item 4'},
-  {id: '5', text: 'Item 1'},
-  {id: '6', text: 'Item 2'},
-];
-
-const ListGroup = ({groups}: {groups: IGroup[]}) => {
+const ListGroup = ({
+  groups,
+  emptyText,
+}: {
+  groups: IGroup[];
+  emptyText?: string;
+}) => {
   return (
-    <FlatList
-      initialNumToRender={3}
-      maxToRenderPerBatch={2}
-      horizontal={false}
-      data={groups}
-      numColumns={2}
-      renderItem={({item}) => (
-        <View width={'50%'}>{item && <GroupCard group={item} />}</View>
+    <>
+      {groups?.length === 0 && (
+        <>
+          {emptyText ? (
+            <Text pl={3} fontSize="xl">
+              {emptyText}
+            </Text>
+          ) : (
+            <SearchNotFound />
+          )}
+        </>
       )}
-      keyExtractor={item => item._id}
-    />
+      <FlatList
+        initialNumToRender={3}
+        maxToRenderPerBatch={2}
+        horizontal={false}
+        data={groups}
+        numColumns={2}
+        renderItem={({item}) => (
+          <View width={'50%'}>{item && <GroupCard group={item} />}</View>
+        )}
+        keyExtractor={item => item._id}
+      />
+    </>
   );
 };
 
