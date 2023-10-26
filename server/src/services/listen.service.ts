@@ -14,7 +14,9 @@ import { Category, ROLE } from '../const/common'
 
 @injectable()
 export default class ListenService {
-  async getUserProgress(me: string) {
+  async getUserProgress(user: any, isFavoriteUsers: boolean) {
+    console.log(user)
+    const { _id: me, favoriteUsers } = user
     const data = await UserModel.aggregate([
       {
         $lookup: {
@@ -56,7 +58,8 @@ export default class ListenService {
           listens: 1,
           records: 1,
           totalRecord: 1,
-          nativeLanguage: 1
+          nativeLanguage: 1,
+          fullName: 1
         }
       }
     ]).then((data) => {
@@ -67,7 +70,7 @@ export default class ListenService {
         item.record.toString()
       )
 
-      const result = data.map((user) => {
+      let result = data.map((user) => {
         let count = 0
         user.records.forEach((x: any) => {
           if (myRecord.includes(x._id.toString())) {
@@ -79,6 +82,12 @@ export default class ListenService {
           ...user
         }
       })
+      if (isFavoriteUsers) {
+        console.log(favoriteUsers)
+        result = result.filter((item: any) =>
+          favoriteUsers.includes(item._id.toString())
+        )
+      }
       return result.filter(
         (item: any) => item._id.toString() !== me.toString()
       )
@@ -282,7 +291,7 @@ export default class ListenService {
   }
   async getListenDetailInGroup(query: IQueryListen, me: string) {
     let group = await GroupModel.findById(query.groupId)
-      .populate('members')
+      .populate('members creator')
       .lean()
     if (!group) {
       throw new BadRequestError('group not found')
@@ -410,7 +419,6 @@ export default class ListenService {
   }
 
   async getAudioList(query: IQueryAudio) {
-    console.log('audio list pro')
     let currentRecord: any
 
     let nextRecord: any = []
@@ -444,7 +452,7 @@ export default class ListenService {
         user: currentRecord?.user
       }).populate('vocabulary user')
     }
-    console.log(currentRecord)
+
     return {
       currentRecord,
       nextRecord: nextRecord
