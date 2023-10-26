@@ -27,8 +27,10 @@ export default class ListenController {
   }
 
   async getUserProgress(req: IRequest, res: IResponse) {
+    const { isFavoriteUsers } = req.query as any
     const data = await this.listenService.getUserProgress(
-      req.user._id
+      req.user,
+      isFavoriteUsers
     )
     return res.success(data)
   }
