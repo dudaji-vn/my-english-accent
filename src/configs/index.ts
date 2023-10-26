@@ -24,6 +24,7 @@ export const userEndpoint = {
   myKeyword: 'api/user/myKeyword',
   addKeyword: 'api/user/keyword/add',
   deleteKeyword: 'api/user/keyword/delete',
+  addOrRemoveFavoriteUser: 'api/user/addOrRemoveFavoriteUser',
 };
 
 export const vocabularyEndpoint = {

@@ -18,4 +18,5 @@ export const SCREEN_NAMES = {
   listAudioListenScreen: 'listAudioListenScreen',
   mainGroup: 'mainGroup',
   createGroup: 'createGroup',
+  detailGroup: 'detailGroup',
 };
