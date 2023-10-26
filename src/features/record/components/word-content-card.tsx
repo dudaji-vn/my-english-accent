@@ -1,6 +1,6 @@
-import {HStack, Image, Pressable, VStack} from 'native-base';
+import {HStack, Image, VStack} from 'native-base';
 import React from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import Tts from 'react-native-tts';
 import {SpeakerIcon} from '../../../components/icons';
 import {flagMap} from '../../../configs';
@@ -25,6 +25,7 @@ export const WordContentCard = ({vocabulary}: Props) => {
     Tts.addEventListener('tts-start', event => {
       setIsSpeaking(true);
     });
+    Tts.setDefaultVoice('en-us-x-iom-local');
     Tts.speak(vocabulary.text.en);
   };
 
@@ -33,11 +34,11 @@ export const WordContentCard = ({vocabulary}: Props) => {
       <HStack alignItems="center" space={4}>
         <Text style={styles.font}>{vocabulary?.text?.en}</Text>
         {!isSpeaking ? (
-          <Pressable onPress={handleSpeak}>
+          <TouchableOpacity onPress={handleSpeak}>
             <SpeakerIcon />
-          </Pressable>
+          </TouchableOpacity>
         ) : (
-          <Pressable
+          <TouchableOpacity
             onPress={() => {
               Tts.stop();
               setIsSpeaking(false);
@@ -48,7 +49,7 @@ export const WordContentCard = ({vocabulary}: Props) => {
               autoPlay
               loop
             />
-          </Pressable>
+          </TouchableOpacity>
         )}
       </HStack>
       <Text style={styles?.pronunciation}>/{vocabulary?.pronunciation}/</Text>
