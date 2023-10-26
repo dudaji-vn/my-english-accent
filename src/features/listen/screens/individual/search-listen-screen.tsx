@@ -8,7 +8,7 @@ import {WordItem} from '../../../../components/word-item';
 import {COLORS, OPACITY} from '../../../../constants/design-system';
 import SearchResult from '../../components/SearchResult';
 import {useUser} from '../../../../hooks/useUser';
-
+import React from 'react';
 const SearchListenScreen = () => {
   const {keywords, addUserKeyword, deleteUserKeyword} = useUser();
   const [textSearch, setTextSearch] = useState('');
@@ -18,7 +18,13 @@ const SearchListenScreen = () => {
         <HStack justifyContent={'space-between'} alignItems={'center'} mb={5}>
           <Text style={{color: COLORS.highlight}}>Recent Search</Text>
           <Pressable>
-            <Text style={{opacity: OPACITY.normal}}>Clear all</Text>
+            <Text
+              style={{
+                textDecorationLine: 'underline',
+                opacity: OPACITY.normal,
+              }}>
+              Clear all
+            </Text>
           </Pressable>
         </HStack>
 
@@ -59,9 +65,9 @@ const SearchListenScreen = () => {
         autoFocus
         showSoftInputOnFocus={true}
         blurOnSubmit={false}
-        onSubmitEditing={value => {
-          addUserKeyword(textSearch);
-        }}
+        // onSubmitEditing={value => {
+        //   addUserKeyword(textSearch);
+        // }}
         onChangeText={value => {
           setTextSearch(value);
         }}
@@ -69,11 +75,15 @@ const SearchListenScreen = () => {
         marginBottom={5}
         placeholder="Search for Individuals or Groups"
       />
-      {!textSearch ? (
-        renderRecentSearch()
-      ) : (
+      {!textSearch && renderRecentSearch()}
+
+      <View
+        style={{
+          flex: 1,
+          opacity: !!textSearch ? 1 : 0,
+        }}>
         <SearchResult textSearch={textSearch} />
-      )}
+      </View>
     </ScreenWrapper>
   );
 };

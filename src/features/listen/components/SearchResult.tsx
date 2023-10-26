@@ -9,6 +9,7 @@ import SearchNotFound from '../../../components/search-notfound';
 import {useQuery} from '@tanstack/react-query';
 import {listenService} from '../../../services/listen.service';
 import {groupService} from '../../../services/group.service';
+import React from 'react';
 
 const SearchResult = ({textSearch}: {textSearch: string}) => {
   const {data: userProgress, error} = useQuery({
@@ -28,7 +29,7 @@ const SearchResult = ({textSearch}: {textSearch: string}) => {
         item.toUpperCase().includes(textSearch.toUpperCase()),
       ),
     );
-  }, [textSearch]);
+  }, [textSearch, userProgress]);
   const groupFilter = useMemo(() => {
     if (!myGroups) {
       return [];
@@ -38,7 +39,7 @@ const SearchResult = ({textSearch}: {textSearch: string}) => {
         item.toUpperCase().includes(textSearch.toUpperCase()),
       ),
     );
-  }, [textSearch]);
+  }, [myGroups, textSearch]);
   const data = [
     {
       type: 'user',
@@ -59,9 +60,9 @@ const SearchResult = ({textSearch}: {textSearch: string}) => {
             {item.text}
           </Text>
           {item.type === 'user' ? (
-            <ListUser users={usersFilter} />
+            <ListUser emptyText={'There’s no result'} users={usersFilter} />
           ) : (
-            <ListGroup groups={groupFilter} />
+            <ListGroup emptyText={'There’s no result'} groups={groupFilter} />
           )}
         </View>
       )}
@@ -85,14 +86,14 @@ const SearchResult = ({textSearch}: {textSearch: string}) => {
   });
 
   const [index, setIndex] = useState(0);
-  const [routes] = useState([
+  const routes = [
     {
       key: 'allScreen',
       title: `All (${usersFilter.length + groupFilter.length})`,
     },
     {key: 'individualScreen', title: `Individual (${usersFilter.length})`},
     {key: 'groupScreen', title: `Group (${groupFilter.length})`},
-  ]);
+  ];
   return (
     <TabView
       swipeEnabled={false}

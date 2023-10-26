@@ -8,7 +8,7 @@ const HeadPhoneListenIcon = (props: SvgProps) => (
     height={24}
     fill="none"
     {...props}>
-    <G opacity={0.4}>
+    <G opacity={0.2}>
       <Rect width={24} height={24} fill="#333" rx={12} />
       <Path
         fill="#ffff"
