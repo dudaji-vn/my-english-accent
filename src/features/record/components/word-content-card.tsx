@@ -1,6 +1,6 @@
 import {HStack, Image, VStack} from 'native-base';
 import React from 'react';
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text} from 'react-native';
 import Tts from 'react-native-tts';
 import {SpeakerIcon} from '../../../components/icons';
 import {flagMap} from '../../../configs';
@@ -8,6 +8,7 @@ import {COLORS} from '../../../constants/design-system';
 import {useRootSelector} from '../../../redux/reducers';
 import {Vocabulary} from '../../../types/vocabulary';
 import LottieView from 'lottie-react-native';
+import {PressableIcon} from '../../../components/pressable-icon';
 
 type Props = {
   vocabulary: Vocabulary;
@@ -34,11 +35,13 @@ export const WordContentCard = ({vocabulary}: Props) => {
       <HStack alignItems="center" space={4}>
         <Text style={styles.font}>{vocabulary?.text?.en}</Text>
         {!isSpeaking ? (
-          <TouchableOpacity onPress={handleSpeak}>
+          <PressableIcon py={0} mr={-4} onPress={handleSpeak}>
             <SpeakerIcon />
-          </TouchableOpacity>
+          </PressableIcon>
         ) : (
-          <TouchableOpacity
+          <PressableIcon
+            py={0}
+            mr={-4}
             onPress={() => {
               Tts.stop();
               setIsSpeaking(false);
@@ -49,7 +52,7 @@ export const WordContentCard = ({vocabulary}: Props) => {
               autoPlay
               loop
             />
-          </TouchableOpacity>
+          </PressableIcon>
         )}
       </HStack>
       <Text style={styles?.pronunciation}>/{vocabulary?.pronunciation}/</Text>
