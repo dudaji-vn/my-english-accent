@@ -39,6 +39,7 @@ import Swiper from 'react-native-swiper';
 import SwiperDeck from 'react-native-deck-swiper';
 import {Text600} from '../../../components/text-600';
 import {CompleteRecordScreen} from './complete-record-screen';
+import {PressableIcon} from '../../../components/pressable-icon';
 
 const PAGE_SIZE = 0;
 
@@ -356,6 +357,9 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                 showsPagination={false}
                 loop={false}>
                 <Pressable
+                  _pressed={{
+                    opacity: 1,
+                  }}
                   pb={5}
                   px={5}
                   width={screenWith}
@@ -382,6 +386,9 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                   </RecordCard>
                 </Pressable>
                 <Pressable
+                  _pressed={{
+                    opacity: 1,
+                  }}
                   px={5}
                   pb={5}
                   width={screenWith}
@@ -403,6 +410,9 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                   </RecordCard>
                 </Pressable>
                 <Pressable
+                  _pressed={{
+                    opacity: 1,
+                  }}
                   style={{
                     width: screenWith,
                     height: screenHeight - footerHeight - headerHeight,
@@ -416,7 +426,11 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
                       width: screenWith,
                       height: screenHeight - footerHeight - headerHeight,
                     }}>
-                    <Pressable pb={5}>
+                    <Pressable
+                      _pressed={{
+                        opacity: 1,
+                      }}
+                      pb={5}>
                       <VStack mb={4} px={5} py={2} space={5}>
                         <RecordCard
                           initialRecordUri={
@@ -535,20 +549,20 @@ const Header = ({
 
   return (
     <>
-      <HStack h={14} alignItems="center" justifyContent="space-between">
-        <Pressable p={5} onPress={goBack}>
+      <HStack alignItems="center" justifyContent="space-between">
+        <PressableIcon onPress={goBack}>
           <X width={24} height={24} color={COLORS.text} />
-        </Pressable>
-        <HStack space={8}>
-          <Pressable px={3} disabled={disabledBackward} onPress={backward}>
+        </PressableIcon>
+        <HStack space={8} justifyContent="center">
+          <PressableIcon disabled={disabledBackward} onPress={backward}>
             <ChevronLeft
               opacity={disabledBackward ? 0.3 : 0.6}
               width={24}
               height={24}
               color={COLORS.text}
             />
-          </Pressable>
-          <HStack>
+          </PressableIcon>
+          <HStack alignItems="center" justifyContent="center">
             <Text fontWeight="medium" opacity={0.6} color={COLORS.text}>
               {currentIdx + 1}
             </Text>
@@ -556,17 +570,23 @@ const Header = ({
               /{total}
             </Text>
           </HStack>
-          <Pressable px={3} disabled={disabledForward} onPress={forward}>
+
+          <PressableIcon disabled={disabledForward} onPress={forward}>
             <ChevronRight
               opacity={disabledForward ? 0.3 : 0.6}
               width={24}
               height={24}
               color={COLORS.text}
             />
-          </Pressable>
+          </PressableIcon>
         </HStack>
 
-        <HStack space={1} mr={5} alignItems="center">
+        <HStack
+          justifyContent="center"
+          alignItems="center"
+          h="full"
+          space={1}
+          mr={5}>
           <TextDf style={styles.text}>{completed}</TextDf>
           <Text>
             <MicCheckIcon />

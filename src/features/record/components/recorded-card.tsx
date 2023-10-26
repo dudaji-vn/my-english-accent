@@ -1,11 +1,12 @@
+import LottieView from 'lottie-react-native';
 import {HStack, Pressable, View} from 'native-base';
 import React from 'react';
 import {Animated, StyleSheet} from 'react-native';
 import {Volume2} from 'react-native-feather';
-import {MicFilledIcon, TrashIcon} from '../../../components/icons';
+import {SmallMicFilledIcon, TrashIcon} from '../../../components/icons';
+import {PressableIcon} from '../../../components/pressable-icon';
 import {COLORS} from '../../../constants/design-system';
 import {useAudioRecord} from '../../../hooks/use-audio-record';
-import LottieView from 'lottie-react-native';
 
 type Props = {
   children?: React.ReactNode;
@@ -54,9 +55,9 @@ export const RecordedCard = ({
           alignSelf="center"
           justifyContent={recordUri ? 'space-between' : 'center'}
           alignItems="center">
-          <Pressable p={4} onPress={onReRecord}>
-            <MicFilledIcon color={COLORS.text} opacity={0.6} />
-          </Pressable>
+          <PressableIcon onPress={onReRecord}>
+            <SmallMicFilledIcon opacity={0.6} />
+          </PressableIcon>
           {recordUri && (
             <Pressable
               onPressIn={() => setIsPressing(true)}
@@ -91,13 +92,13 @@ export const RecordedCard = ({
           )}
 
           {recordUri && (
-            <Pressable
+            <PressableIcon
               onPressIn={() => setIsDeleting(true)}
               onPressOut={() => setIsDeleting(false)}
               p={4}
               onPress={onDelete}>
               <TrashIcon color={isDeleting ? COLORS.error : COLORS.text} />
-            </Pressable>
+            </PressableIcon>
           )}
         </HStack>
       </View>

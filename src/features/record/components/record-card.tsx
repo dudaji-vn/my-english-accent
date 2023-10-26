@@ -13,6 +13,7 @@ import {useAudioRecord} from '../../../hooks/use-audio-record';
 import {useModal} from '../../../hooks/use-modal';
 import {Modal} from '../../../components/modal';
 import {ModalCard} from '../../../components/modal-card';
+import {PressableIcon} from '../../../components/pressable-icon';
 
 type Props = {
   children?: React.ReactNode;
@@ -130,13 +131,12 @@ export const RecordCard = ({
           alignSelf="center"
           justifyContent="space-between"
           alignItems="center">
-          <Pressable
+          <PressableIcon
             disabled={!cacheFilePath || isRecording}
             opacity={!cacheFilePath || isRecording ? 0 : 1}
-            p={4}
             onPress={handlePressPlayOrPause}>
             {isPlaying ? <PauseIcon /> : <PlayIcon />}
-          </Pressable>
+          </PressableIcon>
           <Pressable
             onPressIn={() => setIsPressing(true)}
             onPressOut={() => setIsPressing(false)}
@@ -163,13 +163,12 @@ export const RecordCard = ({
             </Animated.View>
           </Pressable>
 
-          <Pressable
+          <PressableIcon
             disabled={!cacheFilePath || isRecording}
             opacity={!cacheFilePath || isRecording ? 0 : 1}
-            p={4}
             onPress={handlePressDelete}>
             <TrashIcon color={isDeleting ? COLORS.error : COLORS.text} />
-          </Pressable>
+          </PressableIcon>
         </HStack>
       </View>
       <Modal isOpen={isShowing} onClose={close}>

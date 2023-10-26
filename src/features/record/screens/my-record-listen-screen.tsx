@@ -23,6 +23,7 @@ import {SentenceContentCard} from '../components/sentence-content-card';
 import {WordContentCard} from '../components/word-content-card';
 import {useUpdateRecord} from '../hooks/use-update-record';
 import {useQueryClient} from '@tanstack/react-query';
+import {PressableIcon} from '../../../components/pressable-icon';
 
 type Props = {
   navigation: NavigationProp<any>;
@@ -132,13 +133,12 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
   return (
     <View bg="white" h="full">
       <HStack h={14} alignItems="center" justifyContent="space-between">
-        <Pressable
-          p={5}
+        <PressableIcon
           onPress={() => {
             navigation.goBack();
           }}>
           <X width={24} height={24} color={COLORS.text} />
-        </Pressable>
+        </PressableIcon>
       </HStack>
 
       <VStack px={5} py={2} space={5}>
