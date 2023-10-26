@@ -1,3 +1,4 @@
+import exp from 'constants'
 import { Language, Role } from '../../entities/User'
 
 export interface IUserLoginDTO {
@@ -20,4 +21,11 @@ export interface IUserUpdateDTO {
   role?: Role
   nativeLanguage?: Language
   autoDownload?: boolean
+}
+
+export interface IAddOrRemoveFavoriteUser {
+  me: string
+  userId: string
+  //type: add |remove
+  type: string
 }
