@@ -1,8 +1,7 @@
-import React from 'react';
 import {Image, Text, View} from 'native-base';
-import {COLORS} from '../../constants/design-system';
-import {ViewProps} from 'react-native';
 import {InterfaceViewProps} from 'native-base/lib/typescript/components/basic/View/types';
+import React from 'react';
+import {COLORS} from '../../constants/design-system';
 
 const emptyDataImg = require('../../assets/images/empty.png');
 type Props = {
