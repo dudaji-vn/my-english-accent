@@ -21,3 +21,4 @@ export * from './send-filled-icon';
 export * from './gamepad-filled-icon';
 export * from './headphone-filled-icon';
 export * from './cog-filled-icon';
+export * from './small-mic-filled-icon';

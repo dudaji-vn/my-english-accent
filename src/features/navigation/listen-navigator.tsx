@@ -7,6 +7,7 @@ import IndividualTab from '../listen/screens/individual/individual-tab';
 import ListAudioListenScreen from '../listen/screens/individual/list-audio-screen';
 import SearchListenScreen from '../listen/screens/individual/search-listen-screen';
 import ListenScreen from '../listen/screens/listen-screen';
+import DetailGroupScreen from '../listen/screens/group/detail-group-screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,14 +21,18 @@ export const ListenNavigator = () => {
       />
       <Stack.Screen name={SCREEN_NAMES.individual} component={IndividualTab} />
       <Stack.Screen
-        name={SCREEN_NAMES.listenDetailScreen}
-        component={ListenDetailScreen}
+        name={SCREEN_NAMES.listenDetailScreen as any}
+        component={ListenDetailScreen as any}
       />
       <Stack.Screen
         name={SCREEN_NAMES.listAudioListenScreen}
         component={ListAudioListenScreen}
       />
       <Stack.Screen name={SCREEN_NAMES.mainGroup} component={MainGroupScreen} />
+      <Stack.Screen
+        name={SCREEN_NAMES.detailGroup}
+        component={DetailGroupScreen}
+      />
       <Stack.Screen
         name={SCREEN_NAMES.createGroup}
         component={CreateGroupScreen}

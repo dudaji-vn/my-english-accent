@@ -61,7 +61,7 @@ const GroupCard = ({group}: {group: IGroup}) => {
 
       <Text style={styles.textName}>{group?.name}</Text>
       <Text style={styles.textRole}>{group?.members.length} members</Text>
-      <Text style={styles.textSentences}>0 sentences</Text>
+      <Text style={styles.textSentences}>0 words</Text>
     </Pressable>
   );
 };

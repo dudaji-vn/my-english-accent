@@ -5,7 +5,7 @@ import HomeIcon from '../../../../components/icons/home-icon';
 import {COLORS} from '../../../../constants/design-system';
 import {SCREEN_NAMES} from '../../../../constants/screen';
 
-const FavoriteNotFound = () => {
+const NotFoundFavorite = () => {
   const navigation = useNavigation<any>();
   const handleClick = () => {
     navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
@@ -32,4 +32,4 @@ const FavoriteNotFound = () => {
   );
 };
 
-export default memo(FavoriteNotFound);
+export default memo(NotFoundFavorite);

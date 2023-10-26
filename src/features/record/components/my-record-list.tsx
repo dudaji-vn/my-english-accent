@@ -1,4 +1,8 @@
-import {NavigationProp, RouteProp} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useIsFocused,
+} from '@react-navigation/native';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {FlatList, HStack, Spinner, Text, VStack, View} from 'native-base';
 import React from 'react';
@@ -20,6 +24,8 @@ import {IPaginationResponse} from '../../../interfaces/api/Http';
 import {ModalCardDelete} from '../../../components/modal-card';
 import {Modal} from '../../../components/modal';
 import {ShareModal} from '../../../components/share-modal';
+import {removeCompletedId} from '../../../redux/reducers/record.reducer';
+import {useDispatch} from 'react-redux';
 const designerImg = require('../../../assets/images/Designer.png');
 
 const generalImg = require('../../../assets/images/Chat.png');
@@ -74,10 +80,12 @@ const topics: Topic[] = [
 ];
 
 const MyRecordList = ({navigation}: Props) => {
+  const isFocused = useIsFocused();
   const queryClient = useQueryClient();
   const [currentSelectedItemId, setCurrentSelectedItemId] =
     React.useState<Record | null>(null);
   const role = useRootSelector(state => state.user.profile?.role);
+  const dispatch = useDispatch();
   const completedIds =
     useRootSelector(state => state.record)?.completedIds || [];
   const [searchQuery, setSearchQuery] = React.useState<string>('');
@@ -86,10 +94,11 @@ const MyRecordList = ({navigation}: Props) => {
     pageSize: 0,
     q: searchQuery,
   });
-  const {data, refetch, queryKey, isLoading, isRefetching} = useGetMyRecords({
-    ...filter,
-    q: searchQuery,
-  });
+  const {data, refetch, queryKey, isLoading, isRefetching, isFetching} =
+    useGetMyRecords({
+      ...filter,
+      q: searchQuery,
+    });
 
   const vocabularies = data?.items || [];
   const {data: progress, refetch: refetchProgress} = useQuery({
@@ -98,6 +107,7 @@ const MyRecordList = ({navigation}: Props) => {
   });
 
   const handlePressItem = (record: Record) => {
+    dispatch(removeCompletedId(record._id));
     navigation.navigate(SCREEN_NAMES.recordNavigator, {
       screen: SCREEN_NAMES.myRecordListen,
       params: {
@@ -197,56 +207,61 @@ const MyRecordList = ({navigation}: Props) => {
         <SendAllButton />
       </HStack>
 
-      {isLoading ? (
-        <Spinner mt={12} size="lg" color={COLORS.highlight} />
-      ) : (
+      {isFocused && (
         <>
-          {vocabularies.length > 0 ? (
-            <FlatList
-              removeClippedSubviews={true}
-              initialNumToRender={5}
-              maxToRenderPerBatch={5}
-              // refreshControl={
-              //   <RefreshControl
-              //     refreshing={isRefetching}
-              //     onRefresh={() => {
-              //       refetch();
-              //       refetchProgress();
-              //     }}
-              //     colors={[COLORS.highlight]}
-              //   />
-              // }
-              mt={5}
-              ItemSeparatorComponent={renderSeparator}
-              data={vocabularies}
-              renderItem={({item, index}) => {
-                return (
-                  <>
-                    <RecordItem
-                      onDelete={() => {
-                        setCurrentSelectedItemId(item);
-                        openDelete();
-                      }}
-                      onSend={() => {
-                        setCurrentSelectedItemId(item);
-                        open();
-                      }}
-                      onPress={handlePressItem}
-                      item={item}
-                      isNew={completedIds.includes(item._id)}
-                    />
-                    {index === vocabularies.length - 1 && <View h={31} />}
-                  </>
-                );
-              }}
-              keyExtractor={item => item._id}
-            />
+          {isLoading ? (
+            <Spinner mt={12} size="lg" color={COLORS.highlight} />
           ) : (
             <>
-              <EmptyData>
-                <Text>Record your words to see them here</Text>
-              </EmptyData>
-              <View h={31} />
+              {vocabularies.length > 0 ? (
+                <FlatList
+                  removeClippedSubviews={true}
+                  initialNumToRender={5}
+                  maxToRenderPerBatch={5}
+                  refreshing={isRefetching}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={isRefetching}
+                      onRefresh={() => {
+                        refetch();
+                        refetchProgress();
+                      }}
+                      colors={[COLORS.highlight]}
+                    />
+                  }
+                  mt={5}
+                  ItemSeparatorComponent={renderSeparator}
+                  data={vocabularies}
+                  renderItem={({item, index}) => {
+                    return (
+                      <>
+                        <RecordItem
+                          onDelete={() => {
+                            setCurrentSelectedItemId(item);
+                            openDelete();
+                          }}
+                          onSend={() => {
+                            setCurrentSelectedItemId(item);
+                            open();
+                          }}
+                          onPress={handlePressItem}
+                          item={item}
+                          isNew={completedIds.includes(item._id)}
+                        />
+                        {index === vocabularies.length - 1 && <View h={31} />}
+                      </>
+                    );
+                  }}
+                  keyExtractor={item => item._id}
+                />
+              ) : (
+                <>
+                  <EmptyData>
+                    <Text>Record your words to see them here</Text>
+                  </EmptyData>
+                  <View h={31} />
+                </>
+              )}
             </>
           )}
         </>
@@ -263,7 +278,7 @@ const MyRecordList = ({navigation}: Props) => {
         />
       </Modal>
       <Modal onClose={close} isOpen={isShowing}>
-        <ShareModal recordId={currentSelectedItemId?._id!} />
+        <ShareModal onDone={close} recordId={currentSelectedItemId?._id!} />
       </Modal>
     </VStack>
   );

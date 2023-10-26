@@ -1,4 +1,4 @@
-import {HStack, Image, Pressable, VStack} from 'native-base';
+import {HStack, Image, VStack} from 'native-base';
 import React from 'react';
 import {StyleSheet, Text} from 'react-native';
 import Tts from 'react-native-tts';
@@ -8,6 +8,7 @@ import {COLORS} from '../../../constants/design-system';
 import {useRootSelector} from '../../../redux/reducers';
 import {Vocabulary} from '../../../types/vocabulary';
 import LottieView from 'lottie-react-native';
+import {PressableIcon} from '../../../components/pressable-icon';
 
 type Props = {
   vocabulary: Vocabulary;
@@ -25,6 +26,7 @@ export const WordContentCard = ({vocabulary}: Props) => {
     Tts.addEventListener('tts-start', event => {
       setIsSpeaking(true);
     });
+    Tts.setDefaultVoice('en-us-x-iom-local');
     Tts.speak(vocabulary.text.en);
   };
 
@@ -33,11 +35,13 @@ export const WordContentCard = ({vocabulary}: Props) => {
       <HStack alignItems="center" space={4}>
         <Text style={styles.font}>{vocabulary?.text?.en}</Text>
         {!isSpeaking ? (
-          <Pressable onPress={handleSpeak}>
+          <PressableIcon py={0} mr={-4} onPress={handleSpeak}>
             <SpeakerIcon />
-          </Pressable>
+          </PressableIcon>
         ) : (
-          <Pressable
+          <PressableIcon
+            py={0}
+            mr={-4}
             onPress={() => {
               Tts.stop();
               setIsSpeaking(false);
@@ -48,7 +52,7 @@ export const WordContentCard = ({vocabulary}: Props) => {
               autoPlay
               loop
             />
-          </Pressable>
+          </PressableIcon>
         )}
       </HStack>
       <Text style={styles?.pronunciation}>/{vocabulary?.pronunciation}/</Text>

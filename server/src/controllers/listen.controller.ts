@@ -55,14 +55,30 @@ export default class ListenController {
   async getAudioList(req: IRequest, res: IResponse) {
     const me = req.user._id
     const { recordId } = req.params
-    const { groupId } = req.query as unknown as IQueryListen
+    const { groupId, userId } = req.query as unknown as IQueryListen
 
     const query: IQueryAudio = {
       recordId: recordId,
-      userId: me,
-      groupId: groupId
+      userId: userId,
+      groupId: groupId,
+      me: me
     }
     const data = await this.listenService.getAudioList(query)
+    return res.success(data)
+  }
+  async getUserAudioInGroup(req: IRequest, res: IResponse) {
+    const me = req.user._id
+    const { recordId } = req.params
+    const { groupId, userId, vocabularyId } =
+      req.query as unknown as IQueryAudio
+    const query: IQueryAudio = {
+      recordId: recordId,
+      userId: userId,
+      groupId: groupId,
+      me: me,
+      vocabularyId: vocabularyId
+    }
+    const data = await this.listenService.getUserAudioInGroup(query)
     return res.success(data)
   }
 }

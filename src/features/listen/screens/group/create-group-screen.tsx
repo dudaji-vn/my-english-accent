@@ -33,8 +33,8 @@ const CreateGroupScreen = () => {
   const queryClient = useQueryClient();
   const [allowGoBack, setAllowGoBack] = useState(false);
   const {data: users} = useQuery({
-    queryKey: ['listen-user-progress'],
-    queryFn: listenService.getUserProgress,
+    queryKey: ['users'],
+    queryFn: () => listenService.getUserProgress(),
   });
   const {mutate} = useMutation({
     mutationFn: groupService.createGroup,
@@ -73,6 +73,7 @@ const CreateGroupScreen = () => {
         nativeLanguage: user.nativeLanguage,
         role: user.role,
         isInvite: false,
+        fullName: user.fullName,
       };
     });
     setUsersInvite(userInvites);

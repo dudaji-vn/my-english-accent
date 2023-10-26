@@ -32,7 +32,7 @@ export const SendAllButton = ({onPress}: {onPress?: () => void}) => {
         </Text>
       </HStack>
       <Modal onClose={close} isOpen={isShowing}>
-        <ShareModal isSendAll recordId={''} />
+        <ShareModal onDone={close} isSendAll recordId={''} />
       </Modal>
     </Pressable>
   );

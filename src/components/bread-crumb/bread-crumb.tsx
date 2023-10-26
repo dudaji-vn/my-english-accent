@@ -15,7 +15,8 @@ const BreadCrumb = (props: IBreadCrumbProps) => {
   return (
     <HStack space={2} alignItems={'center'}>
       <Pressable
-        py={4}
+        p={5}
+        m={-5}
         onPress={() => {
           navigation.goBack();
         }}>

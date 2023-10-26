@@ -26,7 +26,6 @@ const AudioItem = (props: IAudioItemProps) => {
   const {mutate} = useMutation({
     mutationFn: listenService.listenRecord,
     onSuccess: data => {
-      console.log('call api success');
       queryClient.invalidateQueries({queryKey: ['listen-user-progress']});
     },
     onError: (error, variables) => {
@@ -40,17 +39,16 @@ const AudioItem = (props: IAudioItemProps) => {
   }, [isListened]);
   useEffect(() => {
     if (!isPlayAll) {
+      stopPlayer();
       return;
     }
 
     const playAudio = async () => {
-      console.log('useEffect');
       if (!record) {
         return;
       }
       if (record.recordUrl.word) {
         try {
-          console.log('word');
           setIsPlayingWord(true);
           await player.startPlayer(record.recordUrl.word);
 
@@ -100,7 +98,6 @@ const AudioItem = (props: IAudioItemProps) => {
     }
 
     return () => {
-      console.log('clean up');
       player.stopPlayer();
       player.removePlayBackListener();
     };
@@ -112,19 +109,16 @@ const AudioItem = (props: IAudioItemProps) => {
   const [isPlayingWord, setIsPlayingWord] = useState<boolean>(false);
   const [isPlayingSentence, setIsPlayingSentence] = useState<boolean>(false);
   const togglePlayback = async (recordType: RecordType) => {
-    console.log('toggle playback call');
     if (isPlayingWord || isPlayingSentence) {
-      console.log('is playing');
       await stopPlayer();
     } else {
       if (recordType === 'word') {
-        console.log('word');
         setIsPlayingWord(!isPlayingWord);
-        console.log(record.recordUrl.word);
+
         await player.startPlayer(record.recordUrl.word);
       } else {
         setIsPlayingSentence(!isPlayingSentence);
-        console.log('sentence');
+
         console.log(record.recordUrl.sentence);
         await player.startPlayer(record.recordUrl.sentence);
       }

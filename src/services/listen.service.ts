@@ -7,6 +7,7 @@ import {
   IParamListenDetail,
 } from '../interfaces/api/Listen';
 import {IUserProgress} from '../interfaces/api/User';
+import {User} from '../types/user';
 import httpService from './http.service';
 
 class ListenService {
@@ -19,9 +20,12 @@ class ListenService {
     );
     return res.data.data;
   }
-  async getUserProgress(): Promise<IUserProgress[]> {
+  async getUserProgress(isFavoriteUsers?: boolean): Promise<IUserProgress[]> {
     const res = await httpService.get<IApiResponse<IUserProgress[]>>(
       listenEndpoint.getUserProgress,
+      {
+        params: {isFavoriteUsers: isFavoriteUsers},
+      },
     );
 
     return res.data.data;
@@ -49,6 +53,21 @@ class ListenService {
         params: {
           groupId: paramAudio.groupId,
           userId: paramAudio.userId,
+        },
+      },
+    );
+
+    return res.data.data;
+  }
+  
+  async getUserAudioInGroup(paramAudio: IParamAudio) {
+    const res = await httpService.get<IApiResponse<User[]>>(
+      `${listenEndpoint.getUserAudioInGroup}/${paramAudio.recordId}`,
+      {
+        params: {
+          groupId: paramAudio.groupId,
+          userId: paramAudio.userId,
+          vocabularyId: paramAudio.vocabularyId,
         },
       },
     );

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { injectable } from 'tsyringe'
 import RecordModel from '../entities/Record'
 import UserModel from '../entities/User'
@@ -11,11 +12,11 @@ import {
 import GroupRecordModel from '../entities/GroupRecord'
 import GroupModel from '../entities/Group'
 import { Category, ROLE } from '../const/common'
+import { group } from 'console'
 
 @injectable()
 export default class ListenService {
   async getUserProgress(user: any, isFavoriteUsers: boolean) {
-    console.log(user)
     const { _id: me, favoriteUsers } = user
     const data = await UserModel.aggregate([
       {
@@ -83,7 +84,6 @@ export default class ListenService {
         }
       })
       if (isFavoriteUsers) {
-        console.log(favoriteUsers)
         result = result.filter((item: any) =>
           favoriteUsers.includes(item._id.toString())
         )
@@ -418,20 +418,51 @@ export default class ListenService {
     }
   }
 
+  async getUserAudioInGroup(query: IQueryAudio) {
+    const records = await GroupRecordModel.find({
+      group: query.groupId
+    }).populate({
+      path: 'record',
+      populate: 'vocabulary user'
+    })
+    console.log({ records, vocaId: query.vocabularyId })
+    return records
+      .filter(
+        (item) =>
+          item.record.vocabulary._id.toString() == query.vocabularyId
+      )
+      .map((item) => item?.record?.user)
+  }
   async getAudioList(query: IQueryAudio) {
     let currentRecord: any
 
     let nextRecord: any = []
     if (query.groupId) {
-      currentRecord = await RecordModel.findById(
-        query.recordId
-      ).populate('vocabulary user')
+      currentRecord = await GroupRecordModel.findOne({
+        record: query.recordId,
+        group: query.groupId
+      })
+        .populate({
+          path: 'record',
+          populate: 'vocabulary user'
+        })
+        .select('record')
+
       if (query.userId) {
         currentRecord = await RecordModel.findOne({
           user: query.userId,
-          vocabulary: currentRecord.vocabulary
-        }).populate('vocabulary user')
+          vocabulary: currentRecord.record.vocabulary
+        })
+        currentRecord = await GroupRecordModel.findOne({
+          record: currentRecord._id
+        })
+          .populate({
+            path: 'record',
+            populate: 'vocabulary user'
+          })
+          .select('record')
       }
+      currentRecord = currentRecord?.record
 
       const nextRecordData = await GroupRecordModel.find({
         record: { $ne: query.recordId },

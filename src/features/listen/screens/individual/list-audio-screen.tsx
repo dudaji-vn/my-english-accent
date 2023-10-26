@@ -28,6 +28,7 @@ import {useRootSelector} from '../../../../redux/reducers';
 import HeaderSwiper from '../../components/HeaderSwiper';
 import {IUser} from '../../../../interfaces/api/User';
 import {IParamAudio} from '../../../../interfaces/api/Listen';
+import {panGestureHandlerCustomNativeProps} from 'react-native-gesture-handler/lib/typescript/handlers/PanGestureHandler';
 
 const ListAudioListenScreen = (props: Props) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -39,10 +40,11 @@ const ListAudioListenScreen = (props: Props) => {
   const navigation = useNavigation();
 
   const {route} = props;
-  const {typeScreen, recordId, groupId, group} = route.params!;
+  const {typeScreen, recordId, groupId, group, vocabularyId} = route.params!;
   const [params, setParams] = useState<IParamAudio>({
     recordId: recordId,
     groupId: groupId,
+    vocabularyId: vocabularyId,
   });
 
   if (!recordId) {
@@ -53,15 +55,27 @@ const ListAudioListenScreen = (props: Props) => {
   const {data: audioList, isSuccess} = useQuery(keyCaches, () =>
     listenService.getAudioList(params),
   );
+
+  const {data: members} = useQuery(
+    ['getUserAudioInGroup', params.vocabularyId],
+    () => listenService.getUserAudioInGroup(params),
+    {
+      enabled: !!params.groupId,
+    },
+  );
   const dataRecord = useMemo(() => {
     let mergeArray = [];
     if (!audioList) {
       return;
     }
     const {currentRecord, nextRecord} = audioList!;
+    if (!currentRecord) {
+      return [];
+    }
     if (currentRecord) {
       mergeArray.push(currentRecord);
     }
+
     if (nextRecord && nextRecord.length > 0) {
       mergeArray = [...mergeArray, ...nextRecord];
     }
@@ -69,10 +83,11 @@ const ListAudioListenScreen = (props: Props) => {
   }, [audioList]);
 
   const groupMember = useMemo(() => {
-    if (!group || !group.members) {
+    console.log({members});
+    if (!members) {
       return [];
     }
-    return group.members.map((item: any) => ({
+    return members.map(item => ({
       label: item.displayName,
       value: item._id,
       icon: (
@@ -85,7 +100,7 @@ const ListAudioListenScreen = (props: Props) => {
         />
       ),
     }));
-  }, [group]);
+  }, [members]);
 
   const handleNext = () => {
     swiperRef.current?.swipeLeft();
@@ -100,15 +115,23 @@ const ListAudioListenScreen = (props: Props) => {
     swiperRef.current?.swipeRight();
   };
   useEffect(() => {
-    if (currentIdx < 0 || !dataRecord) {
+    if (currentIdx < 0 || !dataRecord || dataRecord.length == 0) {
       return;
     }
+    setParams(prev => {
+      return {
+        ...prev,
+        vocabularyId: dataRecord[currentIdx].vocabulary._id,
+      };
+    });
     setSelectUser(prev => dataRecord[currentIdx].user);
   }, [currentIdx, dataRecord?.length]);
   return (
     <ScreenWrapper>
       <HStack justifyContent={'space-between'} mb={6}>
         <Pressable
+          p={8}
+          m={-8}
           onPress={() => {
             navigation.goBack();
           }}>
@@ -125,6 +148,8 @@ const ListAudioListenScreen = (props: Props) => {
         )}
 
         <Pressable
+          p={5}
+          m={-5}
           onPress={() => {
             dispatch(togglePlayAll());
           }}>
@@ -148,7 +173,7 @@ const ListAudioListenScreen = (props: Props) => {
               </HStack>
             }
             onSelected={data => {
-              if (!group.members) {
+              if (!members) {
                 return;
               }
               setParams(prev => {
@@ -161,7 +186,6 @@ const ListAudioListenScreen = (props: Props) => {
                 (item: any) => item._id === data.value,
               );
 
-              console.log({user, data, groupMember});
               setSelectUser(user);
             }}
             filterItems={groupMember}
@@ -172,14 +196,20 @@ const ListAudioListenScreen = (props: Props) => {
         {dataRecord && dataRecord.length > 0 && (
           <SwiperDeck
             onSwipedLeft={cardIndex => {
+              if (cardIndex <= 1) {
+                return;
+              }
               setCurrentIdx(prev => ++prev);
             }}
             onSwipedRight={cardIndex => {
+              if (cardIndex === dataRecord.length - 1) {
+                return;
+              }
               setCurrentIdx(prev => --prev);
             }}
             ref={swiperRef}
             verticalSwipe={false}
-            infinite={true}
+            infinite={false}
             swipeAnimationDuration={450}
             containerStyle={{
               backgroundColor: 'transparent',
