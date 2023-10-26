@@ -12,6 +12,8 @@ export class HttpService {
       headers: {
         'Content-Type': 'application/json',
       },
+      timeout: 10000,
+      timeoutErrorMessage: 'Request timed out',
     });
 
     this.instance.interceptors.request.use(
@@ -30,6 +32,7 @@ export class HttpService {
         return config;
       },
       error => {
+        console.error('Error from request interceptor:', error);
         return Promise.reject(error);
       },
     );

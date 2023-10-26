@@ -133,6 +133,19 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
       });
       dispatch(addCompletedId(recorded._id));
     },
+    onError: error => {
+      console.log(error);
+      toast.show({
+        render(props) {
+          return (
+            <Toast {...props} status="error">
+              Something went wrong!
+            </Toast>
+          );
+        },
+        placement: 'bottom',
+      });
+    },
   });
   const handleSaveRecord = async () => {
     setIsSaving(true);
@@ -141,7 +154,6 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
       // Handle the case where currentVocabulary is not available.
       return null;
     }
-
     const promises = [];
 
     if (recordedWord?.uri) {
@@ -185,14 +197,18 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
       setIsSaving(false);
     }, 50);
 
-    const [wordRecordUri, sentenceRecordUri] = await Promise.all(promises);
-    mutate({
-      vocabularyId: currentVocabulary._id,
-      recordUrl: {
-        word: wordRecordUri,
-        sentence: sentenceRecordUri,
-      },
-    });
+    try {
+      const [wordRecordUri, sentenceRecordUri] = await Promise.all(promises);
+      mutate({
+        vocabularyId: currentVocabulary._id,
+        recordUrl: {
+          word: wordRecordUri,
+          sentence: sentenceRecordUri,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
   React.useEffect(() => {
     request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {
@@ -488,7 +504,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         space={1}>
         {vocabularies.length > 0 && vocabularies.length - 1 !== currentIdx && (
           <Button
-            disabled={currentIdx === vocabularies.length - 1}
+            disabled={currentIdx === vocabularies.length - 1 || isSaving}
             onPress={forward}
             variant="ghost">
             Skip
