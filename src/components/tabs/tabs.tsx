@@ -1,6 +1,6 @@
-import {Box, Pressable} from 'native-base';
+import {Box} from 'native-base';
 import React from 'react';
-import {Animated, Dimensions, StyleSheet} from 'react-native';
+import {Animated, Dimensions, StyleSheet, TouchableOpacity} from 'react-native';
 import {
   NavigationState,
   SceneMap,
@@ -42,15 +42,12 @@ export const Tabs = ({tabs}: Props) => {
           const color = index === i ? COLORS.text : COLORS.stroke;
           const borderColor = index === i ? COLORS.highlight : COLORS.stroke;
           return (
-            <Pressable
+            <TouchableOpacity
               key={i}
               onPress={() => {
                 setIndex(i);
               }}
-              borderBottomWidth="3"
-              borderColor={borderColor}
-              flex={1}
-              alignItems="center">
+              style={[styles.tabButton, {borderColor}]}>
               <Box p={3}>
                 <Animated.Text
                   style={[
@@ -62,7 +59,7 @@ export const Tabs = ({tabs}: Props) => {
                   {route.title}
                 </Animated.Text>
               </Box>
-            </Pressable>
+            </TouchableOpacity>
           );
         })}
       </Box>
@@ -88,5 +85,10 @@ const styles = StyleSheet.create({
   tabText: {
     fontWeight: '600',
     fontSize: 16,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    borderBottomWidth: 3,
   },
 });

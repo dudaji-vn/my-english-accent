@@ -31,7 +31,7 @@ export const NavbarButton = ({children, isFocused, onPress}: any) => {
           opacity: isFocused ? 0 : 1,
         }}
       />
-      <TouchableOpacity activeOpacity={1} onPress={onPress} style={styles.btn}>
+      <TouchableOpacity onPress={onPress} style={styles.btn}>
         <Animated.View
           style={{
             transform: [{translateY}],

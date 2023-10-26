@@ -117,29 +117,20 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     }
   }, [recordedWord, recordedSentence]);
 
-  const {mutateAsync} = useMutation({
+  const {mutate} = useMutation({
     mutationFn: recordService.createRecord,
     onSuccess: recorded => {
       setRecordedWord(null);
       setRecordedSentence(null);
-      setTimeout(() => {
-        const vocabularyId: string = data?.items[currentIdx]._id as string;
-        setSavedList(prev => ({...prev, [vocabularyId]: recorded}));
-        dispatch(addCompletedId(recorded._id));
-        queryClient.invalidateQueries(refreshKey);
-        queryClient.invalidateQueries(['progress']);
-        forward();
-        toast.show({
-          render(props) {
-            return (
-              <Toast {...props} status="success">
-                File has been saved!
-              </Toast>
-            );
-          },
-          placement: 'bottom',
-        });
-      }, 50);
+      queryClient.invalidateQueries(refreshKey);
+      queryClient.invalidateQueries(['progress']);
+      setSavedList(prev => {
+        prev[recorded.vocabulary] = recorded;
+        return {
+          ...prev,
+        };
+      });
+      dispatch(addCompletedId(recorded._id));
     },
   });
   const handleSaveRecord = async () => {
@@ -169,16 +160,38 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         }),
       );
     }
+    setTimeout(() => {
+      const vocabularyId: string = data?.items[currentIdx]._id as string;
+      setSavedList(prev => {
+        prev[vocabularyId] = {} as Record;
+        return {
+          ...prev,
+        };
+      });
+      forward();
+      toast.show({
+        render(props) {
+          return (
+            <Toast {...props} status="success">
+              File has been saved!
+            </Toast>
+          );
+        },
+        placement: 'bottom',
+      });
+      setRecordedWord(null);
+      setRecordedSentence(null);
+      setIsSaving(false);
+    }, 50);
 
     const [wordRecordUri, sentenceRecordUri] = await Promise.all(promises);
-    await mutateAsync({
+    mutate({
       vocabularyId: currentVocabulary._id,
       recordUrl: {
         word: wordRecordUri,
         sentence: sentenceRecordUri,
       },
     });
-    setIsSaving(false);
   };
   React.useEffect(() => {
     request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {
