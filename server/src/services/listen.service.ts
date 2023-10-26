@@ -12,7 +12,6 @@ import {
 import GroupRecordModel from '../entities/GroupRecord'
 import GroupModel from '../entities/Group'
 import { Category, ROLE } from '../const/common'
-import { group } from 'console'
 
 @injectable()
 export default class ListenService {
@@ -213,11 +212,7 @@ export default class ListenService {
           dateListenAt: {
             $arrayElemAt: ['$listenData.createdAt', 0]
           },
-          vocabulary: {
-            text: '$vocabularyData.text',
-            _id: '$vocabularyData._id',
-            type: '$vocabularyData.type'
-          }
+          vocabulary: '$vocabularyData'
         }
       },
       {
@@ -329,6 +324,19 @@ export default class ListenService {
         }
       },
       {
+        $lookup: {
+          from: 'users',
+          localField: 'recordData.user',
+          foreignField: '_id',
+          as: 'userData'
+        }
+      },
+      {
+        $unwind: {
+          path: '$userData'
+        }
+      },
+      {
         $match: {
           ...(query.type && { 'vocabularyData.type': query.type })
         }
@@ -347,6 +355,7 @@ export default class ListenService {
           createdAt: 1,
           listenData: 1,
           recordData: 1,
+          userData: 1,
           category: '$vocabularyData.category',
           isListen: {
             $cond: {
@@ -370,11 +379,7 @@ export default class ListenService {
             }
           },
 
-          vocabulary: {
-            text: '$vocabularyData.text',
-            _id: '$vocabularyData._id',
-            type: '$vocabularyData.type'
-          }
+          vocabulary: '$vocabularyData'
         }
       },
       {
@@ -386,8 +391,10 @@ export default class ListenService {
           records: {
             $push: {
               _id: '$recordData._id',
+              user: '$userData',
               vocabulary: '$vocabulary',
-              isListen: '$isListen'
+              isListen: '$isListen',
+              recordUrl: '$recordData.recordUrl'
             }
           }
         }
