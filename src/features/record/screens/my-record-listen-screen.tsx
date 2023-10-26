@@ -17,8 +17,8 @@ import {COLORS} from '../../../constants/design-system';
 import {useModal} from '../../../hooks/use-modal';
 import {Record} from '../../../types/record';
 import {uploadAudio} from '../../../utils/upload-audio';
-import {RecordCard} from '../components/record-card';
-import {RecordedCard} from '../components/recorded-card';
+import {RecordCard, RecordCardMethods} from '../components/record-card';
+import {RecordedCard, RecordedCardMethods} from '../components/recorded-card';
 import {SentenceContentCard} from '../components/sentence-content-card';
 import {WordContentCard} from '../components/word-content-card';
 import {useUpdateRecord} from '../hooks/use-update-record';
@@ -38,6 +38,10 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
   const [newRecordUri, setNewRecordUri] = React.useState<string | null>(null);
   const [isSaving, setIsSaving] = React.useState(false);
   const toast = useToast();
+
+  const wordRef = React.useRef<RecordedCardMethods>(null);
+  const sentenceRef = React.useRef<RecordedCardMethods>(null);
+  const recordRef = React.useRef<RecordCardMethods>(null);
 
   const {
     close: closeRecord,
@@ -69,6 +73,7 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
         navigation.goBack();
         return;
       }
+      setNewRecordUri(null);
       setRecord(data as Record);
       closeDelete();
       closeRecord();
@@ -128,6 +133,8 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
         placement: 'bottom',
       });
     }, 100);
+
+    recordRef.current?.handlePressDelete();
   };
 
   return (
@@ -143,6 +150,10 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
 
       <VStack px={5} py={2} space={5}>
         <RecordedCard
+          ref={wordRef}
+          onPressPlay={() => {
+            sentenceRef.current?.stopPlayer();
+          }}
           onReRecord={() => {
             setCurrentItem('word');
             if (!record?.recordUrl?.word) {
@@ -159,6 +170,10 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
           <WordContentCard vocabulary={record.vocabulary} />
         </RecordedCard>
         <RecordedCard
+          onPressPlay={() => {
+            wordRef.current?.stopPlayer();
+          }}
+          ref={sentenceRef}
           onReRecord={() => {
             setCurrentItem('sentence');
             if (!record?.recordUrl?.sentence) {
@@ -210,6 +225,7 @@ export const MyRecordListenScreen = ({navigation, route}: Props) => {
       <Modal isTransparent isOpen={isShowingRecord} onClose={closeRecord}>
         <VStack space={5}>
           <RecordCard
+            ref={recordRef}
             onHasRecord={uri => {
               setNewRecordUri(uri);
             }}

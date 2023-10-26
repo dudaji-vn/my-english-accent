@@ -1,8 +1,4 @@
-import {
-  NavigationProp,
-  RouteProp,
-  useIsFocused,
-} from '@react-navigation/native';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
 import React from 'react';
 
 import {View} from 'native-base';
@@ -16,7 +12,6 @@ type Props = {
 };
 
 const MainRecordScreen = ({navigation, route}: Props) => {
-  const isFocused = useIsFocused();
   const tabs: TabData[] = React.useMemo(
     () => [
       {
@@ -38,7 +33,7 @@ const MainRecordScreen = ({navigation, route}: Props) => {
   );
   return (
     <View flex={1} bg="white">
-      {isFocused && <Tabs tabs={tabs} />}
+      <Tabs tabs={tabs} />
     </View>
   );
 };
