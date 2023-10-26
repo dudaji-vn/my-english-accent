@@ -15,12 +15,19 @@ const BreadCrumb = (props: IBreadCrumbProps) => {
   return (
     <HStack space={2} alignItems={'center'}>
       <Pressable
+        py={4}
         onPress={() => {
           navigation.goBack();
         }}>
         <ChevronLeftIcon />
       </Pressable>
-      <Text style={[styles.parentTitle, styles.title]}>{parentTitle}</Text>
+      <Pressable
+        onPress={() => {
+          navigation.goBack();
+        }}>
+        <Text style={[styles.parentTitle, styles.title]}>{parentTitle}</Text>
+      </Pressable>
+
       <DotIcon />
       <Text style={styles.title}>{mainTitle}</Text>
     </HStack>
