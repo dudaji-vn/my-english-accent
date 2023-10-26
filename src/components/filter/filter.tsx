@@ -3,7 +3,7 @@ import React from 'react';
 import {TouchableOpacity} from 'react-native';
 import {COLORS} from '../../constants/design-system';
 import {FilterIcon} from '../icons';
-type FilterItems = {
+export type FilterItems = {
   label: string;
   value: string;
   icon?: JSX.Element;
