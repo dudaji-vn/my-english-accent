@@ -138,6 +138,13 @@ const theme = extendTheme({
       },
       bg: 'darkerBackground',
     },
+    Pressable: {
+      defaultProps: {
+        _pressed: {
+          opacity: 0.5,
+        },
+      },
+    },
   },
 });
 
