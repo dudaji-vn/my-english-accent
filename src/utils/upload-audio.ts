@@ -1,3 +1,4 @@
+import axios from 'axios';
 import uuid from 'react-native-uuid';
 export const uploadAudio = async (uri: string) => {
   const id = uuid.v4();
@@ -10,13 +11,14 @@ export const uploadAudio = async (uri: string) => {
   formData.append('file', file);
   formData.append('upload_preset', 'kctmadgr');
   formData.append('cloud_name', 'deowxipsu');
-  const response = await fetch(
-    'https://api.cloudinary.com/v1_1/deowxipsu/auto/upload',
+  const response = await axios.post(
+    'https://api.cloudinary.com/v1_1/deowxipsu/raw/upload',
+    formData,
     {
-      method: 'post',
-      body: formData,
+      timeout: 5000,
+      timeoutErrorMessage: 'Request timed out',
     },
   );
-  const data = await response.json();
+  const data = response.data;
   return data.secure_url;
 };

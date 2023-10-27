@@ -2,15 +2,11 @@ import {NavigationProp, RouteProp} from '@react-navigation/native';
 import {useQuery} from '@tanstack/react-query';
 import {FlatList, HStack, Spinner, VStack, View, useToast} from 'native-base';
 import React from 'react';
-// import {RefreshControl} from 'react-native';
+import {RefreshControl} from 'react-native';
 import {Mic} from 'react-native-feather';
 import {AppProgress} from '../../../components/app-progress';
 import {Filter} from '../../../components/filter';
-import {
-  MicCheckIcon,
-  MicFilledIcon,
-  SmallMicFilledIcon,
-} from '../../../components/icons';
+import {MicCheckIcon, SmallMicFilledIcon} from '../../../components/icons';
 import {Toast} from '../../../components/toast';
 import {Topic, TopicCard} from '../../../components/topic-card';
 import {WordItem} from '../../../components/word-item';
@@ -206,21 +202,21 @@ const Record = ({navigation, route, jumpTo}: Props) => {
             <Spinner mt={12} size="lg" color={COLORS.highlight} />
           ) : (
             <FlatList
-              // getItemLayout={(data, index) => ({
-              //   length: 60,
-              //   offset: 60 * index,
-              //   index,
-              // })}
-              // refreshControl={
-              //   <RefreshControl
-              //     refreshing={isRefetching}
-              //     onRefresh={() => {
-              //       refetch();
-              //       refetchProgress();
-              //     }}
-              //     colors={[COLORS.highlight]}
-              //   />
-              // }
+              getItemLayout={(data, index) => ({
+                length: 60,
+                offset: 60 * index,
+                index,
+              })}
+              refreshControl={
+                <RefreshControl
+                  refreshing={isRefetching}
+                  onRefresh={() => {
+                    refetch();
+                    refetchProgress();
+                  }}
+                  colors={[COLORS.highlight]}
+                />
+              }
               mt={5}
               ItemSeparatorComponent={renderSeparator}
               data={vocabularies}

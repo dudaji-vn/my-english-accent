@@ -5,6 +5,7 @@ import {View} from 'native-base';
 import {TabData, Tabs} from '../../../components/tabs';
 import MyRecordList from '../components/my-record-list';
 import Record from '../components/record';
+import {CompleteRecordScreen} from './complete-record-screen';
 
 type Props = {
   navigation: NavigationProp<any>;

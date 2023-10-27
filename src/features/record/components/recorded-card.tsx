@@ -74,6 +74,7 @@ export const RecordedCard = React.forwardRef<RecordedCardMethods, Props>(
             </PressableIcon>
             {recordUri && (
               <Pressable
+                shadow="1"
                 onPressIn={() => setIsPressing(true)}
                 onPressOut={() => setIsPressing(false)}
                 onPress={handlePressPlayOrPause}
@@ -87,7 +88,7 @@ export const RecordedCard = React.forwardRef<RecordedCardMethods, Props>(
                     transform: [{scale: zoom}],
                     backgroundColor: isPlaying
                       ? COLORS.highlight
-                      : COLORS.stroke,
+                      : COLORS.darkerBackground,
                     justifyContent: 'center',
                     alignItems: 'center',
                   }}>
