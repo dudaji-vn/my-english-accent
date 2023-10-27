@@ -102,7 +102,7 @@ const ListAudioListenScreen = (props: Props) => {
   }, [records, currentUserIndex]);
 
   const userFilters = useMemo(() => {
-    if (!groupId) {
+    if (!groupId && currentIdx < 0) {
       return null;
     }
     const result = displayRecords[currentIdx].map(item => {
@@ -157,7 +157,8 @@ const ListAudioListenScreen = (props: Props) => {
       <HStack justifyContent={'center'}>
         {typeScreen === 'group' &&
           displayRecords &&
-          displayRecords.length > 0 && (
+          displayRecords.length > 0 &&
+          currentIdx >= 0 && (
             <Filter
               maxHeight={220}
               marginTop={2}
@@ -191,11 +192,11 @@ const ListAudioListenScreen = (props: Props) => {
           )}
       </HStack>
       <View h={700}>
-        {displayRecords && displayRecords.length > 0 && (
+        {displayRecords && displayRecords.length > 0 && currentIdx >= 0 && (
           <SwiperDeck
-            disableLeftSwipe={!currentIdx || currentIdx <= 0}
+            disableLeftSwipe={currentIdx >= displayRecords.length - 1}
             disableRightSwipe={
-              !currentIdx || currentIdx >= displayRecords.length - 1
+              currentIdx <= 0 || currentIdx >= displayRecords.length
             }
             onSwipedLeft={cardIndex => {
               setCurrentIdx(prev => ++prev);
