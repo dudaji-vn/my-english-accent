@@ -102,6 +102,9 @@ const ListAudioListenScreen = (props: Props) => {
   }, [records, currentUserIndex]);
 
   const userFilters = useMemo(() => {
+    if (!currentIdx) {
+      return null;
+    }
     if (!groupId) {
       return null;
     }
@@ -123,7 +126,6 @@ const ListAudioListenScreen = (props: Props) => {
 
     return result;
   }, [displayRecords, currentIdx]);
-  console.log(displayRecords[currentIdx][currentUserIndex]?.recordUrl);
 
   return (
     <ScreenWrapper>
@@ -194,8 +196,10 @@ const ListAudioListenScreen = (props: Props) => {
       <View h={700}>
         {displayRecords && displayRecords.length > 0 && (
           <SwiperDeck
-            disableLeftSwipe={currentIdx === 0}
-            disableRightSwipe={currentIdx === displayRecords.length - 1}
+            disableLeftSwipe={!currentIdx || currentIdx <= 0}
+            disableRightSwipe={
+              !currentIdx || currentIdx >= displayRecords.length - 1
+            }
             onSwipedLeft={cardIndex => {
               setCurrentIdx(prev => ++prev);
             }}

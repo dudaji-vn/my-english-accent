@@ -74,12 +74,7 @@ const ListenDetailScreen = ({route}: Props) => {
     category: 'general',
     groupId: groupId,
   });
-  const currentProgress = useMemo(() => {
-    if (!user) {
-      return;
-    }
-    return Math.round((user?.totalListen * 100) / user?.totalRecord);
-  }, [user]);
+
   const {
     data: listenDetail,
     isFetching,
@@ -88,7 +83,23 @@ const ListenDetailScreen = ({route}: Props) => {
   } = useQuery(['listenDetail', params], () =>
     listenService.getListenDetail(params),
   );
+  const currentProgress = useMemo(() => {
+    if (!listenDetail) {
+      return;
+    }
+    let totalRecord = 1;
+    let totalListen = 0;
+    for (let i of listenDetail?.recordInfo) {
+      totalRecord += i.totalRecord;
+      for (let j of i.records) {
+        if (j.isListen) {
+          totalListen += 1;
+        }
+      }
+    }
 
+    return Math.round((totalListen * 100) / totalRecord);
+  }, [listenDetail]);
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       if (refetch) {
@@ -227,7 +238,7 @@ const ListenDetailScreen = ({route}: Props) => {
         initialNumToRender={4}
         horizontal={false}
         data={records}
-        renderItem={({item}) =>
+        renderItem={({item, index}) =>
           item &&
           item.vocabulary && (
             <View style={{marginBottom: 10}}>
@@ -239,7 +250,7 @@ const ListenDetailScreen = ({route}: Props) => {
                     x = {
                       typeScreen: !!params.groupId ? 'group' : 'user',
                       recordId: item._id,
-                      records: records,
+                      records: records?.filter((item, id) => id >= index),
                       groupId: params.groupId,
                       group: listenDetail?.group,
                     };
@@ -247,7 +258,7 @@ const ListenDetailScreen = ({route}: Props) => {
                     x = {
                       typeScreen: 'user',
                       recordId: item._id,
-                      records: records,
+                      records: records?.filter((item, id) => id >= index),
                       user: user,
                     };
                   }
