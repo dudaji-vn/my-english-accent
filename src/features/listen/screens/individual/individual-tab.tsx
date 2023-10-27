@@ -14,7 +14,7 @@ const IndividualTab = ({isFavorite}: {isFavorite?: boolean}) => {
     isFetching,
   } = useQuery({
     queryKey: ['listen-user-progress'],
-    queryFn: () => listenService.getUserProgress(isFavorite),
+    queryFn: () => listenService.getUserProgress(),
   });
   const [filter, setFilter] = useState('');
   const userProgressFilter = useMemo(() => {
@@ -39,9 +39,7 @@ const IndividualTab = ({isFavorite}: {isFavorite?: boolean}) => {
         return items;
     }
   }, [filter, items?.length]);
-  if (isFavorite && items?.length == 0) {
-    return <NotFoundFavorite />;
-  }
+
   if (isFetching) {
     return <LoadingScreen />;
   }
@@ -65,4 +63,4 @@ const IndividualTab = ({isFavorite}: {isFavorite?: boolean}) => {
   );
 };
 
-export default memo(IndividualTab);
+export default IndividualTab;

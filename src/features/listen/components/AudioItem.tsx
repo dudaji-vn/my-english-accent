@@ -15,17 +15,18 @@ const player = getPlayerInstance();
 const fullWidth = Dimensions.get('window').width;
 type RecordType = 'word' | 'sentence';
 interface IAudioItemProps {
-  record: Record;
+  recordData: Record;
   handleNext?: () => void;
 }
 const AudioItem = (props: IAudioItemProps) => {
-  const {record: recordProp, handleNext} = props;
-  const [record, setRecord] = useState<Record>(recordProp);
+  const {recordData, handleNext} = props;
+  const [record, setRecord] = useState<Record>(recordData);
   useEffect(() => {
-    if (recordProp) {
-      setRecord(recordProp);
+    if (recordData) {
+      console.log(recordData.recordUrl);
+      setRecord(recordData);
     }
-  }, [recordProp]);
+  }, [recordData]);
   const isPlayAll = useRootSelector(item => item.slider.isPlayAll);
   const [isListened, setIsListened] = useState<boolean>(false);
   const queryClient = useQueryClient();
@@ -173,11 +174,11 @@ const AudioItem = (props: IAudioItemProps) => {
         <HStack alignItems={'center'} justifyContent={'space-between'}>
           <HStack space={2} alignItems={'center'}>
             <UserAvatar
-              imageUrl={record.user.avatar}
+              imageUrl={record?.user?.avatar}
               flagWidth={2}
               width={6}
               height={6}
-              nativeLanguage={record.user.nativeLanguage}
+              nativeLanguage={record?.user?.nativeLanguage}
             />
             <Text>{record.user.displayName}</Text>
           </HStack>

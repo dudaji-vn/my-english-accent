@@ -23,9 +23,9 @@ class ListenService {
   async getUserProgress(isFavoriteUsers?: boolean): Promise<IUserProgress[]> {
     const res = await httpService.get<IApiResponse<IUserProgress[]>>(
       listenEndpoint.getUserProgress,
-      {
-        params: {isFavoriteUsers: isFavoriteUsers},
-      },
+      // {
+      //   params: {isFavoriteUsers: isFavoriteUsers},
+      // },
     );
 
     return res.data.data;
@@ -59,7 +59,7 @@ class ListenService {
 
     return res.data.data;
   }
-  
+
   async getUserAudioInGroup(paramAudio: IParamAudio) {
     const res = await httpService.get<IApiResponse<User[]>>(
       `${listenEndpoint.getUserAudioInGroup}/${paramAudio.recordId}`,

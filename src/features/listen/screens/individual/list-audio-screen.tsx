@@ -39,7 +39,7 @@ const ListAudioListenScreen = (props: Props) => {
   const navigation = useNavigation();
 
   const {route} = props;
-  const {typeScreen, recordId, groupId, group, vocabularyId, records} =
+  const {typeScreen, recordId, groupId, group, vocabularyId, records, user} =
     route.params!;
   const [params, setParams] = useState<IParamAudio>({
     recordId: recordId,
@@ -79,7 +79,12 @@ const ListAudioListenScreen = (props: Props) => {
     }
 
     if (!groupId) {
-      return records;
+      return records.map(item => {
+        return {
+          ...item,
+          user: user,
+        };
+      });
     }
     const groupedRecords: any = {};
 
@@ -216,7 +221,7 @@ const ListAudioListenScreen = (props: Props) => {
               return (
                 <AudioItem
                   handleNext={handleNext}
-                  record={groupId ? item[currentUserIndex] : item}
+                  recordData={groupId ? item[currentUserIndex] : item}
                 />
               );
             }}

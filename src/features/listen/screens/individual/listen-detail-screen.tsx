@@ -234,16 +234,26 @@ const ListenDetailScreen = ({route}: Props) => {
               <WordItem
                 onPress={() => {
                   dispatch(turnOffPlayAll());
-                  navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
-                    screen: SCREEN_NAMES.listAudioListenScreen,
-                    params: {
+                  let x = {};
+                  if (params?.groupId) {
+                    x = {
                       typeScreen: !!params.groupId ? 'group' : 'user',
                       recordId: item._id,
                       records: records,
                       groupId: params.groupId,
                       group: listenDetail?.group,
-                      vocabularyId: item?.vocabulary._id,
-                    },
+                    };
+                  } else {
+                    x = {
+                      typeScreen: 'user',
+                      recordId: item._id,
+                      records: records,
+                      user: user,
+                    };
+                  }
+                  navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
+                    screen: SCREEN_NAMES.listAudioListenScreen,
+                    params: x,
                   });
                 }}
                 word={item.vocabulary.text.en}
