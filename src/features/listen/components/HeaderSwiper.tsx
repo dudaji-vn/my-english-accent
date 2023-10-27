@@ -19,7 +19,7 @@ const HeaderSwiper = ({
 }) => {
   return (
     <HStack space={8}>
-      <Pressable px={3} onPress={backward}>
+      <Pressable p={4} m={-4} onPress={backward}>
         <ChevronLeft width={24} height={24} color={COLORS.text} />
       </Pressable>
       <HStack>
@@ -30,7 +30,7 @@ const HeaderSwiper = ({
           /{total}
         </Text>
       </HStack>
-      <Pressable px={3} onPress={forward}>
+      <Pressable p={8} m={-8} onPress={forward}>
         <ChevronRight width={24} height={24} color={COLORS.text} />
       </Pressable>
     </HStack>

@@ -1,5 +1,6 @@
 import {userEndpoint} from '../configs';
 import {IApiResponse} from '../interfaces/api/Http';
+import {IAddOrRemoveFavoriteUser} from '../interfaces/api/User';
 import {Keyword, User} from '../types/user';
 import httpService from './http.service';
 
@@ -32,6 +33,14 @@ class UserService {
       {
         id: id,
       },
+    );
+    return res.data.data;
+  }
+  async addOrRemoveFavoriteUser(body: IAddOrRemoveFavoriteUser) {
+    console.log({body});
+    const res = await httpService.post<IApiResponse<boolean>>(
+      userEndpoint.addOrRemoveFavoriteUser,
+      body,
     );
     return res.data.data;
   }

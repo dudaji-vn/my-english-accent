@@ -9,5 +9,7 @@ export interface IQueryListen {
 export interface IQueryAudio {
   groupId?: string
   recordId: string
-  userId: string
+  userId?: string
+  me?: string
+  vocabularyId?: string
 }

@@ -1,5 +1,5 @@
 import {HStack, Image, Pressable, Text, View} from 'native-base';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {Dimensions, StyleSheet} from 'react-native';
 import {getPlayerInstance} from '../../../../server/src/services/player.service';
 import SpeakerIconRound from '../../../components/icons/speaker-icon-round';
@@ -15,20 +15,24 @@ const player = getPlayerInstance();
 const fullWidth = Dimensions.get('window').width;
 type RecordType = 'word' | 'sentence';
 interface IAudioItemProps {
-  record: Record;
+  recordData: Record;
   handleNext?: () => void;
 }
 const AudioItem = (props: IAudioItemProps) => {
-  const {record, handleNext} = props;
+  const {recordData, handleNext} = props;
+  const [record, setRecord] = useState<Record>(recordData);
+  useEffect(() => {
+    if (recordData) {
+      console.log(recordData.recordUrl);
+      setRecord(recordData);
+    }
+  }, [recordData]);
   const isPlayAll = useRootSelector(item => item.slider.isPlayAll);
   const [isListened, setIsListened] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const {mutate} = useMutation({
     mutationFn: listenService.listenRecord,
-    onSuccess: data => {
-      console.log('call api success');
-      queryClient.invalidateQueries({queryKey: ['listen-user-progress']});
-    },
+    onSuccess: data => {},
     onError: (error, variables) => {
       console.log('create group error', error, variables);
     },
@@ -40,17 +44,16 @@ const AudioItem = (props: IAudioItemProps) => {
   }, [isListened]);
   useEffect(() => {
     if (!isPlayAll) {
+      stopPlayer();
       return;
     }
 
     const playAudio = async () => {
-      console.log('useEffect');
       if (!record) {
         return;
       }
       if (record.recordUrl.word) {
         try {
-          console.log('word');
           setIsPlayingWord(true);
           await player.startPlayer(record.recordUrl.word);
 
@@ -100,7 +103,6 @@ const AudioItem = (props: IAudioItemProps) => {
     }
 
     return () => {
-      console.log('clean up');
       player.stopPlayer();
       player.removePlayBackListener();
     };
@@ -112,19 +114,16 @@ const AudioItem = (props: IAudioItemProps) => {
   const [isPlayingWord, setIsPlayingWord] = useState<boolean>(false);
   const [isPlayingSentence, setIsPlayingSentence] = useState<boolean>(false);
   const togglePlayback = async (recordType: RecordType) => {
-    console.log('toggle playback call');
     if (isPlayingWord || isPlayingSentence) {
-      console.log('is playing');
       await stopPlayer();
     } else {
       if (recordType === 'word') {
-        console.log('word');
         setIsPlayingWord(!isPlayingWord);
-        console.log(record.recordUrl.word);
+
         await player.startPlayer(record.recordUrl.word);
       } else {
         setIsPlayingSentence(!isPlayingSentence);
-        console.log('sentence');
+
         console.log(record.recordUrl.sentence);
         await player.startPlayer(record.recordUrl.sentence);
       }
@@ -173,11 +172,11 @@ const AudioItem = (props: IAudioItemProps) => {
         <HStack alignItems={'center'} justifyContent={'space-between'}>
           <HStack space={2} alignItems={'center'}>
             <UserAvatar
-              imageUrl={record.user.avatar}
+              imageUrl={record?.user?.avatar}
               flagWidth={2}
               width={6}
               height={6}
-              nativeLanguage={record.user.nativeLanguage}
+              nativeLanguage={record?.user?.nativeLanguage}
             />
             <Text>{record.user.displayName}</Text>
           </HStack>

@@ -24,6 +24,7 @@ export const userEndpoint = {
   myKeyword: 'api/user/myKeyword',
   addKeyword: 'api/user/keyword/add',
   deleteKeyword: 'api/user/keyword/delete',
+  addOrRemoveFavoriteUser: 'api/user/addOrRemoveFavoriteUser',
 };
 
 export const vocabularyEndpoint = {
@@ -39,6 +40,7 @@ export const listenEndpoint = {
   getListenDetail: 'api/listen/listenDetail',
   getListenDetailInGroup: 'api/listen/listenDetailInGroup',
   getAudioList: 'api/listen/audioList',
+  getUserAudioInGroup: 'api/listen/getUserAudioInGroup',
   listenRecord: 'api/listen/listenRecord',
 };
 

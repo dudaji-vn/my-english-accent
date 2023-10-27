@@ -11,7 +11,7 @@ const PlayAllIcon = (props: IPlayAllIconProps) => (
     width={24}
     height={24}
     fill="none"
-    opacity={0.6}
+    opacity={props.isHighLight ? 1 : 0.6}
     {...props}>
     <Path
       fill={props.isHighLight ? COLORS.highlight : '#333'}

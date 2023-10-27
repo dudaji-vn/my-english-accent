@@ -17,7 +17,7 @@ export const TabBar = ({onValueChange, tabItems, value = ''}: Props) => {
   React.useEffect(() => {
     setSelected(value);
   }, [value]);
-  console.log('selected', selected);
+
   return (
     <HStack rounded="xl" space={5} p={3} bg={COLORS.background}>
       {tabItems.map(item => {

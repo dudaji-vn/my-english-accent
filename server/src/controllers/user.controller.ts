@@ -31,6 +31,15 @@ export default class UserController {
     )
     return res.success(result)
   }
+  async addOrRemoveFavoriteUser(req: IRequest, res: IResponse) {
+    const { userId, type } = req.body
+    const result = await this.userService.addOrRemoveFavoriteUser({
+      me: req.user._id,
+      type: type,
+      userId: userId
+    })
+    return res.success(result)
+  }
   async deleteKeyword(req: IRequest, res: IResponse) {
     const { id } = req.body
     const result = await this.userService.deleteKeyword(id)

@@ -11,11 +11,11 @@ const LottiePlaying = () => {
       borderRadius={40}
       w={20}
       h={20}
-      bg={COLORS.stroke}>
+      bg={COLORS.highlight}>
       <LottieView
         style={{
-          width: 40,
-          height: 40,
+          width: 80,
+          height: 80,
         }}
         source={require('../../assets/jsons/speaker-animation.json')}
         autoPlay

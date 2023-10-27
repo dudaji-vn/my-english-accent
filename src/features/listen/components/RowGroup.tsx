@@ -7,9 +7,11 @@ import {IGroup, IGroupMember} from '../../../interfaces/api/Group';
 
 interface IRowGroupProps {
   group: IGroup | any;
+  isShowingName?: boolean;
+  isLarge?: boolean;
 }
 const RowGroup = (props: IRowGroupProps) => {
-  const {group} = props;
+  const {group, isShowingName, isLarge} = props;
   const navigation = useNavigation<any>();
   const handleClick = () => {};
 
@@ -31,13 +33,13 @@ const RowGroup = (props: IRowGroupProps) => {
 
   return (
     <HStack alignItems={'center'}>
-      <View style={styles.container}>
+      <View style={[styles.container, isLarge && {width: 100}]}>
         {users.map((item: any, index) => {
           return (
             <View key={item?._id} style={styles.avatar}>
               <Avatar
                 backgroundColor={item?.remainingCount && COLORS.highlight}
-                size={'sm'}
+                size={isLarge ? 12 : 'sm'}
                 source={{
                   uri: item.avatar,
                 }}>
@@ -49,10 +51,12 @@ const RowGroup = (props: IRowGroupProps) => {
           );
         })}
       </View>
-      <View>
-        <Text style={styles.textName}>{group.name}</Text>
-        <Text style={styles.textSentences}>11 sentences</Text>
-      </View>
+      {isShowingName && (
+        <View>
+          <Text style={styles.textName}>{group.name}</Text>
+          {/* <Text style={styles.textSentences}>11 sentences</Text> */}
+        </View>
+      )}
     </HStack>
   );
 };

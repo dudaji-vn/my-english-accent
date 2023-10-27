@@ -18,6 +18,7 @@ export type User = {
   role: Role;
   appSetting?: AppSetting;
   autoDownload?: boolean;
+  favoriteUsers: string[];
 } & BaseEntity;
 
 export type Category = 'general' | 'developer' | 'designer' | 'others';

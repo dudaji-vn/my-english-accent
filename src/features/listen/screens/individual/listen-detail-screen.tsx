@@ -32,6 +32,9 @@ import {
 import {listenService} from '../../../../services/listen.service';
 import RowGroup from '../../components/RowGroup';
 import RowUserAvatar from '../../components/RowUserAvatar';
+import {Modal} from '../../../../components/modal';
+import UserModal from '../../../../components/user-modal';
+import {useModal} from '../../../../hooks/use-modal';
 
 type RootStackParamList = {
   ListenDetail: {user?: IUserProgress; typeScreen: string; groupId?: string};
@@ -45,10 +48,6 @@ const filterItems = [
   {
     label: 'Latest files first',
     value: 'sortBy=latestFile',
-  },
-  {
-    label: 'Completed recently',
-    value: 'Completed recently',
   },
   {
     label: 'Type (Verb)',
@@ -67,7 +66,7 @@ const ListenDetailScreen = ({route}: Props) => {
   const {typeScreen, user, groupId} = route.params!;
   const [topicShow, setTopicShow] = useState<Topic[]>([]);
   const dispatch = useDispatch();
-
+  const {close, open, isShowing} = useModal();
   const navigation = useNavigation<any>();
   const [indexTopicActive, setIndexTopicActive] = useState(0);
   const [params, setParams] = useState<IParamListenDetail>({
@@ -75,24 +74,35 @@ const ListenDetailScreen = ({route}: Props) => {
     category: 'general',
     groupId: groupId,
   });
-  const currentProgress = useMemo(() => {
-    if (!user) {
-      return;
-    }
-    return Math.round((user?.totalListen * 100) / user?.totalRecord);
-  }, [user]);
+
   const {
     data: listenDetail,
     isFetching,
+    isSuccess,
     refetch,
   } = useQuery(['listenDetail', params], () =>
     listenService.getListenDetail(params),
   );
-  console.log(listenDetail);
+  const currentProgress = useMemo(() => {
+    if (!listenDetail) {
+      return;
+    }
+    let totalRecord = 1;
+    let totalListen = 0;
+    for (let i of listenDetail?.recordInfo) {
+      totalRecord += i.totalRecord;
+      for (let j of i.records) {
+        if (j.isListen) {
+          totalListen += 1;
+        }
+      }
+    }
+
+    return Math.round((totalListen * 100) / totalRecord);
+  }, [listenDetail]);
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       if (refetch) {
-        console.log('refetch');
         refetch();
       }
     });
@@ -115,7 +125,6 @@ const ListenDetailScreen = ({route}: Props) => {
     }
   }, [listenDetail]);
   const records = useMemo(() => {
-    console.log('calling');
     if (!listenDetail) {
       return [];
     }
@@ -133,21 +142,38 @@ const ListenDetailScreen = ({route}: Props) => {
         parentTitle="Listen"
         mainTitle={typeScreen === 'user' ? 'Individual' : 'Group'}
       />
-
       <HStack
-        mt={5}
+        mt={1}
         mb={6}
         justifyContent={'space-between'}
         alignItems={'center'}>
         <HStack space={2} alignItems={'center'}>
           {typeScreen === 'group'
             ? listenDetail &&
-              listenDetail?.group && <RowGroup group={listenDetail.group} />
+              listenDetail?.group && (
+                <RowGroup isShowingName group={listenDetail.group} />
+              )
             : user && <RowUserAvatar user={user} />}
 
-          {!isFetching && <InfoIcon />}
+          {isSuccess && (
+            <Pressable
+              p={16}
+              m={-16}
+              onPress={() => {
+                if (listenDetail.group) {
+                  navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
+                    screen: SCREEN_NAMES.detailGroup,
+                    params: {typeScreen: 'group', group: listenDetail.group},
+                  });
+                } else {
+                  open();
+                }
+              }}>
+              <InfoIcon />
+            </Pressable>
+          )}
         </HStack>
-        <DownLoadIcon />
+        {/* <DownLoadIcon /> */}
       </HStack>
       {user && (
         <AppProgress
@@ -155,7 +181,6 @@ const ListenDetailScreen = ({route}: Props) => {
           startIcon={<Headphones color="white" width={20} height={20} />}
         />
       )}
-
       <HStack my={6} space={4} justifyContent="space-between">
         {topicShow &&
           topicShow.map((topic, index) => (
@@ -188,6 +213,8 @@ const ListenDetailScreen = ({route}: Props) => {
         />
 
         <Pressable
+          p={4}
+          m={-4}
           onPress={() => {
             if (!records) return;
             dispatch(togglePlayAll());
@@ -202,31 +229,42 @@ const ListenDetailScreen = ({route}: Props) => {
           <PlayAllIcon />
         </Pressable>
       </HStack>
-
       <FlatList
         refreshControl={
-          <RefreshControl refreshing={isFetching} colors={[COLORS.highlight]} />
+          <RefreshControl refreshing={!isSuccess} colors={[COLORS.highlight]} />
         }
         numColumns={1}
         maxToRenderPerBatch={4}
         initialNumToRender={4}
         horizontal={false}
         data={records}
-        renderItem={({item}) =>
+        renderItem={({item, index}) =>
           item &&
           item.vocabulary && (
             <View style={{marginBottom: 10}}>
               <WordItem
                 onPress={() => {
                   dispatch(turnOffPlayAll());
-                  navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
-                    screen: SCREEN_NAMES.listAudioListenScreen,
-                    params: {
+                  let x = {};
+                  if (params?.groupId) {
+                    x = {
                       typeScreen: !!params.groupId ? 'group' : 'user',
                       recordId: item._id,
+                      records: records?.filter((item, id) => id >= index),
                       groupId: params.groupId,
                       group: listenDetail?.group,
-                    },
+                    };
+                  } else {
+                    x = {
+                      typeScreen: 'user',
+                      recordId: item._id,
+                      records: records?.filter((item, id) => id >= index),
+                      user: user,
+                    };
+                  }
+                  navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
+                    screen: SCREEN_NAMES.listAudioListenScreen,
+                    params: x,
                   });
                 }}
                 word={item.vocabulary.text.en}
@@ -238,6 +276,10 @@ const ListenDetailScreen = ({route}: Props) => {
         }
         keyExtractor={item => item._id.toString()}
       />
+
+      <Modal isOpen={isShowing} onClose={close}>
+        {user && <UserModal user={user} />}
+      </Modal>
     </ScreenWrapper>
   );
 };

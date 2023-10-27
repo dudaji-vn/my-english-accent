@@ -1,5 +1,6 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {userService} from '../services/user.service';
+import {IAddOrRemoveFavoriteUser} from '../interfaces/api/User';
 
 export const useUser = () => {
   const queryClient = useQueryClient();
@@ -14,6 +15,16 @@ export const useUser = () => {
     {
       onSuccess: newKeyword => {
         queryClient.invalidateQueries(['myKeyword']);
+      },
+    },
+  );
+
+  const addOrRemoveFavoriteUserMutation = useMutation(
+    (body: IAddOrRemoveFavoriteUser) =>
+      userService.addOrRemoveFavoriteUser(body),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(['listen-user-progress']);
       },
     },
   );
@@ -34,9 +45,13 @@ export const useUser = () => {
     await deleteKeywordMutation.mutateAsync(id);
   };
 
+  const addOrRemoveFavoriteUser = async (data: IAddOrRemoveFavoriteUser) => {
+    addOrRemoveFavoriteUserMutation.mutateAsync(data);
+  };
   return {
     keywords,
     addUserKeyword,
     deleteUserKeyword,
+    addOrRemoveFavoriteUser,
   };
 };

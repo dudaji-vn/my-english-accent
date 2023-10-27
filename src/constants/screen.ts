@@ -20,4 +20,5 @@ export const SCREEN_NAMES = {
   createGroup: 'createGroup',
   errorNavigator: 'error-navigator',
   recordError: 'record-error',
+  detailGroup: 'detailGroup',
 };
