@@ -26,7 +26,10 @@ import {COLORS} from '../../../constants/design-system';
 import {SCREEN_NAMES} from '../../../constants/screen';
 import {useModal} from '../../../hooks/use-modal';
 import {useUnsavedChange} from '../../../hooks/use-unsaved-change';
-import {addCompletedId} from '../../../redux/reducers/record.reducer';
+import {
+  addCompletedId,
+  addFailedUpload,
+} from '../../../redux/reducers/record.reducer';
 import {recordService} from '../../../services/record.service';
 import {Record} from '../../../types/record';
 import {GetVocabulariesParams, Vocabulary} from '../../../types/vocabulary';
@@ -118,7 +121,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
     }
   }, [recordedWord, recordedSentence]);
 
-  const {mutate} = useMutation({
+  const {mutateAsync} = useMutation({
     mutationFn: recordService.createRecord,
     onSuccess: recorded => {
       setRecordedWord(null);
@@ -131,20 +134,19 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
           ...prev,
         };
       });
+      // forward();
       dispatch(addCompletedId(recorded._id));
-    },
-    onError: error => {
-      console.log(error);
-      toast.show({
-        render(props) {
-          return (
-            <Toast {...props} status="error">
-              Something went wrong!
-            </Toast>
-          );
-        },
-        placement: 'bottom',
-      });
+      // toast.show({
+      //   render(props) {
+      //     return (
+      //       <Toast {...props} status="success">
+      //         File has been saved!
+      //       </Toast>
+      //     );
+      //   },
+      //   placement: 'bottom',
+      //   duration: 1000,
+      // });
     },
   });
   const handleSaveRecord = async () => {
@@ -173,7 +175,22 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         }),
       );
     }
-    setTimeout(() => {
+    // setTimeout(() => {
+    //   const vocabularyId: string = data?.items[currentIdx]._id as string;
+    //   setSavedList(prev => {
+    //     prev[vocabularyId] = {} as Record;
+    //     return {
+    //       ...prev,
+    //     };
+    //   });
+    //   forward();
+    //   setIsSaving(false);
+    //   setRecordedWord(null);
+    //   setRecordedSentence(null);
+    // }, 50);
+
+    try {
+      const [wordRecordUri, sentenceRecordUri] = await Promise.all(promises);
       const vocabularyId: string = data?.items[currentIdx]._id as string;
       setSavedList(prev => {
         prev[vocabularyId] = {} as Record;
@@ -182,6 +199,9 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         };
       });
       forward();
+      setRecordedWord(null);
+      setRecordedSentence(null);
+      setIsSaving(false);
       toast.show({
         render(props) {
           return (
@@ -191,15 +211,9 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
           );
         },
         placement: 'bottom',
+        duration: 1000,
       });
-      setRecordedWord(null);
-      setRecordedSentence(null);
-      setIsSaving(false);
-    }, 50);
-
-    try {
-      const [wordRecordUri, sentenceRecordUri] = await Promise.all(promises);
-      mutate({
+      await mutateAsync({
         vocabularyId: currentVocabulary._id,
         recordUrl: {
           word: wordRecordUri,
@@ -207,8 +221,32 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         },
       });
     } catch (error) {
-      console.log(error);
+      dispatch(
+        addFailedUpload({
+          vocabulary: currentVocabulary,
+          recordUrl: {word: recordedWord?.uri, sentence: recordedSentence?.uri},
+        }),
+      );
+      toast.show({
+        render(props) {
+          return (
+            <Toast
+              {...props}
+              status="error"
+              leftElementOnPress={() => {
+                toast.closeAll();
+                handleSaveRecord();
+              }}
+              leftElement="Retry">
+              Failed to save record of ({currentVocabulary.text.en})
+            </Toast>
+          );
+        },
+        placement: 'bottom',
+        duration: 10000,
+      });
     }
+    setIsSaving(false);
   };
   React.useEffect(() => {
     request(PERMISSIONS.ANDROID.RECORD_AUDIO).then(result => {
@@ -361,7 +399,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
           verticalSwipe={false}
           ref={swiperDeckRef}
           cards={data?.items || []}
-          renderCard={(item, cardIndex) => {
+          renderCard={item => {
             return (
               <Swiper
                 index={tabIndex}
@@ -504,6 +542,7 @@ const WordsRecordScreen = ({navigation, route}: Props) => {
         space={1}>
         {vocabularies.length > 0 && vocabularies.length - 1 !== currentIdx && (
           <Button
+            opacity={isSaving ? 0.3 : 1}
             disabled={currentIdx === vocabularies.length - 1 || isSaving}
             onPress={forward}
             variant="ghost">

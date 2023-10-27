@@ -12,6 +12,7 @@ var fullWidth = Dimensions.get('window').width;
 export const Toast = (props: Props) => {
   return (
     <HStack
+      alignItems="center"
       justifyContent="space-between"
       rounded="lg"
       bg="black"
@@ -21,7 +22,7 @@ export const Toast = (props: Props) => {
       py={4}>
       <Text style={styles.text}>{props.children}</Text>
       {props.leftElement && (
-        <Pressable onPress={props.leftElementOnPress}>
+        <Pressable p={2} onPress={props.leftElementOnPress}>
           <Text style={styles.font}>{props.leftElement}</Text>
         </Pressable>
       )}

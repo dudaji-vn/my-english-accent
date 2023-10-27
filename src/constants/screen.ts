@@ -18,4 +18,6 @@ export const SCREEN_NAMES = {
   listAudioListenScreen: 'listAudioListenScreen',
   mainGroup: 'mainGroup',
   createGroup: 'createGroup',
+  errorNavigator: 'error-navigator',
+  recordError: 'record-error',
 };
