@@ -102,7 +102,7 @@ const ListAudioListenScreen = (props: Props) => {
   }, [records, currentUserIndex]);
 
   const userFilters = useMemo(() => {
-    if (!groupId && currentIdx < 0) {
+    if (!groupId || currentIdx < 0 || !displayRecords) {
       return null;
     }
     const result = displayRecords[currentIdx].map(item => {
