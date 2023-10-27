@@ -52,6 +52,9 @@ const ListAudioListenScreen = (props: Props) => {
   }
 
   const handleNext = () => {
+    if (currentIdx >= displayRecords.length - 1) {
+      return;
+    }
     swiperRef.current?.swipeLeft();
   };
   const forward = () => {
