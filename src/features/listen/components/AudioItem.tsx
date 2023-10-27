@@ -1,5 +1,5 @@
 import {HStack, Image, Pressable, Text, View} from 'native-base';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useMemo} from 'react';
 import {Dimensions, StyleSheet} from 'react-native';
 import {getPlayerInstance} from '../../../../server/src/services/player.service';
 import SpeakerIconRound from '../../../components/icons/speaker-icon-round';
@@ -19,7 +19,13 @@ interface IAudioItemProps {
   handleNext?: () => void;
 }
 const AudioItem = (props: IAudioItemProps) => {
-  const {record, handleNext} = props;
+  const {record: recordProp, handleNext} = props;
+  const [record, setRecord] = useState<Record>(recordProp);
+  useEffect(() => {
+    if (recordProp) {
+      setRecord(recordProp);
+    }
+  }, [recordProp]);
   const isPlayAll = useRootSelector(item => item.slider.isPlayAll);
   const [isListened, setIsListened] = useState<boolean>(false);
   const queryClient = useQueryClient();

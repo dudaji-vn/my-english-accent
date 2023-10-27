@@ -11,7 +11,7 @@ export type FilterItems = {
 
 type Props = {
   filterItems: FilterItems[];
-  onSelected: (value: FilterItems) => void;
+  onSelected: (value: FilterItems, index?: number) => void;
   selectedValue?: FilterItems;
   icon?: JSX.Element;
   placement?:
@@ -35,13 +35,13 @@ type Props = {
 export const Filter = (props: Props) => {
   const [isShow, setIsShow] = React.useState(false);
   const [selectedValue, setSelectedValue] = React.useState<FilterItems>();
-  const handleSelected = (value: FilterItems) => {
+  const handleSelected = (value: FilterItems, index?: number) => {
     setSelectedValue(prev => {
       if (prev && prev.value === value.value) {
-        props.onSelected({label: '', value: ''});
+        props.onSelected({label: '', value: ''}, index);
         return undefined;
       }
-      props.onSelected(value);
+      props.onSelected(value, index);
       return value;
     });
   };
@@ -89,7 +89,7 @@ export const Filter = (props: Props) => {
               : 'transparent'
           }
           onPress={() => {
-            handleSelected(item);
+            handleSelected(item, index);
           }}
           borderBottomWidth={1}
           borderBottomColor={'white'}

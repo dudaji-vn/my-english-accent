@@ -239,6 +239,7 @@ const ListenDetailScreen = ({route}: Props) => {
                     params: {
                       typeScreen: !!params.groupId ? 'group' : 'user',
                       recordId: item._id,
+                      records: records,
                       groupId: params.groupId,
                       group: listenDetail?.group,
                       vocabularyId: item?.vocabulary._id,
