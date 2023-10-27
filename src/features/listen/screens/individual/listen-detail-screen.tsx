@@ -218,12 +218,26 @@ const ListenDetailScreen = ({route}: Props) => {
           onPress={() => {
             if (!records) return;
             dispatch(togglePlayAll());
+            let x = {};
+            if (params?.groupId) {
+              x = {
+                typeScreen: !!params.groupId ? 'group' : 'user',
+                records: records,
+                groupId: params.groupId,
+                group: listenDetail?.group,
+                recordId: records[0]?._id,
+              };
+            } else {
+              x = {
+                typeScreen: 'user',
+                records: records,
+                user: user,
+                recordId: records[0]?._id,
+              };
+            }
             navigation.navigate(SCREEN_NAMES.listeningsNavigator, {
               screen: SCREEN_NAMES.listAudioListenScreen,
-              params: {
-                typeScreen: 'user',
-                recordId: records[0]?._id,
-              },
+              params: x,
             });
           }}>
           <PlayAllIcon />
