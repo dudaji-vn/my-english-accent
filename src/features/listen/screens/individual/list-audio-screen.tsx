@@ -102,9 +102,6 @@ const ListAudioListenScreen = (props: Props) => {
   }, [records, currentUserIndex]);
 
   const userFilters = useMemo(() => {
-    if (!currentIdx) {
-      return null;
-    }
     if (!groupId) {
       return null;
     }
@@ -125,7 +122,7 @@ const ListAudioListenScreen = (props: Props) => {
     });
 
     return result;
-  }, [displayRecords, currentIdx]);
+  }, [displayRecords]);
 
   return (
     <ScreenWrapper>

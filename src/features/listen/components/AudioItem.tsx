@@ -32,9 +32,7 @@ const AudioItem = (props: IAudioItemProps) => {
   const queryClient = useQueryClient();
   const {mutate} = useMutation({
     mutationFn: listenService.listenRecord,
-    onSuccess: data => {
-      queryClient.invalidateQueries({queryKey: ['listen-user-progress']});
-    },
+    onSuccess: data => {},
     onError: (error, variables) => {
       console.log('create group error', error, variables);
     },

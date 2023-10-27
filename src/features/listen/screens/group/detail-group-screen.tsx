@@ -84,7 +84,7 @@ const DetailGroupScreen = (props: Props) => {
         </VStack>
       )}
 
-      <Button
+      {/* <Button
         _pressed={{
           bg: COLORS.errorClick,
         }}
@@ -93,7 +93,7 @@ const DetailGroupScreen = (props: Props) => {
         _text={{color: COLORS.error}}
         borderColor={COLORS.error}>
         Leave Group
-      </Button>
+      </Button> */}
     </ScreenWrapper>
   );
 };
