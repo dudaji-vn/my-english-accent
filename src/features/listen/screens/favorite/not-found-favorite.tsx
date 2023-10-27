@@ -4,6 +4,7 @@ import React, {memo} from 'react';
 import HomeIcon from '../../../../components/icons/home-icon';
 import {COLORS} from '../../../../constants/design-system';
 import {SCREEN_NAMES} from '../../../../constants/screen';
+import {EmptyData} from '../../../../components/empty-data';
 
 const NotFoundFavorite = () => {
   const navigation = useNavigation<any>();
@@ -13,22 +14,10 @@ const NotFoundFavorite = () => {
     });
   };
   return (
-    <View marginX={5} alignItems={'center'}>
-      <HomeIcon />
-      <View marginX={18} marginBottom={10}>
-        <Text
-          textAlign={'center'}
-          marginTop={5}
-          marginBottom={3}
-          fontSize={20}
-          fontWeight={'500'}
-          color={COLORS.highlight}>
-          List empty
-        </Text>
-        <Text textAlign={'center'}>Mark a person by “Add to favorite”,</Text>
-        <Text textAlign={'center'}>and they will show up here.</Text>
-      </View>
-    </View>
+    <EmptyData mt={32} title=" List empty">
+      <Text textAlign={'center'}>Mark a person by “Add to favorite”,</Text>
+      <Text textAlign={'center'}>and they will show up here.</Text>
+    </EmptyData>
   );
 };
 

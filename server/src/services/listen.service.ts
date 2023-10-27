@@ -106,7 +106,7 @@ export default class ListenService {
       throw new BadRequestError('groupId is required')
     }
     const isExist = await ListenModel.exists({
-      user: '651fbed3b87dcb638078aa17',
+      user: me,
       record: recordId,
       group: groupId
     })
@@ -114,7 +114,7 @@ export default class ListenService {
       throw new BadRequestError('user listened record in group')
     }
     const listen = new ListenModel({
-      user: '651fbed3b87dcb638078aa17',
+      user: me,
       record: recordId,
       group: groupId
     })
@@ -165,6 +165,7 @@ export default class ListenService {
           as: 'vocabularyData'
         }
       },
+
       {
         $match: {
           // 'vocabularyData.category': category || 'general',
@@ -196,11 +197,10 @@ export default class ListenService {
             $cond: {
               if: {
                 $and: [
-                  { $eq: [{ $size: '$listenData' }, 1] },
                   {
-                    $eq: [
-                      { $arrayElemAt: ['$listenData.user', 0] },
-                      new mongoose.Types.ObjectId(me)
+                    $in: [
+                      new mongoose.Types.ObjectId(me),
+                      '$listenData.user'
                     ]
                   }
                 ]

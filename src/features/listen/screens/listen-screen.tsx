@@ -55,7 +55,7 @@ const ListenScreen: FC = () => {
       case 'group':
         return <MainGroupScreen />;
       case 'favorite':
-        return <IndividualTab isFavorite />;
+        return <NotFoundFavorite />;
       case 'download':
         return <DownloadTab />;
       default:
