@@ -53,6 +53,7 @@ const ListAudioListenScreen = (props: Props) => {
 
   const handleNext = () => {
     if (currentIdx >= displayRecords.length - 1) {
+      dispatch(togglePlayAll());
       return;
     }
     swiperRef.current?.swipeLeft();
