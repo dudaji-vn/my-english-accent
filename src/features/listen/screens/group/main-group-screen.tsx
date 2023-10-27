@@ -46,7 +46,7 @@ const MainGroupScreen = () => {
           <Text color={COLORS.highlight}>Create new group</Text>
         </HStack>
       </Button>
-      <VStack marginX={-2} flex={1} mb={20}>
+      <VStack marginX={-2} flex={1} mb={24}>
         <ListGroup groups={myGroups} />
       </VStack>
     </View>

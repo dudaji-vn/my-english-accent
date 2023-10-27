@@ -50,7 +50,7 @@ const UserCard = (props: IUserCardProps) => {
         {capitalizeFirstLetter(userProgress?.role)}
       </Text>
       <Text style={styles.textSentences}>
-        {userProgress?.totalRecord} sentences
+        {userProgress?.totalRecord} words
       </Text>
       <HStack space={2} width={'100%'} alignItems={'center'}>
         <View rounded="full" p={1} bg={'#d4d4d4'}>

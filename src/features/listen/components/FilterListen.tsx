@@ -1,39 +1,34 @@
 import React from 'react';
 import {Filter} from '../../../components/filter';
-
-const FilterListen = () => {
+import {FilterItems} from '../../../components/filter/filter';
+interface IFilterListenProps {
+  onSelected: (value: FilterItems) => void;
+}
+const FilterListen = (props: IFilterListenProps) => {
+  const {onSelected} = props;
   const filterItems = [
     {
       label: 'Name (A-Z)',
-      value: 'all',
+      value: 'a-z',
     },
     {
       label: 'Name (Z-A)',
-      value: 'recorded',
+      value: 'z-a',
     },
     {
       label: 'Position (Designers)',
-      value: 'not-recorded',
+      value: 'position=designer',
     },
     {
       label: 'Position (Developers)',
-      value: 'all',
+      value: 'position=developers',
     },
     {
       label: 'Position (Others)',
-      value: 'recorded',
-    },
-    {
-      label: 'Joined lately',
-      value: 'not-recorded',
+      value: 'position=others',
     },
   ];
-  return (
-    <Filter
-      onSelected={value => console.log(value)}
-      filterItems={filterItems}
-    />
-  );
+  return <Filter onSelected={onSelected} filterItems={filterItems} />;
 };
 
 export default FilterListen;

@@ -21,7 +21,7 @@ import IndividualTab from './individual/individual-tab';
 
 import NotInternet from '../components/NotInternet';
 import DownloadTab from './download/download-tab';
-import FavoriteNotFound from './favorite/not-found-favorite';
+import NotFoundFavorite from './favorite/not-found-favorite';
 import MainGroupScreen from './group/main-group-screen';
 
 var fullWidth = Dimensions.get('window').width;
@@ -55,7 +55,7 @@ const ListenScreen: FC = () => {
       case 'group':
         return <MainGroupScreen />;
       case 'favorite':
-        return true ? <FavoriteNotFound /> : <IndividualTab />;
+        return <IndividualTab isFavorite />;
       case 'download':
         return <DownloadTab />;
       default:

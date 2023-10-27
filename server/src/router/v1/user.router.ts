@@ -35,4 +35,11 @@ userRouter.post(
   auth,
   catchAsync(userController.deleteKeyword.bind(userController))
 )
+userRouter.post(
+  '/addOrRemoveFavoriteUser',
+  auth,
+  catchAsync(
+    userController.addOrRemoveFavoriteUser.bind(userController)
+  )
+)
 export default userRouter

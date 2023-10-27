@@ -33,8 +33,8 @@ const CreateGroupScreen = () => {
   const queryClient = useQueryClient();
   const [allowGoBack, setAllowGoBack] = useState(false);
   const {data: users} = useQuery({
-    queryKey: ['listen-user-progress'],
-    queryFn: listenService.getUserProgress,
+    queryKey: ['users'],
+    queryFn: () => listenService.getUserProgress(),
   });
   const {mutate} = useMutation({
     mutationFn: groupService.createGroup,
@@ -73,6 +73,7 @@ const CreateGroupScreen = () => {
         nativeLanguage: user.nativeLanguage,
         role: user.role,
         isInvite: false,
+        fullName: user.fullName,
       };
     });
     setUsersInvite(userInvites);
@@ -144,6 +145,10 @@ const CreateGroupScreen = () => {
   }, [usersInvite]);
 
   const handleSubmit = () => {
+    setIsFocus(true);
+    if (!formGroup.name || formGroup.members.length === 0) {
+      return;
+    }
     mutate(formGroup);
   };
   return (
@@ -171,7 +176,15 @@ const CreateGroupScreen = () => {
           <Text>({formGroup.members.length})</Text>
         </HStack>
         <View mb={5}>
-          <Input typeInput="search" placeholder="Search" />
+          <Input
+            error={
+              isFocus &&
+              formGroup.members.length === 0 &&
+              'Choose at least 1 person'
+            }
+            typeInput="search"
+            placeholder="Search"
+          />
         </View>
 
         <ScrollView nestedScrollEnabled style={{maxHeight: 330}}>
@@ -185,7 +198,8 @@ const CreateGroupScreen = () => {
                   key={index}>
                   <RowUserAvatar isHighLightName={item.isInvite} user={item} />
                   <Pressable
-                    paddingLeft={4}
+                    p={5}
+                    marginRight={-5}
                     onPress={() => handleToggleInviteUser(index)}>
                     {!item.isInvite ? <AddMemberIcon /> : <RemoveMemberIcon />}
                   </Pressable>
@@ -195,6 +209,8 @@ const CreateGroupScreen = () => {
         </ScrollView>
       </View>
       <Button
+        disabled={!formGroup.name || formGroup.members.length === 0}
+        opacity={!formGroup.name || formGroup.members.length === 0 ? 0.6 : 1}
         onPress={handleSubmit}
         h={14.5}
         bg={COLORS.highlight}

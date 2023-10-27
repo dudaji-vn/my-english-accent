@@ -1,9 +1,9 @@
+// @ts-nocheck
 import {
   NavigationProp,
   RouteProp,
   useNavigation,
 } from '@react-navigation/native';
-import {useQuery} from '@tanstack/react-query';
 import {HStack, Pressable, View} from 'native-base';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {Dimensions} from 'react-native';
@@ -14,7 +14,6 @@ import CloseIcon from '../../../../components/icons/close-icon';
 import PlayAllIcon from '../../../../components/icons/play-all-icon';
 import ScreenWrapper from '../../../../components/layout/screen-wrapper';
 import UserAvatar from '../../../../components/user-avatar';
-import {listenService} from '../../../../services/listen.service';
 import AudioItem from '../../components/AudioItem';
 const fullHeight = Dimensions.get('window').height;
 type Props = {
@@ -23,14 +22,15 @@ type Props = {
 };
 
 import {useDispatch} from 'react-redux';
-import {togglePlayAll} from '../../../../redux/reducers/slider.reducer';
-import {useRootSelector} from '../../../../redux/reducers';
-import HeaderSwiper from '../../components/HeaderSwiper';
-import {IUser} from '../../../../interfaces/api/User';
 import {IParamAudio} from '../../../../interfaces/api/Listen';
+import {IUser} from '../../../../interfaces/api/User';
+import {useRootSelector} from '../../../../redux/reducers';
+import {togglePlayAll} from '../../../../redux/reducers/slider.reducer';
+import HeaderSwiper from '../../components/HeaderSwiper';
 
 const ListAudioListenScreen = (props: Props) => {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [currentUserIndex, setCurrentUserIndex] = useState<number>(0);
+  console.log(currentUserIndex);
   const swiperRef = useRef<SwiperDeck>(null);
   const [selectedUser, setSelectUser] = useState<IUser>();
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -39,53 +39,17 @@ const ListAudioListenScreen = (props: Props) => {
   const navigation = useNavigation();
 
   const {route} = props;
-  const {typeScreen, recordId, groupId, group} = route.params!;
+  const {typeScreen, recordId, groupId, group, vocabularyId, records} =
+    route.params!;
   const [params, setParams] = useState<IParamAudio>({
     recordId: recordId,
     groupId: groupId,
+    vocabularyId: vocabularyId,
   });
 
   if (!recordId) {
     return null;
   }
-  const keyCaches = ['getAudioDetail', params];
-
-  const {data: audioList, isSuccess} = useQuery(keyCaches, () =>
-    listenService.getAudioList(params),
-  );
-  const dataRecord = useMemo(() => {
-    let mergeArray = [];
-    if (!audioList) {
-      return;
-    }
-    const {currentRecord, nextRecord} = audioList!;
-    if (currentRecord) {
-      mergeArray.push(currentRecord);
-    }
-    if (nextRecord && nextRecord.length > 0) {
-      mergeArray = [...mergeArray, ...nextRecord];
-    }
-    return mergeArray;
-  }, [audioList]);
-
-  const groupMember = useMemo(() => {
-    if (!group || !group.members) {
-      return [];
-    }
-    return group.members.map((item: any) => ({
-      label: item.displayName,
-      value: item._id,
-      icon: (
-        <UserAvatar
-          imageUrl={item.avatar}
-          w={6}
-          h={6}
-          flagWidth={2}
-          nativeLanguage={item.nativeLanguage}
-        />
-      ),
-    }));
-  }, [group]);
 
   const handleNext = () => {
     swiperRef.current?.swipeLeft();
@@ -100,31 +64,86 @@ const ListAudioListenScreen = (props: Props) => {
     swiperRef.current?.swipeRight();
   };
   useEffect(() => {
-    if (currentIdx < 0 || !dataRecord) {
+    if (currentIdx < 0) {
       return;
     }
-    setSelectUser(prev => dataRecord[currentIdx].user);
-  }, [currentIdx, dataRecord?.length]);
+
+    setSelectUser(prev => displayRecords[currentIdx].user);
+  }, [currentIdx]);
+
+  const displayRecords = useMemo(() => {
+    console.log('records');
+
+    if (!records) {
+      return [];
+    }
+
+    if (!groupId) {
+      return records;
+    }
+    const groupedRecords: any = {};
+
+    for (const record of records) {
+      const textEN = record.vocabulary.text.en;
+
+      if (!groupedRecords[textEN]) {
+        groupedRecords[textEN] = [];
+      }
+
+      groupedRecords[textEN].push(record);
+    }
+
+    return Object.values(groupedRecords);
+  }, [records, currentUserIndex]);
+
+  const userFilters = useMemo(() => {
+    if (!groupId) {
+      return null;
+    }
+    const result = displayRecords[currentIdx].map(item => {
+      return {
+        label: item.user.displayName,
+        value: item.user._id,
+        icon: (
+          <UserAvatar
+            imageUrl={item.user.avatar}
+            w={6}
+            h={6}
+            flagWidth={2}
+            nativeLanguage={item.user.nativeLanguage}
+          />
+        ),
+      };
+    });
+
+    return result;
+  }, [displayRecords, currentIdx]);
+  console.log(displayRecords[currentIdx][currentUserIndex]?.recordUrl);
+
   return (
     <ScreenWrapper>
       <HStack justifyContent={'space-between'} mb={6}>
         <Pressable
+          p={8}
+          m={-8}
           onPress={() => {
             navigation.goBack();
           }}>
           <CloseIcon />
         </Pressable>
-        {dataRecord && dataRecord?.length > 0 && (
+        {displayRecords && displayRecords.length > 0 && (
           <HeaderSwiper
             currentIdx={currentIdx}
             navigation={navigation}
-            total={dataRecord?.length || 0}
+            total={displayRecords.length || 0}
             forward={forward}
             backward={backward}
           />
         )}
 
         <Pressable
+          p={5}
+          m={-5}
           onPress={() => {
             dispatch(togglePlayAll());
           }}>
@@ -132,45 +151,46 @@ const ListAudioListenScreen = (props: Props) => {
         </Pressable>
       </HStack>
       <HStack justifyContent={'center'}>
-        {typeScreen === 'group' && selectedUser && (
-          <Filter
-            maxHeight={220}
-            marginTop={2}
-            marginLeft={-2}
-            placement="bottom"
-            icon={
-              <HStack space={2} alignItems={'center'}>
-                <UserAvatar
-                  imageUrl={selectedUser.avatar}
-                  nativeLanguage={selectedUser.nativeLanguage}
-                />
-                <ArrowDownIcon />
-              </HStack>
-            }
-            onSelected={data => {
-              if (!group.members) {
-                return;
+        {typeScreen === 'group' &&
+          displayRecords &&
+          displayRecords.length > 0 && (
+            <Filter
+              maxHeight={220}
+              marginTop={2}
+              marginLeft={-2}
+              placement="bottom"
+              icon={
+                <HStack space={2} alignItems={'center'}>
+                  <UserAvatar
+                    imageUrl={
+                      displayRecords[currentIdx][currentUserIndex].user.avatar
+                    }
+                    nativeLanguage={
+                      displayRecords[currentIdx][currentUserIndex].user
+                        .nativeLanguage
+                    }
+                  />
+                  <ArrowDownIcon />
+                </HStack>
               }
-              setParams(prev => {
-                return {
-                  ...prev,
-                  userId: data.value,
-                };
-              });
-              const user = group.members.find(
-                (item: any) => item._id === data.value,
-              );
-
-              console.log({user, data, groupMember});
-              setSelectUser(user);
-            }}
-            filterItems={groupMember}
-          />
-        )}
+              onSelected={(data, index) => {
+                setCurrentUserIndex(index);
+                setParams(prev => {
+                  return {
+                    ...prev,
+                    userId: data.value,
+                  };
+                });
+              }}
+              filterItems={userFilters}
+            />
+          )}
       </HStack>
       <View h={700}>
-        {dataRecord && dataRecord.length > 0 && (
+        {displayRecords && displayRecords.length > 0 && (
           <SwiperDeck
+            disableLeftSwipe={currentIdx === 0}
+            disableRightSwipe={currentIdx === displayRecords.length - 1}
             onSwipedLeft={cardIndex => {
               setCurrentIdx(prev => ++prev);
             }}
@@ -179,7 +199,7 @@ const ListAudioListenScreen = (props: Props) => {
             }}
             ref={swiperRef}
             verticalSwipe={false}
-            infinite={true}
+            infinite={false}
             swipeAnimationDuration={450}
             containerStyle={{
               backgroundColor: 'transparent',
@@ -191,10 +211,15 @@ const ListAudioListenScreen = (props: Props) => {
               top: 0,
               left: 0,
             }}
-            cards={dataRecord}
-            renderCard={item => (
-              <AudioItem handleNext={handleNext} record={item} />
-            )}
+            cards={displayRecords}
+            renderCard={item => {
+              return (
+                <AudioItem
+                  handleNext={handleNext}
+                  record={groupId ? item[currentUserIndex] : item}
+                />
+              );
+            }}
             backgroundColor="transparent"
             showSecondCard={false}
           />

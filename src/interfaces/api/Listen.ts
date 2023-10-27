@@ -13,6 +13,7 @@ export interface IParamAudio {
   recordId: string;
   userId?: string;
   groupId?: string;
+  vocabularyId?: string;
 }
 export interface IListenDetailResponse {
   user?: User;

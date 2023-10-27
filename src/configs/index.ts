@@ -9,7 +9,7 @@ const generalImg = require('../assets/images/Chat.png');
 const otherImg = require('../assets/images/Other.png');
 
 // import {API_URL} from '@env';
-export const baseApiUrl = 'http://192.168.1.116:5000/';
+export const baseApiUrl = 'http://192.168.1.4:5000/';
 export const googleClientId =
   '87150114919-c8fv6vqb433lcmb3n6vc92d2q5688nd4.apps.googleusercontent.com';
 
@@ -24,6 +24,7 @@ export const userEndpoint = {
   myKeyword: 'api/user/myKeyword',
   addKeyword: 'api/user/keyword/add',
   deleteKeyword: 'api/user/keyword/delete',
+  addOrRemoveFavoriteUser: 'api/user/addOrRemoveFavoriteUser',
 };
 
 export const vocabularyEndpoint = {
@@ -39,6 +40,7 @@ export const listenEndpoint = {
   getListenDetail: 'api/listen/listenDetail',
   getListenDetailInGroup: 'api/listen/listenDetailInGroup',
   getAudioList: 'api/listen/audioList',
+  getUserAudioInGroup: 'api/listen/getUserAudioInGroup',
   listenRecord: 'api/listen/listenRecord',
 };
 

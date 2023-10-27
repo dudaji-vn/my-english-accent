@@ -37,7 +37,8 @@ const userSchema = new mongoose.Schema(
     autoDownload: {
       type: Boolean,
       default: false
-    }
+    },
+    favoriteUsers: [{ type: mongoose.Types.ObjectId, ref: 'user' }]
   },
   {
     timestamps: true

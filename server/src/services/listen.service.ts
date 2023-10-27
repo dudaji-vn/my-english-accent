@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { injectable } from 'tsyringe'
 import RecordModel from '../entities/Record'
 import UserModel from '../entities/User'
@@ -14,7 +15,8 @@ import { Category, ROLE } from '../const/common'
 
 @injectable()
 export default class ListenService {
-  async getUserProgress(me: string) {
+  async getUserProgress(user: any, isFavoriteUsers: boolean) {
+    const { _id: me, favoriteUsers } = user
     const data = await UserModel.aggregate([
       {
         $lookup: {
@@ -56,7 +58,8 @@ export default class ListenService {
           listens: 1,
           records: 1,
           totalRecord: 1,
-          nativeLanguage: 1
+          nativeLanguage: 1,
+          fullName: 1
         }
       }
     ]).then((data) => {
@@ -67,7 +70,7 @@ export default class ListenService {
         item.record.toString()
       )
 
-      const result = data.map((user) => {
+      let result = data.map((user) => {
         let count = 0
         user.records.forEach((x: any) => {
           if (myRecord.includes(x._id.toString())) {
@@ -79,6 +82,11 @@ export default class ListenService {
           ...user
         }
       })
+      if (isFavoriteUsers) {
+        result = result.filter((item: any) =>
+          favoriteUsers.includes(item._id.toString())
+        )
+      }
       return result.filter(
         (item: any) => item._id.toString() !== me.toString()
       )
@@ -204,11 +212,7 @@ export default class ListenService {
           dateListenAt: {
             $arrayElemAt: ['$listenData.createdAt', 0]
           },
-          vocabulary: {
-            text: '$vocabularyData.text',
-            _id: '$vocabularyData._id',
-            type: '$vocabularyData.type'
-          }
+          vocabulary: '$vocabularyData'
         }
       },
       {
@@ -282,7 +286,7 @@ export default class ListenService {
   }
   async getListenDetailInGroup(query: IQueryListen, me: string) {
     let group = await GroupModel.findById(query.groupId)
-      .populate('members')
+      .populate('members creator')
       .lean()
     if (!group) {
       throw new BadRequestError('group not found')
@@ -320,6 +324,19 @@ export default class ListenService {
         }
       },
       {
+        $lookup: {
+          from: 'users',
+          localField: 'recordData.user',
+          foreignField: '_id',
+          as: 'userData'
+        }
+      },
+      {
+        $unwind: {
+          path: '$userData'
+        }
+      },
+      {
         $match: {
           ...(query.type && { 'vocabularyData.type': query.type })
         }
@@ -338,6 +355,7 @@ export default class ListenService {
           createdAt: 1,
           listenData: 1,
           recordData: 1,
+          userData: 1,
           category: '$vocabularyData.category',
           isListen: {
             $cond: {
@@ -361,11 +379,7 @@ export default class ListenService {
             }
           },
 
-          vocabulary: {
-            text: '$vocabularyData.text',
-            _id: '$vocabularyData._id',
-            type: '$vocabularyData.type'
-          }
+          vocabulary: '$vocabularyData'
         }
       },
       {
@@ -377,8 +391,10 @@ export default class ListenService {
           records: {
             $push: {
               _id: '$recordData._id',
+              user: '$userData',
               vocabulary: '$vocabulary',
-              isListen: '$isListen'
+              isListen: '$isListen',
+              recordUrl: '$recordData.recordUrl'
             }
           }
         }
@@ -409,21 +425,51 @@ export default class ListenService {
     }
   }
 
+  async getUserAudioInGroup(query: IQueryAudio) {
+    const records = await GroupRecordModel.find({
+      group: query.groupId
+    }).populate({
+      path: 'record',
+      populate: 'vocabulary user'
+    })
+    console.log({ records, vocaId: query.vocabularyId })
+    return records
+      .filter(
+        (item) =>
+          item.record.vocabulary._id.toString() == query.vocabularyId
+      )
+      .map((item) => item?.record?.user)
+  }
   async getAudioList(query: IQueryAudio) {
-    console.log('audio list pro')
     let currentRecord: any
 
     let nextRecord: any = []
     if (query.groupId) {
-      currentRecord = await RecordModel.findById(
-        query.recordId
-      ).populate('vocabulary user')
+      currentRecord = await GroupRecordModel.findOne({
+        record: query.recordId,
+        group: query.groupId
+      })
+        .populate({
+          path: 'record',
+          populate: 'vocabulary user'
+        })
+        .select('record')
+
       if (query.userId) {
         currentRecord = await RecordModel.findOne({
           user: query.userId,
-          vocabulary: currentRecord.vocabulary
-        }).populate('vocabulary user')
+          vocabulary: currentRecord.record.vocabulary
+        })
+        currentRecord = await GroupRecordModel.findOne({
+          record: currentRecord._id
+        })
+          .populate({
+            path: 'record',
+            populate: 'vocabulary user'
+          })
+          .select('record')
       }
+      currentRecord = currentRecord?.record
 
       const nextRecordData = await GroupRecordModel.find({
         record: { $ne: query.recordId },
@@ -444,7 +490,7 @@ export default class ListenService {
         user: currentRecord?.user
       }).populate('vocabulary user')
     }
-    console.log(currentRecord)
+
     return {
       currentRecord,
       nextRecord: nextRecord

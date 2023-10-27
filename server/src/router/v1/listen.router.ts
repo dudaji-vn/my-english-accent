@@ -40,4 +40,11 @@ listenRouter.get(
   auth,
   catchAsync(listenController.getAudioList.bind(listenController))
 )
+listenRouter.get(
+  '/getUserAudioInGroup/:recordId',
+  auth,
+  catchAsync(
+    listenController.getUserAudioInGroup.bind(listenController)
+  )
+)
 export default listenRouter
