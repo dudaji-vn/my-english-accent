@@ -3,20 +3,28 @@ import {Button, HStack, Image, Text, View, VStack} from 'native-base';
 import {COLORS} from '../../../constants/design-system';
 import {Send} from 'react-native-feather';
 import {NavigationProp} from '@react-navigation/native';
+import LottieView from 'lottie-react-native';
+import {useWindowDimensions} from 'react-native';
 
 type Props = {
   navigation: NavigationProp<any>;
 };
 
 export const CompleteRecordScreen = ({navigation}: Props) => {
+  const w = useWindowDimensions().width;
   return (
     <View px={5} height="100%" justifyContent="center" alignItems="center">
       <VStack alignItems="center" w="full" space={10}>
         <VStack px={12} space={5} alignItems="center" justifyContent="center">
-          <Image
-            position="absolute"
-            source={require('../../../assets/images/bantumlum.png')}
-            alt="Complete Record"
+          <LottieView
+            style={{
+              position: 'absolute',
+              width: w,
+              height: w,
+            }}
+            source={require('../../../assets/jsons/confetti-animation.json')}
+            autoPlay
+            loop
           />
           <Image
             source={require('../../../assets/images/badge-record.png')}
